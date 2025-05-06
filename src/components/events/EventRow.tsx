@@ -24,23 +24,23 @@ export const EventRow: React.FC<EventRowProps> = ({
 
   return (
     <tr className="border-b border-[#F3F4F6] hover:bg-[#F9FAFB]">
-      <td className="py-4 px-6 whitespace-nowrap text-sm text-[#111827]">{event.activityName}</td>
-      <td className="py-4 px-6 whitespace-nowrap text-sm text-[#6B7280]">{event.event}</td>
-      <td className="py-4 px-6 whitespace-nowrap text-sm text-[#6B7280]">{formatDate(event.eventDate)}</td>
-      <td className="py-4 px-6 whitespace-nowrap text-sm text-[#6B7280]">{event.eventTime}</td>
-      <td className="py-4 px-6 whitespace-nowrap text-sm text-[#6B7280]">{event.category}</td>
-      <td className="py-4 px-6 whitespace-nowrap text-sm text-[#6B7280]">{event.location}</td>
-      <td className="py-4 px-6 whitespace-nowrap text-sm text-[#6B7280]">
+      <td className="py-4 px-6 whitespace-nowrap text-sm text-[rgba(68,63,63)]">{event.activityName}</td>
+      <td className="py-4 px-6 whitespace-nowrap text-sm text-[rgba(68,63,63)]">{event.event}</td>
+      <td className="py-4 px-6 whitespace-nowrap text-sm text-[rgba(68,63,63)]">{formatDate(event.eventDate)}</td>
+      <td className="py-4 px-6 whitespace-nowrap text-sm text-[rgba(68,63,63)]">{event.eventTime}</td>
+      <td className="py-4 px-6 whitespace-nowrap text-sm text-[rgba(68,63,63)]">{event.category}</td>
+      <td className="py-4 px-6 whitespace-nowrap text-sm text-[rgba(68,63,63)]">{event.location}</td>
+      <td className="py-4 px-6 whitespace-nowrap text-sm text-[rgba(68,63,63)]">
         <div className="flex items-center space-x-4">
           <button 
             onClick={() => onEdit(event)}
-            className="text-[#6B7280] hover:text-[#111827] transition-colors"
+            className="text-[rgba(68,63,63)] hover:text-[#111827] transition-colors"
           >
             <FiEdit2 size={16} />
           </button>
           <button 
             onClick={() => onDelete(event)}
-            className="text-[#6B7280] hover:text-[#111827] transition-colors"
+            className="text-[rgba(68,63,63)] hover:text-[#111827] transition-colors"
           >
             <FiTrash2 size={16} />
           </button>

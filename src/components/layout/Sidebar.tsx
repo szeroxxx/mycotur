@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { FiHome, FiActivity, FiCalendar, FiUsers, FiLogOut, FiChevronLeft } from 'react-icons/fi';
+import { FiCalendar, FiUsers, FiLogOut } from 'react-icons/fi';
+import { RxDashboard } from "react-icons/rx";
+import { BsWindowStack } from "react-icons/bs";
 import { TbLayoutSidebarRightExpand } from "react-icons/tb";
-
 import { signOut, useSession } from 'next-auth/react';
 
 interface SidebarItemProps {
@@ -19,10 +20,10 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ href, icon, text, isActive, i
     <Link href={href}>
       <div className={`flex items-center px-4 py-3 my-1 rounded-lg cursor-pointer transition-colors ${
         isActive 
-          ? 'bg-[rgba(255,255,255,1)]  text-[#D45B20] font-medium' 
-          : 'text-[#6B7280] hover:bg-[#FFF5F1] hover:text-[#D45B20]'
+          ? 'bg-[rgba(255,255,255,1)]  text-[rgba(123,48,12)] font-medium border border-[rgba(244,242,242,1)] shadow-sm shadow-[rgba(24,27,37,0.04)]' 
+          : 'text-[rgba(100,92,90)] hover:bg-[#FFF5F1] hover:text-[#D45B20]'
       }`}>
-        <div className={`${isActive ? 'text-[#D45B20]' : 'text-[#6B7280]'}`}>{icon}</div>
+        <div className={`${isActive ? 'text-[rgba(123,48,12)]' : 'text-[rgba(100,92,90)]'}`}>{icon}</div>
         {isExpanded && <span className="ml-3">{text}</span>}
       </div>
     </Link>
@@ -41,10 +42,10 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <div className={`h-screen ${isExpanded ? 'w-64' : 'w-20'} bg-[#fdfaf6] shadow-[2px_0_4px_rgba(0,0,0,0.05)] flex flex-col transition-all duration-300`}>
+    <div className={`h-screen ${isExpanded ? 'w-64' : 'w-20'} bg-[rgba(253,250,246)] shadow-[2px_0_4px_rgba(0,0,0,0.05)] flex flex-col transition-all duration-300`}>
       <div className="p-6 flex items-center justify-between border-b border-[#F3F4F6]">
         <div className="flex items-center flex-1">
-          {isExpanded && <h1 className="text-xl font-bold text-[#111827]">Mycotur</h1>}
+          {isExpanded && <h1 className="text-xl font-bold themeTextColor">Mycotur</h1>}
         </div>
         <button 
           onClick={() => setIsExpanded(!isExpanded)}
@@ -52,7 +53,7 @@ const Sidebar: React.FC = () => {
           title={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
         >
           <TbLayoutSidebarRightExpand 
-            className={`text-black transform transition-transform duration-300 ${isExpanded ? '' : 'rotate-180'} `}
+            className={`text-[rgba(127,118,115)] transform transition-transform duration-300 ${isExpanded ? '' : 'rotate-180'} `}
             size={20}
           />
         </button>
@@ -61,14 +62,14 @@ const Sidebar: React.FC = () => {
       <div className="flex-1 px-4">
         <SidebarItem 
           href="/dashboard" 
-          icon={<FiHome size={20} />} 
+          icon={<RxDashboard size={20} />} 
           text="Dashboard" 
           isActive={path === '/dashboard'}
           isExpanded={isExpanded}
         />
         <SidebarItem 
           href="/activities" 
-          icon={<FiActivity size={20} />} 
+          icon={<BsWindowStack size={20} />} 
           text="Activities" 
           isActive={path.includes('/activities')}
           isExpanded={isExpanded}
@@ -89,13 +90,13 @@ const Sidebar: React.FC = () => {
         />
       </div>
       
-      <div className="p-4 mb-2 mt-auto border-t border-[#F3F4F6] bg-[rgba(255,255,255,1)]">
+      <div className="p-4 rounded-[15px] m-2 mt-auto border-t border-[#F3F4F6] bg-[rgba(255,255,255)]">
         <div className="flex items-center justify-between">
           {isExpanded ? (
             <>
               <div>
-                <p className="text-sm font-medium text-[#111827]">{session?.user?.name || 'Matt Henry'}</p>
-                <p className="text-xs text-[#6B7280]">{session?.user?.email || 'matt@example.com'}</p>
+                <p className="text-[12px] font-medium themeTextColor">{session?.user?.name || 'Matt Henry'}</p>
+                <p className="text-[14px] text-[rgba(100,92,90)]">{session?.user?.email || 'matt@example.com'}</p>
               </div>
               <button 
                 className="text-[#6B7280] hover:text-[#D45B20] transition-colors"

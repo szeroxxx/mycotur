@@ -6,6 +6,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['var(--font-manrope)'],
+      },
       colors: {
         primary: '#CF6D4C',
         'primary-light': '#E7A586',
@@ -20,4 +23,4 @@ module.exports = {
     },
   },
   plugins: [],
-}; 
+};

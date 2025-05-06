@@ -27,7 +27,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
           name="title"
           value={activity.title || ''}
           onChange={onChange}
-          className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
+          className="w-full px-4 py-2 text-black border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
           required
         />
       </div>
@@ -40,7 +40,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
           name="category"
           value={activity.category || ''}
           onChange={onChange}
-          className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
+          className="w-full px-4 py-2 text-black border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
           required
         >
           <option value="">Select Category</option>
@@ -59,7 +59,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
           name="location"
           value={activity.location || ''}
           onChange={onChange}
-          className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
+          className="w-full px-4 py-2 text-black border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
           required
         />
       </div>
@@ -74,7 +74,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
             name="startMonth"
             value={activity.startMonth || ''}
             onChange={onChange}
-            className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
+            className="w-full px-4 py-2 text-black border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
           />
         </div>
         <div>
@@ -86,7 +86,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
             name="endMonth"
             value={activity.endMonth || ''}
             onChange={onChange}
-            className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
+            className="w-full px-4 py-2 text-black border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
           />
         </div>
       </div>
@@ -102,7 +102,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
             value={activity.email || ''}
             onChange={onChange}
             placeholder="Email address"
-            className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
+            className="w-full px-4 py-2 text-black border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
             required
           />
           <input
@@ -111,7 +111,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
             value={activity.phone || ''}
             onChange={onChange}
             placeholder="Phone number"
-            className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
+            className="w-full px-4 py-2 text-black border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
           />
         </div>
       </div>
@@ -126,7 +126,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
           onChange={onChange}
           placeholder="Maximum if there are any fees involved, such as a €50 charge per person covering food and all activities"
           rows={3}
-          className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
+          className="w-full px-4 py-2 text-black border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
         />
       </div>
 
@@ -140,7 +140,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
           onChange={onChange}
           placeholder="Write more details. Activity type will help people can contact you."
           rows={3}
-          className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
+          className="w-full px-4 py-2 text-black border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
           required
         />
       </div>

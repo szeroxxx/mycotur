@@ -1,4 +1,5 @@
 import React from 'react';
+import { BsWindowX } from "react-icons/bs";
 
 interface DeleteModalProps {
   isOpen: boolean;
@@ -14,31 +15,27 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-opacity-70 backdrop-blur-none flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 shadow-lg max-w-sm w-full">
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-none flex items-center justify-center z-50">
+      <div className="bg-[rgba(255,255,255)] rounded-lg p-6 shadow-lg max-w-sm w-full">
         <div className="flex flex-col items-center text-center">
-          <div className="mb-4">
-            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M24 44C35.0457 44 44 35.0457 44 24C44 12.9543 35.0457 4 24 4C12.9543 4 4 12.9543 4 24C4 35.0457 12.9543 44 24 44Z" stroke="#EF4444" strokeWidth="4"/>
-              <path d="M24 20V28" stroke="#EF4444" strokeWidth="4" strokeLinecap="round"/>
-              <path d="M24 34H24.02" stroke="#EF4444" strokeWidth="4" strokeLinecap="round"/>
-            </svg>
+          <div className="mb-4 bg-[rgba(254,242,242)] rounded-full p-4">
+            <BsWindowX size={25} className="text-[rgba(220,38,38)]"/>
           </div>
-          <h3 className="text-xl font-semibold text-[#111827] mb-2">Remove Activity?</h3>
-          <p className="text-sm text-[#6B7280] mb-6">
+          <h3 className="text-xl font-semibold text-[rgba(68,63,63)] mb-2">Remove Activity?</h3>
+          <p className="text-sm text-[rgba(100,92,90)] mb-6">
             Are you sure you want to remove this activity?
             This action can not be undone.
           </p>
           <div className="flex justify-center space-x-4 w-full">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-[#6B7280] hover:text-[#111827]"
+              className="flex-1 basis-[120px] px-4 py-2 text-sm font-medium text-[rgba(68,63,63)] hover:text-[#111827] border border-[rgba(199,195,193)] rounded-lg transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={onConfirm}
-              className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors"
+              className="flex-1 basis-[120px] px-4 py-2 text-sm font-medium bg-[rgba(220,38,38)] hover:bg-red-600 text-[rgba(255,255,255)] border border-[rgba(199,195,193)] rounded-lg transition-colors"
             >
               Yes, Remove
             </button>

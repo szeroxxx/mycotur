@@ -26,7 +26,7 @@ export const AgentForm: React.FC<AgentFormProps> = ({
           value={agent.name || ''}
           onChange={onChange}
           placeholder="Eg. John Fisher"
-          className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
+          className="w-full px-4 py-2 text-black border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
           required
         />
       </div>
@@ -41,7 +41,7 @@ export const AgentForm: React.FC<AgentFormProps> = ({
           value={agent.email || ''}
           onChange={onChange}
           placeholder="john@example.com"
-          className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
+          className="w-full px-4 py-2 text-black border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
           required
         />
       </div>
@@ -54,7 +54,7 @@ export const AgentForm: React.FC<AgentFormProps> = ({
           name="status"
           value={agent.status || 'Active'}
           onChange={onChange}
-          className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
+          className="w-full px-4 py-2 text-black border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
         >
           <option value="Active">Active</option>
           <option value="Invited">Invited</option>

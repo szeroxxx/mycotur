@@ -13,7 +13,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const isLoginPage = router.pathname === '/login';
 
   if (status === 'loading') {
-    return <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center">Loading...</div>;
+    return <div className="min-h-screen bg-[rgba(255,255,255)] flex items-center justify-center">Loading...</div>;
   }
 
   if (!session && !isLoginPage) {
@@ -26,7 +26,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   }
 
   return (
-    <div className="flex h-screen bg-[#F9FAFB]">
+    <div className="flex h-screen bg-[rgba(255,255,255)]">
       <Sidebar />
       <main className="flex-1 overflow-auto p-6">
         {children}

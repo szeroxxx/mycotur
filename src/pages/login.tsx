@@ -46,11 +46,11 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex">
+    <div className="min-h-screen bg-[rgba(255,255,255)] flex">
       <div className="flex w-full">
         <div className="w-full lg:w-5/12 xl:w-4/12 flex items-center justify-center p-10">
-          <div className="w-full max-w-md bg-white rounded-lg shadow-sm p-8">
-            <h2 className="text-xl font-semibold text-center text-gray-800 mb-6">Admin Log in</h2>
+          <div className="w-full max-w-md bg-[rgba(255,255,255)] rounded-lg border border-gray-200 shadow-md p-8">
+            <h2 className="text-xl font-semibold text-center text-[rgb(68,63,63)] mb-6">Admin Log in</h2>
             
             {error && (
               <div className="mb-4 p-2 bg-red-100 text-red-800 rounded-md text-center text-sm">
@@ -60,12 +60,12 @@ const Login: React.FC = () => {
             
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-600 mb-1">Email</label>
+                <label htmlFor="email" className="block text-sm font-medium text-[rgb(68,63,63)] mb-1">Email</label>
                 <input
                   id="email"
                   type="email"
                   placeholder="admin@cotur.com"
-                  className="w-full p-2.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400"
+                  className="w-full p-2.5 text-[rgb(142,133,129)] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -73,13 +73,13 @@ const Login: React.FC = () => {
               </div>
               
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-600 mb-1">Password</label>
+                <label htmlFor="password" className="block text-sm font-medium text-[rgb(68,63,63)] mb-1">Password</label>
                 <div className="relative">
                   <input
                     id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    className="w-full p-2.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400"
+                    className="w-full p-2.5 text-[rgb(142,133,129)] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -93,10 +93,9 @@ const Login: React.FC = () => {
                   </button>
                 </div>
               </div>
-              
               <button
                 type="submit"
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2.5 px-4 rounded transition-colors"
+                className="w-full bg-[rgb(194,91,52)] hover:bg-[rgb(174,81,42)] text-white font-medium py-2.5 px-4 rounded transition-colors"
                 disabled={isLoading}
               >
                 Log in
@@ -105,35 +104,13 @@ const Login: React.FC = () => {
           </div>
         </div>
         
-        <div className="hidden lg:block lg:w-7/12 xl:w-8/12" style={{ background: '#1e2124' }}>
-          <div className="h-full flex items-center justify-center">
-            <div className="relative w-full h-full">
-              <div className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/4">
-                <div className="w-40 h-40 bg-orange-500 rounded-full relative">
-                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-32 bg-orange-100 rounded-b-full"></div>
-                  <div className="absolute inset-4 bg-orange-300 rounded-full"></div>
-                </div>
-              </div>
-              <div className="absolute top-1/2 left-1/4">
-                <div className="w-24 h-24 bg-orange-400 rounded-full relative">
-                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-8 h-20 bg-orange-100 rounded-b-full"></div>
-                  <div className="absolute inset-3 bg-orange-200 rounded-full"></div>
-                </div>
-              </div>
-              
-              <div className="absolute bottom-1/4 right-1/3">
-                <div className="w-32 h-32 bg-orange-600 rounded-full relative">
-                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-10 h-28 bg-orange-100 rounded-b-full"></div>
-                  <div className="absolute inset-4 bg-orange-400 rounded-full"></div>
-                </div>
-              </div>
-              <div className="absolute top-1/3 right-1/4 w-16 h-16 bg-green-100 rounded-full opacity-50"></div>
-              <div className="absolute bottom-1/3 left-1/3 w-12 h-12 bg-green-200 rounded-full opacity-40"></div>
-              <div className="absolute top-1/2 right-1/2 w-8 h-8 bg-yellow-100 rounded-full opacity-60"></div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <h1 className="text-white text-4xl font-bold opacity-20">Mycotur</h1>
-              </div>
-            </div>
+        <div className="hidden lg:block lg:w-7/12 xl:w-8/12 relative ">
+          <div className="absolute inset-0  overflow-hidden p-3">
+            <img 
+              src="/back.png" 
+              alt="Decorative mushroom background" 
+              className="w-full h-full object-cover rounded-[24px]"
+            />
           </div>
         </div>
       </div>
