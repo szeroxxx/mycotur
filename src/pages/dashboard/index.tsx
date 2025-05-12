@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Head from "next/head";
 import {
   FiUsers,
@@ -29,17 +29,13 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon }) => {
 };
 
 const Dashboard: React.FC = () => {
-  const [dashboardData, setDashboardData] = useState({
+  const [dashboardData] = useState({
     totalAgents: "100",
     totalForms: "100",
     totalActivities: "500",
     totalClicks: "500",
     totalEvents: "500",
   });
-
-  useEffect(() => {
-    // You can fetch real data here if needed
-  }, []);
 
   return (
     <>

@@ -7,29 +7,49 @@ export default NextAuth({
       name: 'Credentials',
       credentials: {
         email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' },
+        password: { label: 'Password', type: 'password' }
       },
       async authorize(credentials) {
         if (credentials?.email === 'admin@cotur.com' && credentials?.password === 'admin@123') {
           return {
             id: '1',
-            name: 'Admin',
+            name: 'Admin User',
             email: 'admin@cotur.com',
+            role: 'admin'
           };
         }
+        
+        if (credentials?.email === 'agent@cotur.com' && credentials?.password === 'agent@123') {
+          return {
+            id: '2',
+            name: 'Test Agent',
+            email: 'agent@cotur.com',
+            role: 'agent'
+          };
+        }
+        
         return null;
       },
     }),
   ],
-  pages: {
-    signIn: '/login',
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.role = user.role;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        (session.user as { role?: string }).role = token.role as string;
+      }
+      return session;
+    }
+  },  pages: {
+    signIn: '/login'
   },
   session: {
     strategy: 'jwt',
-  },
-  callbacks: {
-    async redirect({ url, baseUrl }) {
-      return url.startsWith(baseUrl) ? url : `${baseUrl}/dashboard`;
-    },
+    maxAge: 24 * 60 * 60, 
   },
 });

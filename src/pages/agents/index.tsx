@@ -70,9 +70,8 @@ const AgentsPage: React.FC = () => {
         await createAgent(selectedAgent);
       }
       setIsModalOpen(false);
-      setSelectedAgent(null);
-    } catch (error) {
-      showToast("error", "Failed to save agent");
+      setSelectedAgent(null);    } catch (err) {
+      showToast("error", err instanceof Error ? err.message : "Failed to save agent");
     }
   };
 
@@ -81,9 +80,8 @@ const AgentsPage: React.FC = () => {
       try {
         await deleteAgent(agentToDelete.id);
         setIsDeleteModalOpen(false);
-        setAgentToDelete(null);
-      } catch (error) {
-        showToast("error", "Failed to delete agent");
+        setAgentToDelete(null);    } catch (err) {
+      showToast("error", err instanceof Error ? err.message : "Failed to delete agent");
       }
     }
   };

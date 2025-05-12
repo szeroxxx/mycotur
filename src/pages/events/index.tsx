@@ -90,9 +90,8 @@ const EventsPage: React.FC = () => {
         await createEvent(selectedEvent);
       }
       setIsModalOpen(false);
-      setSelectedEvent(null);
-    } catch (error) {
-      showToast("error", "Failed to save event");
+      setSelectedEvent(null);    } catch (err) {
+      showToast("error", err instanceof Error ? err.message : "Failed to save event");
     }
   };
 
@@ -101,9 +100,8 @@ const EventsPage: React.FC = () => {
       try {
         await deleteEvent(eventToDelete.id);
         setIsDeleteModalOpen(false);
-        setEventToDelete(null);
-      } catch (error) {
-        showToast("error", "Failed to delete event");
+        setEventToDelete(null);    } catch (err) {
+      showToast("error", err instanceof Error ? err.message : "Failed to delete event");
       }
     }
   };

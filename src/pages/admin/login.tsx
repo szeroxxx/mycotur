@@ -4,7 +4,7 @@ import { signIn } from 'next-auth/react';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import Image from 'next/image';
 
-const AgentLogin: React.FC = () => {
+const AdminLogin: React.FC = () => {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -16,24 +16,29 @@ const AgentLogin: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
+    console.log('Login attempt with:', { email });
 
     try {
       const result = await signIn('credentials', {
         email,
         password,
         redirect: false,
-        callbackUrl: '/dashboard',
-        role: 'agent'
+        isAdmin: true,
+        callbackUrl: '/dashboard'
       });
 
       if (result?.error) {
+        console.error('Login error:', result.error);
         setError('Invalid email or password');
       } else if (result?.ok) {
-        await router.replace('/dashboard');
-      } else {
+        console.log('Login successful, navigating to dashboard...');
+        await router.replace('/dashboard');      } else {
+        console.error('Unexpected result:', result);
         setError('An unexpected error occurred');
-      }    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred during login');
+      }
+    } catch (err) {
+      console.error('Login error:', err instanceof Error ? err.message : 'Unknown error');
+      setError('An error occurred during login');
     } finally {
       setIsLoading(false);
     }
@@ -44,7 +49,7 @@ const AgentLogin: React.FC = () => {
       <div className="flex w-full">
         <div className="w-full lg:w-5/12 xl:w-4/12 flex items-center justify-center p-10">
           <div className="w-full max-w-md bg-[rgba(255,255,255)] rounded-lg border border-gray-200 shadow-md p-8">
-            <h2 className="text-xl font-semibold text-center text-[rgb(68,63,63)] mb-6">Welcome back!</h2>
+            <h2 className="text-xl font-semibold text-center text-[rgb(68,63,63)] mb-6">Admin Log in</h2>
             
             {error && (
               <div className="mb-4 p-2 bg-red-100 text-red-800 rounded-md text-center text-sm">
@@ -58,7 +63,7 @@ const AgentLogin: React.FC = () => {
                 <input
                   id="email"
                   type="email"
-                  placeholder="your@email.com"
+                  placeholder="admin@cotur.com"
                   className="w-full p-2.5 text-[rgb(142,133,129)] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -92,7 +97,7 @@ const AgentLogin: React.FC = () => {
                 className="w-full bg-[rgb(194,91,52)] hover:bg-[rgb(174,81,42)] text-white font-medium py-2.5 px-4 rounded transition-colors"
                 disabled={isLoading}
               >
-                Log in
+                {isLoading ? 'Logging in...' : 'Log in'}
               </button>
             </form>
           </div>
@@ -113,4 +118,4 @@ const AgentLogin: React.FC = () => {
   );
 };
 
-export default AgentLogin;
+export default AdminLogin;

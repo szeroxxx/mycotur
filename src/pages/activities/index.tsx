@@ -86,9 +86,8 @@ const ActivitiesPage: React.FC = () => {
         await createActivity(selectedActivity);
       }
       setIsModalOpen(false);
-      setSelectedActivity(null);
-    } catch (error) {
-      showToast("error", "Failed to save activity");
+      setSelectedActivity(null);    } catch (err) {
+      showToast("error", err instanceof Error ? err.message : "Failed to save activity");
     }
   };
 
@@ -97,9 +96,8 @@ const ActivitiesPage: React.FC = () => {
       try {
         await deleteActivity(activityToDelete.id);
         setIsDeleteModalOpen(false);
-        setActivityToDelete(null);
-      } catch (error) {
-        showToast("error", "Failed to delete activity");
+        setActivityToDelete(null);    } catch (err) {
+      showToast("error", err instanceof Error ? err.message : "Failed to delete activity");
       }
     }
   };

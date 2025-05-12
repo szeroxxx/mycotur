@@ -10,14 +10,15 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const router = useRouter();
   const { data: session, status } = useSession();
-  const isLoginPage = router.pathname === '/login';
+  const isLoginPage = router.pathname === '/login' || router.pathname === '/admin/login';
 
   if (status === 'loading') {
     return <div className="min-h-screen bg-[rgba(255,255,255)] flex items-center justify-center">Loading...</div>;
   }
 
   if (!session && !isLoginPage) {
-    router.push('/login');
+    const isAdminRoute = router.pathname.startsWith('/admin') || router.pathname.startsWith('/agents');
+    router.push(isAdminRoute ? '/admin/login' : '/login');
     return null;
   }
 
