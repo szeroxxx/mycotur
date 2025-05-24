@@ -36,10 +36,14 @@ const Sidebar: React.FC = () => {
   const path = router.pathname;
   const [isExpanded, setIsExpanded] = useState(true);
   const isAdmin = session?.user?.role === 'admin';
-
   const handleSignOut = async () => {
+    localStorage.removeItem('userData');
+    localStorage.removeItem('token');
+    localStorage.clear();
     await signOut({ redirect: false });
-    router.push('/login');
+    console.log('isAdmin::: ', isAdmin);
+    const loginPath = isAdmin ? '/admin/login' : '/login';
+    router.push(loginPath);
   };
 
   return (

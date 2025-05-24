@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import { Activity } from "../../types/activity";
 import { ActivityList } from "../../components/activities/ActivityList";
@@ -6,10 +6,30 @@ import { ActivityForm } from "../../components/activities/ActivityForm";
 import { DeleteModal } from "../../components/activities/DeleteModal";
 import { Pagination } from "../../components/pagination/Pagination";
 import { useActivities } from "../../hooks/useActivities";
+import { useProfile } from "../../hooks/useProfile";
+import { CircleCheck } from "lucide-react";
 import { FiPlus } from "react-icons/fi";
 import { IoSearchOutline } from "react-icons/io5";
-
+interface Category {
+  uuid: string;
+  title: string;
+  description: string;
+}
 const ActivitiesPage: React.FC = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(
+    null
+  );
+  const [isAgent, setIsAgent] = useState(false);
+  const [profileStatus, setProfileStatus] = useState<{
+    needsUpdate: boolean;
+    fields: string[];
+    message: string;
+  } | null>(null);
+
+  const [categories, setCategories] = useState<Category[]>([]);
+
   const {
     activities,
     pagination,
@@ -22,41 +42,121 @@ const ActivitiesPage: React.FC = () => {
     deleteActivity,
     showToast,
   } = useActivities();
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(
-    null
-  );
   const [activityToDelete, setActivityToDelete] = useState<Activity | null>(
     null
   );
+  const { checkProfileCompletion, fetchCategories } = useProfile();
+
+  useEffect(() => {
+    const checkProfile = async () => {
+      try {
+        const userData = localStorage.getItem("userData");
+        if (!userData) return;
+
+        const parsedUserData = JSON.parse(userData);
+        setIsAgent(parsedUserData.role === "agent");
+        if (parsedUserData.role !== "agent") return;
+
+        const status = await checkProfileCompletion();
+        console.log("status::: ", status);
+        if (status) {
+          setProfileStatus(status);
+        }
+      } catch (err) {
+        console.error("Error checking profile:", err);
+      }
+    };
+    const getCategories = async () => {
+      try {
+        const userData = localStorage.getItem("userData");
+        const fetchedCategories = await fetchCategories();
+        if (userData) {
+          const parsedUserData = JSON.parse(userData);
+          if (parsedUserData.role === "agent") {
+            const filteredCategories = fetchedCategories.filter((category) =>
+              parsedUserData.categories?.includes(category.uuid)
+            );
+            setCategories(filteredCategories);
+          } else {
+            setCategories(fetchedCategories);
+          }
+        }
+      } catch (error) {
+        console.error("Error loading categories:", error);
+      }
+    };
+    checkProfile();
+    getCategories();
+  }, []);
 
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
-    const { name, value } = e.target;
+    const target = e.target as HTMLInputElement;
+    const { name, value, type, files } = target;
+
     if (selectedActivity) {
-      setSelectedActivity((prev) => ({
-        ...prev!,
-        [name]: value,
-      }));
+      if (type === "file" && files) {
+        if (name === "images") {
+          const existingImages = selectedActivity.images || [];
+          const newImages = Array.from(files);
+          setSelectedActivity((prev) => ({
+            ...prev!,
+            images: [...existingImages, ...newImages],
+          }));
+        } else if (name === "videos") {
+          const existingVideos = selectedActivity.videos || [];
+          const newVideos = Array.from(files);
+          setSelectedActivity((prev) => ({
+            ...prev!,
+            videos: [...existingVideos, ...newVideos],
+          }));
+        } else {
+          setSelectedActivity((prev) => ({
+            ...prev!,
+            [name]: Array.from(files),
+          }));
+        }
+      } else if (name === "mediaUrls") {        
+        setSelectedActivity((prev: Activity | null) => ({
+          ...prev!,
+          mediaUrls: typeof value === 'string' ? JSON.parse(value) : value,
+        }));
+      } else {
+        setSelectedActivity((prev: Activity | null) => ({
+          ...prev!,
+          [name]: value,
+        }));
+      }
     }
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && selectedActivity) {
-      setSelectedActivity((prev) => ({
-        ...prev!,
-        images: Array.from(e.target.files || []),
-      }));
-    }
+    if (!e.target.files || !selectedActivity) return;
+
+    const existingImages = selectedActivity.images || [];
+    const newImages = Array.from(e.target.files);
+
+    setSelectedActivity((prev) => ({
+      ...prev!,
+      images: [...existingImages, ...newImages],
+    }));
   };
 
   const handleEdit = (activity: Activity) => {
-    setSelectedActivity(activity);
+    console.log("Editing activity:", activity);
+
+    const activityCopy = {
+      ...activity,
+      images: activity.images || [],
+      videos: activity.videos || [],
+      mediaUrls: activity.mediaUrls ? [...activity.mediaUrls] : [],
+    };
+
+    console.log("Activity copy for editing:", activityCopy);
+    setSelectedActivity(activityCopy);
     setIsModalOpen(true);
   };
 
@@ -65,12 +165,22 @@ const ActivitiesPage: React.FC = () => {
     setIsDeleteModalOpen(true);
   };
 
-  const handleDuplicate = (activity: Activity) => {
+  const handleDuplicate = async (activity: Activity) => {
     const duplicatedActivity = {
       ...activity,
       id: "",
       title: `${activity.title} (Copy)`,
+      images: [],
+      videos: [],
+      mediaUrls:
+        activity.mediaUrls?.map((media) => ({
+          name: media.name,
+          type: media.type,
+        })) || [],
+      originalActivityId: activity.id,
     };
+
+    console.log("Duplicated activity ready:", duplicatedActivity);
     setSelectedActivity(duplicatedActivity);
     setIsModalOpen(true);
   };
@@ -81,13 +191,36 @@ const ActivitiesPage: React.FC = () => {
 
     try {
       if (selectedActivity.id) {
-        await updateActivity(selectedActivity);
+        const updateData = {
+          ...selectedActivity,
+          images:
+            selectedActivity.images?.filter((img) => img instanceof File) || [],
+          videos:
+            selectedActivity.videos?.filter((vid) => vid instanceof File) || [],
+          mediaUrls: selectedActivity.mediaUrls || [],
+        };
+
+        console.log("Update data:", updateData);
+        await updateActivity(updateData);
       } else {
-        await createActivity(selectedActivity);
+        const createData = {
+          ...selectedActivity,
+          images: selectedActivity.images || [],
+          videos: selectedActivity.videos || [],
+        };
+
+        console.log("Create data:", createData);
+        await createActivity(createData);
       }
+
       setIsModalOpen(false);
-      setSelectedActivity(null);    } catch (err) {
-      showToast("error", err instanceof Error ? err.message : "Failed to save activity");
+      setSelectedActivity(null);
+    } catch (err) {
+      console.error("Error saving activity:", err);
+      showToast(
+        "error",
+        err instanceof Error ? err.message : "Failed to save activity"
+      );
     }
   };
 
@@ -96,18 +229,23 @@ const ActivitiesPage: React.FC = () => {
       try {
         await deleteActivity(activityToDelete.id);
         setIsDeleteModalOpen(false);
-        setActivityToDelete(null);    } catch (err) {
-      showToast("error", err instanceof Error ? err.message : "Failed to delete activity");
+        setActivityToDelete(null);
+      } catch (err) {
+        showToast(
+          "error",
+          err instanceof Error ? err.message : "Failed to delete activity"
+        );
       }
     }
   };
-
   const openAddModal = () => {
-    setSelectedActivity({
+    const newActivity = {
       id: "",
       title: "",
       category: "",
       location: "",
+      lat: "",
+      lon: "",
       startMonth: "",
       endMonth: "",
       email: "",
@@ -116,7 +254,12 @@ const ActivitiesPage: React.FC = () => {
       notes: "",
       description: "",
       images: [],
-    });
+      videos: [],
+      mediaUrls: [],
+    };
+
+    console.log("Opening add modal with new activity:", newActivity);
+    setSelectedActivity(newActivity);
     setIsModalOpen(true);
   };
 
@@ -128,14 +271,16 @@ const ActivitiesPage: React.FC = () => {
 
       {toast && (
         <div
-          className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-lg text-white ${
-            toast.type === "success" ? "bg-green-500" : "bg-red-500"
-          }`}
+          className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-[12px] text-[rgba(255,255,255)] ${
+            toast.type === "success"
+              ? "bg-[rgba(22,163,74)]"
+              : "bg-[rgba(179,38,30)]"
+          } flex items-center`}
         >
-          {toast.message}
+          <CircleCheck className="mr-2" />
+          <span>{toast.message}</span>
         </div>
       )}
-
       <div className="p-4">
         <div className="mb-3 flex justify-between items-center">
           <div className="mb-4 relative ">
@@ -150,28 +295,38 @@ const ActivitiesPage: React.FC = () => {
           </div>
           <button
             onClick={openAddModal}
-            className="inline-flex items-center px-4 py-2 bg-[rgba(194,91,52)] hover:bg-[#C44D16] text-[rgba(255,255,255)] rounded-lg text-sm font-medium transition-colors"
+            disabled={isAgent && profileStatus?.needsUpdate}
+            className={`inline-flex items-center px-4 py-2 ${
+              isAgent && profileStatus?.needsUpdate
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-[rgba(194,91,52)] hover:bg-[#C44D16]"
+            } text-[rgba(255,255,255)] rounded-lg text-sm font-medium transition-colors`}
           >
             <FiPlus className="mr-2" />
             Add Activity
           </button>
         </div>
-
-        <div className="bg-[rgba(255,255,255)] rounded-[16px] border border-[rgba(226,225,223)]">
-          <ActivityList
-            activities={activities}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onDuplicate={handleDuplicate}
-          />
-
-          <Pagination
-            currentPage={pagination.currentPage}
-            totalPages={pagination.totalPages}
-            pageSize={pagination.pageSize}
-            totalItems={pagination.totalItems}
-            onPageChange={setPage}
-          />
+        <div className="bg-[rgba(255,255,255)] rounded-[16px] border border-[rgba(226,225,223)] flex flex-col">
+          <div className="flex-grow overflow-hidden">
+            <ActivityList
+              profileStatus={profileStatus}
+              activities={activities}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onDuplicate={handleDuplicate}
+            />
+          </div>
+          {activities.length > 0 && (
+            <div className="border-t border-[rgba(226,225,223)] bg-white rounded-b-[16px] ">
+              <Pagination
+                currentPage={pagination.currentPage}
+                totalPages={pagination.totalPages}
+                pageSize={pagination.pageSize}
+                totalItems={pagination.totalItems}
+                onPageChange={setPage}
+              />
+            </div>
+          )}
         </div>
       </div>
 
@@ -182,7 +337,7 @@ const ActivitiesPage: React.FC = () => {
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-[#111827] mb-4">
+              <h2 className="text-xl font-medium text-[rgba(68,63,63)] mb-4">
                 {selectedActivity?.id ? "Edit Activity" : "Add Activity"}
               </h2>
               <button
@@ -190,21 +345,24 @@ const ActivitiesPage: React.FC = () => {
                   setIsModalOpen(false);
                   setSelectedActivity(null);
                 }}
-                className="text-[#6B7280] hover:text-[#111827]"
+                className="text-[rgba(68,63,63)] hover:text-[#111827]"
               >
                 ✕
               </button>
             </div>
-            <ActivityForm
-              activity={selectedActivity!}
-              onSubmit={handleSubmit}
-              onChange={handleInputChange}
-              onImageUpload={handleImageUpload}
-              onCancel={() => {
-                setIsModalOpen(false);
-                setSelectedActivity(null);
-              }}
-            />
+            {selectedActivity && (
+              <ActivityForm
+                activity={selectedActivity}
+                categories={categories}
+                onSubmit={handleSubmit}
+                onChange={handleInputChange}
+                onImageUpload={handleImageUpload}
+                onCancel={() => {
+                  setIsModalOpen(false);
+                  setSelectedActivity(null);
+                }}
+              />
+            )}
           </div>
         </div>
       )}

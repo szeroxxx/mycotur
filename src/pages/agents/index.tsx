@@ -8,7 +8,7 @@ import { Pagination } from "../../components/pagination/Pagination";
 import { useAgents } from "../../hooks/useAgents";
 import { FiPlus } from "react-icons/fi";
 import { IoSearchOutline } from "react-icons/io5";
-
+import { CircleCheck } from 'lucide-react';
 const emptyAgent: Agent = {
   id: "",
   name: "",
@@ -70,8 +70,12 @@ const AgentsPage: React.FC = () => {
         await createAgent(selectedAgent);
       }
       setIsModalOpen(false);
-      setSelectedAgent(null);    } catch (err) {
-      showToast("error", err instanceof Error ? err.message : "Failed to save agent");
+      setSelectedAgent(null);
+    } catch (err) {
+      showToast(
+        "error",
+        err instanceof Error ? err.message : "Failed to save agent"
+      );
     }
   };
 
@@ -80,8 +84,12 @@ const AgentsPage: React.FC = () => {
       try {
         await deleteAgent(agentToDelete.id);
         setIsDeleteModalOpen(false);
-        setAgentToDelete(null);    } catch (err) {
-      showToast("error", err instanceof Error ? err.message : "Failed to delete agent");
+        setAgentToDelete(null);
+      } catch (err) {
+        showToast(
+          "error",
+          err instanceof Error ? err.message : "Failed to delete agent"
+        );
       }
     }
   };
@@ -99,11 +107,12 @@ const AgentsPage: React.FC = () => {
 
       {toast && (
         <div
-          className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-lg text-white ${
-            toast.type === "success" ? "bg-green-500" : "bg-red-500"
-          }`}
+          className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-[12px] text-[rgba(255,255,255)] ${
+            toast.type === "success" ? "bg-[rgba(22,163,74)]" : "bg-[rgba(179,38,30)]"
+          } flex items-center`}
         >
-          {toast.message}
+          <CircleCheck className="mr-2" />
+          <span>{toast.message}</span>
         </div>
       )}
 
@@ -139,20 +148,25 @@ const AgentsPage: React.FC = () => {
           </button>
         </div>
 
-        <div className="bg-[rgba(255,255,255)] rounded-[16px] shadow">
-          <AgentList
-            agents={agents}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
-
-          <Pagination
-            currentPage={pagination.currentPage}
-            totalPages={pagination.totalPages}
-            pageSize={pagination.pageSize}
-            totalItems={pagination.totalItems}
-            onPageChange={setPage}
-          />
+        <div className="bg-[rgba(255,255,255)] rounded-[16px] border border-[rgba(226,225,223)] flex flex-col">
+          <div className="flex-grow overflow-hidden">
+            <AgentList
+              agents={agents}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          </div>
+          {agents.length > 0 && (
+            <div className="border-t border-[rgba(226,225,223)] bg-white rounded-b-[16px]">
+              <Pagination
+                currentPage={pagination.currentPage}
+                totalPages={pagination.totalPages}
+                pageSize={pagination.pageSize}
+                totalItems={pagination.totalItems}
+                onPageChange={setPage}
+              />
+            </div>
+          )}
         </div>
       </div>
 

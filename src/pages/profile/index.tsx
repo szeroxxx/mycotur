@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import { useSession } from "next-auth/react";
 import { FiUser, FiMail, FiMapPin, FiEdit2, FiX } from "react-icons/fi";
 import { FaFacebookF, FaInstagram, FaYoutube } from "react-icons/fa";
 import { useProfile } from "@/hooks/useProfile";
-
+import { CircleCheck } from "lucide-react";
 interface Category {
+  uuid: string;
   title: string;
   description: string;
 }
@@ -16,19 +17,42 @@ interface SocialErrors {
   youtube?: string;
 }
 
+import { GetServerSideProps } from "next";
+import { getSession as getServerSession } from "next-auth/react";
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getServerSession(context);
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {
+      session,
+    },
+  };
+};
+
 const ProfilePage: React.FC = () => {
   const { data: session } = useSession();
   const {
     updateProfile,
     changePassword,
     requestPasswordReset,
-    validateSocialUrl,
+    fetchProfile,
+    fetchCategories,
     toast,
   } = useProfile();
   const [isEditing, setIsEditing] = useState(false);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
-
+  const [categories, setCategories] = useState<Category[]>([]);
   const [profileData, setProfileData] = useState({
     name: session?.user?.name || "",
     email: session?.user?.email || "",
@@ -39,22 +63,48 @@ const ProfilePage: React.FC = () => {
       instagram: "",
       youtube: "",
     },
-    categories: [] as Category[],
+    categories: [] as string[],
   });
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const profileData = await fetchProfile();
+        console.log("profileData::: ", profileData);
+        setProfileData({
+          name: profileData.name,
+          email: profileData.email,
+          about: profileData.about || "",
+          address: profileData.address || "",
+          social: {
+            facebook: profileData.social?.facebook || "",
+            instagram: profileData.social?.instagram || "",
+            youtube: profileData.social?.youtube || "",
+          },
+          categories: profileData.categories,
+        });
+      } catch (error) {
+        console.error("Error loading profile:", error);
+      }
+    };
+    const getCategories = async () => {
+      try {
+        const fetchedCategories = await fetchCategories();
+        setCategories(fetchedCategories);
+      } catch (error) {
+        console.error("Error loading categories:", error);
+      }
+    };
+    if (session?.user) {
+      getCategories();
+      loadProfile();
+    }
+  }, [session?.user]);
 
-  const [newCategory, setNewCategory] = useState<Category>({
-    title: "",
-    description: "",
-  });
-
-  // Password states
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
-  // Add validation states
   const [passwordError, setPasswordError] = useState("");
-  const [categoryError, setCategoryError] = useState("");
+
   const [socialErrors, setSocialErrors] = useState<SocialErrors>({});
 
   const validatePassword = () => {
@@ -69,14 +119,15 @@ const ProfilePage: React.FC = () => {
     setPasswordError("");
     return true;
   };
-
   const validateSocialInputs = () => {
     const errors: SocialErrors = {};
     let isValid = true;
 
     Object.entries(profileData.social).forEach(([platform, url]) => {
-      if (url && !validateSocialUrl(url)) {
-        errors[platform as keyof SocialErrors] = `Invalid ${platform} URL`;
+      if (url && !url.startsWith("http://") && !url.startsWith("https://")) {
+        errors[
+          platform as keyof SocialErrors
+        ] = `Please enter a valid URL starting with http:// or https://`;
         isValid = false;
       }
     });
@@ -94,13 +145,12 @@ const ProfilePage: React.FC = () => {
       if (!validateSocialInputs()) {
         return;
       }
-
       await updateProfile({
         name: profileData.name,
         about: profileData.about,
         address: profileData.address,
         social: profileData.social,
-        categories: profileData.categories,
+        categories: profileData.categories as string[],
       });
       setIsEditing(false);
     } catch (err) {
@@ -126,7 +176,7 @@ const ProfilePage: React.FC = () => {
       setNewPassword("");
       setConfirmPassword("");
     } catch (err) {
-      console.log('err::: ', err);
+      console.log("err::: ", err);
       setPasswordError(
         "Failed to change password. Please check your current password."
       );
@@ -144,33 +194,21 @@ const ProfilePage: React.FC = () => {
       );
     }
   };
+  const toggleCategory = (category: Category) => {
+    const exists = profileData.categories.includes(category.uuid);
 
-  const addCategory = () => {
-    setCategoryError("");
-
-    if (!newCategory.title.trim()) {
-      setCategoryError("Category title is required");
-      return;
+    if (exists) {
+      setProfileData((prev) => ({
+        ...prev,
+        categories: prev.categories.filter((uuid) => uuid !== category.uuid),
+      }));
+    } else {
+      setProfileData((prev) => ({
+        ...prev,
+        categories: [...new Set([...prev.categories, category.uuid])],
+      }));
     }
-    if (!newCategory.description.trim()) {
-      setCategoryError("Category description is required");
-      return;
-    }
-
-    setProfileData((prev) => ({
-      ...prev,
-      categories: [...prev.categories, newCategory],
-    }));
-    setNewCategory({ title: "", description: "" });
   };
-
-  const removeCategory = (index: number) => {
-    setProfileData((prev) => ({
-      ...prev,
-      categories: prev.categories.filter((_, i) => i !== index),
-    }));
-  };
-
   return (
     <>
       <Head>
@@ -179,11 +217,14 @@ const ProfilePage: React.FC = () => {
 
       {toast && (
         <div
-          className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-lg text-white ${
-            toast.type === "success" ? "bg-green-500" : "bg-red-500"
-          }`}
+          className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-[12px] text-[rgba(255,255,255)] ${
+            toast.type === "success"
+              ? "bg-[rgba(22,163,74)]"
+              : "bg-[rgba(179,38,30)]"
+          } flex items-center`}
         >
-          {toast.message}
+          <CircleCheck className="mr-2" />
+          <span>{toast.message}</span>
         </div>
       )}
 
@@ -219,7 +260,6 @@ const ProfilePage: React.FC = () => {
 
         <div className="bg-white rounded-lg shadow-md">
           <div className="p-6 space-y-6">
-            {/* Basic Info Section */}
             <div className="space-y-4">
               <div className="flex items-center space-x-4 p-4 bg-[rgba(253,250,246)] rounded-lg">
                 <div className="p-3 bg-[rgba(255,255,255)] rounded-full border border-[rgba(226,225,223)]">
@@ -286,8 +326,6 @@ const ProfilePage: React.FC = () => {
                 </div>
               </div>
             </div>
-
-            {/* About Section */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-[rgb(68,63,63)]">
                 About us
@@ -311,8 +349,6 @@ const ProfilePage: React.FC = () => {
                 </p>
               )}
             </div>
-
-            {/* Social Media Section */}
             <div className="space-y-4">
               <h3 className="text-sm font-medium text-[rgb(68,63,63)]">
                 Social media
@@ -450,82 +486,52 @@ const ProfilePage: React.FC = () => {
                   )}
                 </div>
               </div>
-            </div>
-
-            {/* Categories Section */}
+            </div>{" "}
             <div className="space-y-4">
               <h3 className="text-sm font-medium text-[rgb(68,63,63)]">
                 Categories
               </h3>
-              {isEditing && (
-                <div className="space-y-3 p-4 bg-[rgba(253,250,246)] rounded-lg">
-                  <input
-                    type="text"
-                    value={newCategory.title}
-                    onChange={(e) =>
-                      setNewCategory((prev) => ({
-                        ...prev,
-                        title: e.target.value,
-                      }))
-                    }
-                    placeholder="Category Title"
-                    className="w-full p-2 text-[rgb(68,63,63)] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#D45B20]"
-                  />
-                  <input
-                    type="text"
-                    value={newCategory.description}
-                    onChange={(e) =>
-                      setNewCategory((prev) => ({
-                        ...prev,
-                        description: e.target.value,
-                      }))
-                    }
-                    placeholder="Detail about Category"
-                    className="w-full p-2 text-[rgb(68,63,63)] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#D45B20]"
-                  />
-                  {categoryError && (
-                    <div className="text-red-500 text-sm mt-2">
-                      {categoryError}
-                    </div>
-                  )}
-                  <button
-                    onClick={addCategory}
-                    className="w-full px-4 py-2 bg-[#D45B20] hover:bg-[#C44D16] text-white rounded-lg text-sm font-medium transition-colors"
-                  >
-                    Add Category
-                  </button>
-                </div>
-              )}
-
               <div className="space-y-3">
-                {profileData.categories.map((category, index) => (
-                  <div
-                    key={index}
-                    className="p-4 bg-[rgba(253,250,246)] rounded-lg"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h4 className="font-medium text-[rgb(68,63,63)]">
-                          {category.title}
-                        </h4>
-                        <p className="text-sm text-[rgba(100,92,90)]">
-                          {category.description}
-                        </p>
+                {categories.map((category) => {
+                  const isSelected = profileData.categories.includes(
+                    category.uuid
+                  );
+                  return (
+                    <div
+                      key={category.uuid}
+                      className={`p-4 bg-[rgba(253,250,246)] rounded-lg cursor-pointer transition-colors ${
+                        isSelected
+                          ? "border border-[#D45B20]"
+                          : "hover:border hover:border-[#D45B20]"
+                      }`}
+                      onClick={() => isEditing && toggleCategory(category)}
+                    >
+                      <div className="flex items-start space-x-3">
+                        <div className="pt-1">
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() =>
+                              isEditing && toggleCategory(category)
+                            }
+                            disabled={!isEditing}
+                            className="w-4 h-4 text-[#D45B20] bg-white border-gray-300 rounded focus:ring-[#D45B20]"
+                          />
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-[rgb(68,63,63)]">
+                            {category.title}
+                          </h4>
+                          <p className="text-sm text-[rgba(100,92,90)]">
+                            {category.description}
+                          </p>
+                        </div>
                       </div>
-                      {isEditing && (
-                        <button
-                          onClick={() => removeCategory(index)}
-                          className="text-[rgba(100,92,90)] hover:text-[#D45B20]"
-                        >
-                          <FiX size={20} />
-                        </button>
-                      )}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
-
             {!isEditing && (
               <button
                 onClick={() => setIsChangePasswordOpen(true)}
@@ -538,7 +544,6 @@ const ProfilePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Change Password Modal */}
       {isChangePasswordOpen && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-none flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
@@ -613,7 +618,6 @@ const ProfilePage: React.FC = () => {
         </div>
       )}
 
-      {/* Forgot Password Modal */}
       {isForgotPasswordOpen && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-none flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">

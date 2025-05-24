@@ -13,7 +13,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   return (
-    <div className="flex items-center justify-between px-4 py-3 sm:px-6">
+    <div className="flex items-center justify-between px-4 py-2 sm:px-6">
       <div className="flex flex-1 justify-between sm:hidden">
         <button
           onClick={() => onPageChange(currentPage - 1)}
@@ -59,7 +59,7 @@ export const Pagination: React.FC<PaginationProps> = ({
                 ${
                   currentPage === 1
                     ? "text-[rgba(68,63,63)] cursor-not-allowed"
-                    : "text-gray-500 hover:bg-gray-50"
+                    : "text-gray-500 hover:bg-[#FFF5F1] rounded-[10px]"
                 }`}
             >
               <span className="sr-only">Previous</span>
@@ -84,8 +84,8 @@ export const Pagination: React.FC<PaginationProps> = ({
                 className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold
                   ${
                     page === currentPage
-                      ? "z-10 bg-[rgba(226,225,223)] text-[rgba(68,63,63)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D45B20]"
-                      : "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0"
+                      ? "z-10 rounded-[10px] bg-[rgba(226,225,223)] text-[rgba(68,63,63)] focus-visible:outline-offset-2 focus-visible:outline-[#D45B20]"
+                      : "rounded-[10px] text-gray-900  hover:bg-[#FFF5F1] focus:outline-offset-0"
                   }`}
               >
                 {page}
@@ -98,7 +98,7 @@ export const Pagination: React.FC<PaginationProps> = ({
                 ${
                   currentPage === totalPages
                     ? "text-[rgba(68,63,63)] cursor-not-allowed"
-                    : "text-gray-500 hover:bg-gray-50"
+                    : "text-gray-500 hover:bg-[#FFF5F1] rounded-[10px]"
                 }`}
             >
               <span>Next</span>

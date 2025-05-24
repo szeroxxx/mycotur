@@ -1,123 +1,416 @@
-import { useState, useCallback } from 'react';
-import { Event, Toast, PaginationInfo } from '../types/event';
+import { useState, useCallback, useEffect } from "react";
+import { Event, Toast, PaginationInfo } from "../types/event";
+import axios from "axios";
+import axiosInstance from "../utils/axiosConfig";
 
 const ITEMS_PER_PAGE = 10;
+const MAX_FILE_SIZE_MB = 5;
+const ALLOWED_FILE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
-const initialEvents: Event[] = [
-  {
-    id: '1',
-    activityName: 'Teruel Experience',
-    event: 'Teruel Experience',
-    eventDate: '2025-04-20',
-    eventTime: '12:00',
-    category: 'Experiences',
-    location: '2972 Westheimer Rd. Santa Ana, Illinois 85486',
-    description: 'A unique cultural experience in Teruel',
-    email: 'teruel@example.com',
-    phone: '123-456-7890',
-    fees: '€50 per person',
-    images: []
-  },
-  {
-    id: '2',
-    activityName: 'Teruel Experience 2',
-    event: 'Cultural Event',
-    eventDate: '2025-05-15',
-    eventTime: '14:00',
-    category: 'Cultural',
-    location: '2972 Westheimer Rd. Santa Ana, Illinois 85486',
-    description: 'Cultural event in Teruel',
-    email: 'culture@example.com',
-    phone: '123-456-7891',
-    fees: '€30 per person',
-    images: []
-  }
-];
+const URL = process.env.NEXTAUTH_BACKEND_URL;
+
+interface ApiActivityOption {
+  id: number;
+  title: string;
+}
+
+interface ApiEventItem {
+  id: number;
+  uuid: string;
+  title: string;
+  activityId: number;
+  activityTitle: string;
+  category: string;
+  location: string;
+  date: string;
+  time: string;
+  description: string;
+  capacity: number;
+  isPublic: boolean;
+  email: string;
+  phone: string;
+  link: string;
+  fees: string;
+  media?: Array<{ name: string; type: string }>;
+}
+
 
 export const useEvents = () => {
-  const [events, setEvents] = useState<Event[]>(initialEvents);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('');
+  const [events, setEvents] = useState<Event[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
   const [pagination, setPagination] = useState<PaginationInfo>({
     currentPage: 1,
-    totalPages: Math.ceil(initialEvents.length / ITEMS_PER_PAGE),
+    totalPages: 1,
     pageSize: ITEMS_PER_PAGE,
-    totalItems: initialEvents.length
+    totalItems: 0,
   });
+  const [activities, setActivities] = useState<{ id: string; title: string }[]>(
+    []
+  );
   const [toast, setToast] = useState<Toast | null>(null);
 
-  const showToast = useCallback((type: 'success' | 'error', message: string) => {
-    setToast({ type, message });
-    setTimeout(() => setToast(null), 3000);
+  const showToast = useCallback(
+    (type: "success" | "error", message: string) => {
+      setToast({ type, message });
+      setTimeout(() => setToast(null), 3000);
+    },
+    []
+  );
+
+  const loadActivities = useCallback(async () => {
+    try {
+      const uuid = localStorage.getItem("userUuid");
+
+      const response = await axiosInstance.get(`${URL}/api/activity`, {
+        headers: {
+          userid: uuid,
+        },
+      });
+      if (response.status === 200 && response.data.data) {
+        const activityOptions = response.data.data.map(
+          (item: ApiActivityOption) => ({
+            id: item.id.toString(),
+            title: item.title,
+          })
+        );
+        setActivities(activityOptions);
+      }
+    } catch (error) {
+      console.error("Error fetching activities for dropdown:", error);
+    }
   }, []);
 
-  const createEvent = useCallback(async (event: Omit<Event, 'id'>) => {
-    //API
-    const newEvent = {
-      ...event,
-      id: Date.now().toString()
-    };
-    setEvents(prev => [...prev, newEvent]);
-    showToast('success', 'Event created successfully');
-    return newEvent;
-  }, [showToast]);
+  useEffect(() => {
+    loadActivities();
+  }, [loadActivities]);
 
-  const updateEvent = useCallback(async (event: Event) => {
-    //API
-    setEvents(prev =>
-      prev.map(item => item.id === event.id ? event : item)
-    );
-    showToast('success', 'Event updated successfully');
-    return event;
-  }, [showToast]);
+  const fetchEvents = useCallback(
+    async (page = 1) => {
+      setIsLoading(true);
+      try {
+        const token = localStorage.getItem("token");
 
-  const deleteEvent = useCallback(async (id: string) => {
-    //API
-    setEvents(prev => prev.filter(event => event.id !== id));
-    showToast('success', 'Event deleted successfully');
-  }, [showToast]);
+        if (!token) {
+          console.error("No authentication token found");
+          return;
+        }
 
-  const getFilteredEvents = useCallback(() => {
-    return events.filter(event => {
-      const matchesSearch = !searchTerm || 
-        event.event.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        event.activityName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        event.location.toLowerCase().includes(searchTerm.toLowerCase());
+        const queryParams = new URLSearchParams({
+          page: page.toString(),
+          limit: ITEMS_PER_PAGE.toString(),
+        });
 
-      const matchesCategory = !categoryFilter || event.category === categoryFilter;
+        if (searchTerm) {
+          queryParams.append("search", searchTerm);
+        }
 
-      return matchesSearch && matchesCategory;
-    });
-  }, [events, searchTerm, categoryFilter]);
+        if (categoryFilter) {
+          queryParams.append("category", categoryFilter);
+        }
+        const uuid = localStorage.getItem("userUuid");
+        const response = await axiosInstance.get(
+          `${URL}/api/event?${queryParams.toString()}`,
+          {
+            headers: {
+              userid: uuid,
+            },
+          }
+        );
+        console.log("response::: ", response);
 
-  const getPaginatedEvents = useCallback(() => {
-    const filtered = getFilteredEvents();
-    const start = (pagination.currentPage - 1) * pagination.pageSize;
-    const end = start + pagination.pageSize;
-    
-    return filtered.slice(start, end);
-  }, [getFilteredEvents, pagination.currentPage, pagination.pageSize]);
+        if (response.data && Array.isArray(response.data.data)) {
+          const fetchedEvents: Event[] = response.data.data.map(
+            (item: ApiEventItem) => ({
+              id: item.uuid,
+              activityName: item.activityTitle,
+              activityId: item.activityId.toString(),
+              event: item.title,
+              location: item.location,
+              eventDate: item.date,
+              eventTime: item.time,
+              category: item.category,
+              description: item.description,
+              email: item.email,
+              phone: item.phone,
+              url: item.link,
+              fees: item.fees,
+              images: [],
+              videos: [],
+              mediaUrls: item.media,
+            })
+          );
 
-  const setPage = useCallback((page: number) => {
-    setPagination(prev => ({
-      ...prev,
-      currentPage: page
-    }));
-  }, []);
+          setEvents(fetchedEvents);
+          if (response.data.pagination) {
+            setPagination({
+              currentPage: response.data.pagination.currentPage,
+              totalPages: response.data.pagination.totalPages,
+              pageSize: response.data.pagination.itemsPerPage,
+              totalItems: response.data.pagination.totalItems,
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching events:", error);
+        let errorMessage = "Failed to fetch events";
 
-  // Mock activities data - will be replaced with API call
-  const activities = [
-    { id: '1', title: 'Teruel Experience' },
-    { id: '2', title: 'Teruel Experience 2' }
-  ];
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 401) {
+            errorMessage = "Authentication failed. Please log in again.";
+          } else {
+            errorMessage =
+              error.response?.data?.message ||
+              error.message ||
+              "Error connecting to server";
+          }
+        } else if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+
+        showToast("error", errorMessage);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [showToast, searchTerm, categoryFilter]
+  );
+
+  useEffect(() => {
+    fetchEvents(1);
+  }, [fetchEvents, searchTerm, categoryFilter]);
+
+  const createEvent = useCallback(
+    async (event: Omit<Event, "id">) => {
+      try {
+        const formData = new FormData();
+        if (
+          !event.event ||
+          !event.category ||
+          !event.email ||
+          !event.activityId
+        ) {
+          showToast("error", "Please fill in all required fields");
+          return null;
+        }
+
+        if (event.images && event.images.length > 0) {
+          for (const image of event.images) {
+            if (!ALLOWED_FILE_TYPES.includes(image.type)) {
+              showToast("error", "Only JPG, PNG and WebP images are allowed");
+              return null;
+            }
+            if (image.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+              showToast(
+                "error",
+                `Images must be less than ${MAX_FILE_SIZE_MB}MB`
+              );
+              return null;
+            }
+            formData.append("images", image);
+          }
+        }
+
+        formData.append("activityId", event.activityId.toString());
+        formData.append("title", event.event);
+        formData.append("category", event.category);
+        formData.append("date", event.eventDate);
+        formData.append("time", event.eventTime);
+        formData.append("description", event.description);
+        formData.append("email", event.email);
+        formData.append("phone", event.phone);
+        formData.append("link", event.url);
+        formData.append("fees", event.fees);
+        formData.append("location", event.location || "");
+        if (event.lat) {
+          formData.append("lat", event.lat.toString());
+        }
+        if (event.lon) {
+          formData.append("lon", event.lon.toString());
+        }
+        const uuid = localStorage.getItem("userUuid");
+        const response = await axiosInstance.post(
+          `${URL}/api/event`,
+          formData,
+          {
+            headers: {
+              userid: uuid,
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          const newEvent = {
+            ...event,
+            id: response.data.id,
+          };
+          showToast("success", "Event created successfully");
+          fetchEvents(pagination.currentPage);
+
+          return newEvent;
+        } else {
+          const errorMessage =
+            response.data?.message || "Failed to create event";
+          showToast("error", errorMessage);
+          return null;
+        }
+      } catch (error) {
+        console.error("Error creating event:", error);
+        let errorMessage = "Failed to create event";
+
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 401) {
+            errorMessage = "Authentication failed. Please log in again.";
+          } else if (error.response?.status === 400) {
+            errorMessage =
+              error.response.data?.message ||
+              "Invalid input data. Please check your form.";
+          } else if (error.response?.status === 403) {
+            errorMessage = "You don't have permission to create events.";
+          } else if (error.response?.status === 500) {
+            errorMessage = "Server error. Please try again later.";
+          } else {
+            errorMessage =
+              error.response?.data?.message ||
+              error.message ||
+              "Error connecting to server";
+          }
+        } else if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+
+        showToast("error", errorMessage);
+        return null;
+      }
+    },
+    [showToast, fetchEvents, pagination.currentPage]
+  );
+  const deleteEvent = useCallback(
+    async (id: string) => {
+      try {
+        const response = await axiosInstance.delete(`${URL}/api/event/${id}`);
+
+        if (response.status === 200) {
+          showToast("success", "Event deleted successfully");
+          fetchEvents(pagination.currentPage);
+        } else {
+          throw new Error(response.data?.message || "Failed to delete event");
+        }
+      } catch (error) {
+        console.error("Error deleting event:", error);
+        let errorMessage = "Failed to delete event";
+
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 404) {
+            errorMessage = "Event not found";
+          } else if (error.response?.status === 401) {
+            errorMessage = "Authentication failed. Please log in again.";
+          } else if (error.response?.status === 403) {
+            errorMessage = "You don't have permission to delete this event.";
+          } else {
+            errorMessage = error.response?.data?.message || error.message;
+          }
+        } else if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+
+        showToast("error", errorMessage);
+        throw error;
+      }
+    },
+    [showToast, fetchEvents, pagination.currentPage]
+  );
+
+  const updateEvent = useCallback(
+    async (event: Event) => {
+      try {
+        const formData = new FormData();
+
+        if (event.images && event.images.length > 0) {
+          for (const image of event.images) {
+            if (!ALLOWED_FILE_TYPES.includes(image.type)) {
+              showToast("error", "Only JPG, PNG and WebP images are allowed");
+              return null;
+            }
+            if (image.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+              showToast(
+                "error",
+                `Images must be less than ${MAX_FILE_SIZE_MB}MB`
+              );
+              return null;
+            }
+            formData.append("images", image);
+          }
+        }
+
+        formData.append("activityId", event.activityId.toString());
+        formData.append("title", event.event);
+        formData.append("category", event.category);
+        formData.append("date", event.eventDate);
+        formData.append("time", event.eventTime);
+        formData.append("description", event.description);
+        formData.append("email", event.email);
+        formData.append("phone", event.phone || "");
+        formData.append("link", event.url || "");
+        formData.append("fees", event.fees);
+        formData.append("location", event.location || "");
+        if (event.lat) {
+          formData.append("lat", event.lat.toString());
+        }
+        if (event.lon) {
+          formData.append("lon", event.lon.toString());
+        }
+        const response = await axiosInstance.put(
+          `${URL}/api/event/${event.id}`,
+          formData
+        );
+
+        if (response.status === 200) {
+          showToast("success", "Event updated successfully");
+          fetchEvents(pagination.currentPage);
+
+          return event;
+        } else {
+          const errorMessage =
+            response.data?.message || "Failed to update event";
+          showToast("error", errorMessage);
+          return null;
+        }
+      } catch (error) {
+        console.error("Error updating event:", error);
+        let errorMessage = "Failed to update event";
+
+        if (axios.isAxiosError(error)) {
+          errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            "Error connecting to server";
+        } else if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+
+        showToast("error", errorMessage);
+        return null;
+      }
+    },
+    [showToast, fetchEvents, pagination.currentPage]
+  );
+
+  const setPage = useCallback(
+    (page: number) => {
+      setPagination((prev) => ({
+        ...prev,
+        currentPage: page,
+      }));
+      fetchEvents(page);
+    },
+    [fetchEvents]
+  );
 
   return {
-    events: getPaginatedEvents(),
-    pagination: {
-      ...pagination,
-      totalPages: Math.ceil(getFilteredEvents().length / ITEMS_PER_PAGE),
-      totalItems: getFilteredEvents().length
-    },
+    events,
+    pagination,
     activities,
     toast,
     searchTerm,
@@ -128,6 +421,8 @@ export const useEvents = () => {
     createEvent,
     updateEvent,
     deleteEvent,
-    showToast
+    showToast,
+    isLoading,
+    fetchEvents,
   };
 };

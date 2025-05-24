@@ -14,7 +14,7 @@ export const AgentRow: React.FC<AgentRowProps> = ({
   onDelete
 }) => {
   return (
-    <tr className="border-b border-[#F3F4F6] hover:bg-[#F9FAFB]">
+    <tr className="border-b border-[#F3F4F6] hover:bg-[#F9FAFB] scrollbar-hide">
       <td className="py-4 px-6 whitespace-nowrap text-sm text-[rgba(68,63,63)]">{agent.name}</td>
       <td className="py-4 px-6 whitespace-nowrap text-sm text-[rgba(68,63,63)]">{agent.email}</td>
       <td className="py-4 px-6 whitespace-nowrap">

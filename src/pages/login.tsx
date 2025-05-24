@@ -1,39 +1,47 @@
-import React, { useState } from 'react';
-import { useRouter } from 'next/router';
-import { signIn } from 'next-auth/react';
-import { FiEye, FiEyeOff } from 'react-icons/fi';
-import Image from 'next/image';
+import React, { useState } from "react";
+import { useRouter } from "next/router";
+import { signIn } from "next-auth/react";
+import { FiEye, FiEyeOff } from "react-icons/fi";
+import Image from "next/image";
 
 const AgentLogin: React.FC = () => {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const result = await signIn('credentials', {
+      const result = await signIn("credentials", {
         email,
         password,
         redirect: false,
-        callbackUrl: '/dashboard',
-        role: 'agent'
+        role: "agent",
+        callbackUrl: "/dashboard",
       });
-
-      if (result?.error) {
-        setError('Invalid email or password');
-      } else if (result?.ok) {
-        await router.replace('/dashboard');
-      } else {
-        setError('An unexpected error occurred');
-      }    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred during login');
+      if (!result) {
+        throw new Error("No response from server");
+      }
+      if (result.error) {
+        setError(result.error);
+      } else if (result.ok) {
+        const session = await fetch("/api/auth/session");
+        const sessionData = await session.json();
+        if (sessionData?.user?.uuid) {
+          localStorage.setItem("userUuid", sessionData.user.uuid);
+        }
+        await router.replace("/dashboard");
+      }
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "An error occurred during login"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -44,17 +52,24 @@ const AgentLogin: React.FC = () => {
       <div className="flex w-full">
         <div className="w-full lg:w-5/12 xl:w-4/12 flex items-center justify-center p-10">
           <div className="w-full max-w-md bg-[rgba(255,255,255)] rounded-lg border border-gray-200 shadow-md p-8">
-            <h2 className="text-xl font-semibold text-center text-[rgb(68,63,63)] mb-6">Welcome back!</h2>
-            
+            <h2 className="text-xl font-semibold text-center text-[rgb(68,63,63)] mb-6">
+              Welcome back!
+            </h2>
+
             {error && (
               <div className="mb-4 p-2 bg-red-100 text-red-800 rounded-md text-center text-sm">
                 {error}
               </div>
             )}
-            
+
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-[rgb(68,63,63)] mb-1">Email</label>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-[rgb(68,63,63)] mb-1"
+                >
+                  Email
+                </label>
                 <input
                   id="email"
                   type="email"
@@ -65,9 +80,14 @@ const AgentLogin: React.FC = () => {
                   required
                 />
               </div>
-              
+
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-[rgb(68,63,63)] mb-1">Password</label>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-[rgb(68,63,63)] mb-1"
+                >
+                  Password
+                </label>
                 <div className="relative">
                   <input
                     id="password"
@@ -83,7 +103,11 @@ const AgentLogin: React.FC = () => {
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                    {showPassword ? (
+                      <FiEyeOff size={18} />
+                    ) : (
+                      <FiEye size={18} />
+                    )}
                   </button>
                 </div>
               </div>
@@ -92,16 +116,17 @@ const AgentLogin: React.FC = () => {
                 className="w-full bg-[rgb(194,91,52)] hover:bg-[rgb(174,81,42)] text-white font-medium py-2.5 px-4 rounded transition-colors"
                 disabled={isLoading}
               >
-                Log in
+                {isLoading ? "Logging in..." : "Log in"}
               </button>
             </form>
           </div>
         </div>
-        
+
         <div className="hidden lg:block lg:w-7/12 xl:w-8/12 relative ">
-          <div className="absolute inset-0  overflow-hidden p-3">            <Image 
-              src="/back.png" 
-              alt="Decorative mushroom background" 
+          <div className="absolute inset-0  overflow-hidden p-3">
+            <Image
+              src="/back.png"
+              alt="Decorative mushroom background"
               fill
               className="object-cover rounded-[24px]"
               priority

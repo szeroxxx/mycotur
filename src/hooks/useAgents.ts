@@ -1,67 +1,162 @@
-import { useState, useCallback } from 'react';
-import { Agent, Toast, PaginationInfo } from '../types/agent';
-
+import { useState, useCallback, useEffect } from "react";
+import { Agent, Toast, PaginationInfo } from "../types/agent";
+import axiosInstance from "../utils/axiosConfig";
 const ITEMS_PER_PAGE = 10;
 
-const initialAgents: Agent[] = [
-  { id: '1', name: 'Jane Cooper', email: 'jane@example.com', status: 'Active' },
-  { id: '2', name: 'Wade Warren', email: 'wade@example.com', status: 'Invited' },
-  { id: '3', name: 'Esther Howard', email: 'esther@example.com', status: 'Active' },
-  { id: '4', name: 'Cameron Williamson', email: 'cameron@example.com', status: 'Active' },
-  { id: '5', name: 'Brooklyn Simmons', email: 'brooklyn@example.com', status: 'Active' },
-  { id: '6', name: 'Leslie Alexander', email: 'leslie@example.com', status: 'Active' },
-  { id: '7', name: 'Jenny Wilson', email: 'jenny@example.com', status: 'Active' },
-  { id: '8', name: 'Guy Hawkins', email: 'guy@example.com', status: 'Active' },
-  { id: '9', name: 'Robert Fox', email: 'robert@example.com', status: 'Active' },
-  { id: '10', name: 'Jacob Jones', email: 'jacob@example.com', status: 'Active' }
-];
+interface ApiAgentResponse {
+  uuid: string;
+  name: string;
+  email: string;
+  status: string;
+}
 
 export const useAgents = () => {
-  const [agents, setAgents] = useState<Agent[]>(initialAgents);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [agents, setAgents] = useState<Agent[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [pagination, setPagination] = useState<PaginationInfo>({
     currentPage: 1,
-    totalPages: Math.ceil(initialAgents.length / ITEMS_PER_PAGE),
+    totalPages: 1,
     pageSize: ITEMS_PER_PAGE,
-    totalItems: initialAgents.length
+    totalItems: 0,
   });
   const [toast, setToast] = useState<Toast | null>(null);
 
-  const showToast = useCallback((type: 'success' | 'error', message: string) => {
-    setToast({ type, message });
-    setTimeout(() => setToast(null), 3000);
-  }, []);
+  const showToast = useCallback(
+    (type: "success" | "error", message: string) => {
+      setToast({ type, message });
+      setTimeout(() => setToast(null), 3000);
+    },
+    []
+  );
 
-  const createAgent = useCallback(async (agent: Omit<Agent, 'id'>) => {
-    // API
-    const newAgent = {
-      ...agent,
-      id: Date.now().toString()
-    };
-    setAgents(prev => [...prev, newAgent]);
-    showToast('success', 'Agent added successfully');
-    return newAgent;
+  const fetchAgents = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const response = await axiosInstance.get("/api/user/agent");
+
+      const fetchedAgents = response.data.map((agent: ApiAgentResponse) => ({
+        id: agent.uuid,
+        name: agent.name,
+        email: agent.email,
+        status: agent.status,
+      }));
+
+      setAgents(fetchedAgents);
+      setPagination((prev) => ({
+        ...prev,
+        totalPages: Math.ceil(fetchedAgents.length / ITEMS_PER_PAGE),
+        totalItems: fetchedAgents.length,
+      }));
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to fetch agents";
+      showToast("error", errorMessage);
+      console.error("Error fetching agents:", error);
+    } finally {
+      setIsLoading(false);
+    }
   }, [showToast]);
 
-  const updateAgent = useCallback(async (agent: Agent) => {
-    // API
-    setAgents(prev =>
-      prev.map(item => item.id === agent.id ? agent : item)
-    );
-    showToast('success', 'Agent updated successfully');
-    return agent;
-  }, [showToast]);
+  useEffect(() => {
+    fetchAgents();
+  }, [fetchAgents]);
 
-  const deleteAgent = useCallback(async (id: string) => {
-    // API
-    setAgents(prev => prev.filter(agent => agent.id !== id));
-    showToast('success', 'Agent deleted successfully');
-  }, [showToast]);
+  const createAgent = useCallback(
+    async (agent: Omit<Agent, "id">) => {
+      try {
+        const requestData = {
+          name: agent.name,
+          email: agent.email,
+          role: "agent",
+        };
+        const uuid = localStorage.getItem("userUuid");
+
+        const response = await axiosInstance.post(
+          "/api/user/register",
+          requestData,
+          {
+            headers: {
+              userid: uuid,
+            },
+          }
+        );
+
+        if (response.data && response.data.message === "User created") {
+          await fetchAgents();
+          showToast("success", "Agent added successfully");
+
+          return {
+            ...agent,
+            id: response.data.id || Date.now().toString(),
+          };
+        } else {
+          showToast("error", "Agent not get invited, please try again");
+          return null;
+        }
+      } catch (error) {
+        console.error("Error creating agent:", error);
+        const errorMessage =
+          error instanceof Error ? error.message : "Failed to create agent";
+        showToast("error", errorMessage);
+        throw error;
+      }
+    },
+    [showToast, fetchAgents]
+  );
+
+  const updateAgent = useCallback(
+    async (agent: Agent) => {
+      try {
+        const response = await axiosInstance.put(
+          `/api/user/${agent.id}`,
+          agent
+        );
+        if (response.status === 200) {
+          setAgents((prev) =>
+            prev.map((item) => (item.id === agent.id ? agent : item))
+          );
+          showToast("success", "Agent updated successfully");
+          return agent;
+        }
+      } catch (error) {
+        console.error("Error updating agent:", error);
+        const errorMessage =
+          error instanceof Error ? error.message : "Failed to update agent";
+        showToast("error", errorMessage);
+        throw error;
+      }
+    },
+    [showToast]
+  );
+
+  const deleteAgent = useCallback(
+    async (id: string) => {
+      try {
+        const response = await axiosInstance.delete(`/api/user/${id}`);
+
+        if (response.status === 200 || response.status === 204) {
+          await fetchAgents();
+          showToast("success", "Agent deleted successfully");
+        } else {
+          showToast("error", "Failed to delete agent");
+        }
+      } catch (error) {
+        console.error("Error deleting agent:", error);
+        const errorMessage =
+          error instanceof Error ? error.message : "Failed to delete agent";
+        showToast("error", errorMessage);
+        throw error;
+      }
+    },
+    [showToast, fetchAgents]
+  );
 
   const getFilteredAgents = useCallback(() => {
-    return agents.filter(agent => {
-      const matchesSearch = !searchTerm || 
+    return agents.filter((agent) => {
+      const matchesSearch =
+        !searchTerm ||
         agent.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         agent.email.toLowerCase().includes(searchTerm.toLowerCase());
 
@@ -75,23 +170,24 @@ export const useAgents = () => {
     const filtered = getFilteredAgents();
     const start = (pagination.currentPage - 1) * pagination.pageSize;
     const end = start + pagination.pageSize;
-    
+
     return filtered.slice(start, end);
   }, [getFilteredAgents, pagination.currentPage, pagination.pageSize]);
 
   const setPage = useCallback((page: number) => {
-    setPagination(prev => ({
+    setPagination((prev) => ({
       ...prev,
-      currentPage: page
+      currentPage: page,
     }));
   }, []);
 
   return {
     agents: getPaginatedAgents(),
+    isLoading,
     pagination: {
       ...pagination,
       totalPages: Math.ceil(getFilteredAgents().length / ITEMS_PER_PAGE),
-      totalItems: getFilteredAgents().length
+      totalItems: getFilteredAgents().length,
     },
     toast,
     searchTerm,
@@ -102,6 +198,7 @@ export const useAgents = () => {
     createAgent,
     updateAgent,
     deleteAgent,
-    showToast
+    showToast,
+    refreshAgents: fetchAgents,
   };
 };

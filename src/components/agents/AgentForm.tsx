@@ -1,6 +1,10 @@
 import React from 'react';
 import { Agent } from '../../types/agent';
 
+const RequiredIndicator = () => (
+  <span className="text-[rgba(220,38,38,1)]">*</span>
+);
+
 interface AgentFormProps {
   agent: Partial<Agent>;
   onSubmit: (e: React.FormEvent) => void;
@@ -18,7 +22,7 @@ export const AgentForm: React.FC<AgentFormProps> = ({
     <form onSubmit={onSubmit} className="space-y-6">
       <div>
         <label className="block text-sm font-medium text-[#111827] mb-2">
-          Agent Name*
+          Agent Name <RequiredIndicator />
         </label>
         <input
           type="text"
@@ -33,7 +37,7 @@ export const AgentForm: React.FC<AgentFormProps> = ({
 
       <div>
         <label className="block text-sm font-medium text-[#111827] mb-2">
-          Email*
+          Email <RequiredIndicator />
         </label>
         <input
           type="email"
@@ -44,21 +48,6 @@ export const AgentForm: React.FC<AgentFormProps> = ({
           className="w-full px-4 py-2 text-black border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
           required
         />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-[#111827] mb-2">
-          Status
-        </label>
-        <select
-          name="status"
-          value={agent.status || 'Active'}
-          onChange={onChange}
-          className="w-full px-4 py-2 text-black border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
-        >
-          <option value="Active">Active</option>
-          <option value="Invited">Invited</option>
-        </select>
       </div>
 
       <div className="flex justify-end space-x-4 pt-4 border-t">

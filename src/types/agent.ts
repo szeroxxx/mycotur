@@ -2,18 +2,14 @@ export interface Agent {
   id: string;
   name: string;
   email: string;
-  status: 'Active' | 'Invited';
+  status:  'Invited' |'Active' ;
   about?: string;
   address?: string;
   social?: {
     facebook?: string;
     instagram?: string;
     youtube?: string;
-  };
-  categories?: Array<{
-    title: string;
-    description: string;
-  }>;
+  };  categories?: string[];
 }
 
 export interface Toast {
