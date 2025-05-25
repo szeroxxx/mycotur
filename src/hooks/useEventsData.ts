@@ -18,7 +18,8 @@ export const useEventsData = () => {
     const fetchEvents = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:3500/api/visitor/event');
+        const URL = process.env.NEXTAUTH_BACKEND_URL;
+        const response = await axios.get(`${URL}/api/visitor/event`);
         if (response.data && Array.isArray(response.data.data)) {
           setEvents(response.data.data);
           setFilteredEvents(response.data.data);

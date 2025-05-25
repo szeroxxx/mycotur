@@ -88,8 +88,9 @@ export const useActivitiesData = () => {
     const fetchActivities = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:3500/api/visitor/activity');
-        
+        const URL = process.env.NEXTAUTH_BACKEND_URL;
+        const response = await axios.get(`${URL}/api/visitor/activity`);
+
         if (response.data && Array.isArray(response.data.data)) {
           const mappedActivities = mapActivityData(response.data.data);
           setActivities(mappedActivities);

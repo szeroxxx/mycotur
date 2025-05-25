@@ -41,7 +41,8 @@ const EventCard: React.FC<EventCardProps> = ({
       <div className="relative h-40">
         <motion.img
           whileHover={{ scale: 1.05 }}
-          transition={{ duration: 0.3 }}          src={`http://localhost:3500/${media}`}
+          transition={{ duration: 0.3 }}
+          src={`https://images.unsplash.com/photo-1556910103-1c02745aae4d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80`}
           alt={title}
           className="w-full h-full object-cover"
         />
@@ -94,10 +95,7 @@ const EventCard: React.FC<EventCardProps> = ({
             <span> {time}</span>
           </motion.div>
 
-          <motion.div
-            className="flex items-center gap-2"
-            whileHover={{ x: 5 }}
-          >
+          <motion.div className="flex items-center gap-2" whileHover={{ x: 5 }}>
             <motion.div
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.5 }}
@@ -107,10 +105,7 @@ const EventCard: React.FC<EventCardProps> = ({
             <span className="text-[rgba(68,63,63)] truncate">{owner}</span>
           </motion.div>
 
-          <motion.div
-            className="flex items-center gap-2"
-            whileHover={{ x: 5 }}
-          >
+          <motion.div className="flex items-center gap-2" whileHover={{ x: 5 }}>
             <motion.div
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.5 }}

@@ -6,7 +6,7 @@ import { useActivitiesData } from "@/hooks/useActivitiesData";
 import SearchBar from "@/components/ui/SearchBar";
 import dynamic from "next/dynamic";
 
-const LOCATIONIQ_API_KEY = "pk.bd1aad9ddb52d668b4630b31292a59b6";
+const LOCATIONIQ_API_KEY = process.env.NEXT_PUBLIC_LOCATIONIQ_API_KEY;
 
 const DynamicMapView = dynamic(
   () => import("@/components/activity-map/MapView"),
@@ -54,7 +54,7 @@ const ActivityMapPage = () => {
       } catch (error) {
         console.error("Error searching location:", error);
       } finally {
-        console.log('setIsLoading(false);::: ');
+        console.log("setIsLoading(false);::: ");
       }
     },
     [setSearchLocation]
@@ -63,9 +63,17 @@ const ActivityMapPage = () => {
   const handleFilterChange = useCallback(
     (type: "location" | "category", value: string) => {
       const newLocationFilter =
-        type === "location" ? (value === "Location" ? "" : value) : locationFilter;
+        type === "location"
+          ? value === "Location"
+            ? ""
+            : value
+          : locationFilter;
       const newCategoryFilter =
-        type === "category" ? (value === "Event Category" ? "" : value) : categoryFilter;
+        type === "category"
+          ? value === "Event Category"
+            ? ""
+            : value
+          : categoryFilter;
 
       setLocationFilter(newLocationFilter);
       setCategoryFilter(newCategoryFilter);
@@ -84,7 +92,13 @@ const ActivityMapPage = () => {
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [searchTerm, locationFilter, categoryFilter, filterActivities, handleLocationSearch]);
+  }, [
+    searchTerm,
+    locationFilter,
+    categoryFilter,
+    filterActivities,
+    handleLocationSearch,
+  ]);
 
   return (
     <PublicLayout>
@@ -99,7 +113,9 @@ const ActivityMapPage = () => {
                 locationFilter={locationFilter || "Location"}
                 categoryFilter={categoryFilter || "Event Category"}
                 onFilterChange={handleFilterChange}
-                onSearch={() => filterActivities(searchTerm, locationFilter, categoryFilter)}
+                onSearch={() =>
+                  filterActivities(searchTerm, locationFilter, categoryFilter)
+                }
                 onChange={setSearchTerm}
                 value={searchTerm}
               />
