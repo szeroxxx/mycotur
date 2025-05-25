@@ -107,7 +107,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
     }
   };
   const handleSuggestionClick = (suggestion: LocationSuggestion) => {
-    console.log('suggestion::: ', suggestion);
+    console.log("suggestion::: ", suggestion);
     const locationValue = `${suggestion.display_place}, ${suggestion.display_address}`;
 
     const event = {
@@ -414,7 +414,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
       );
       const existingImageUrls = imageMedias.map((media) => {
         console.log("Processing image media:", media);
-        const url = getMediaUrl(media.name, "image");
+        const url = getMediaUrl(media.name);
         console.log("Generated image URL:", url);
         return url;
       });
@@ -426,7 +426,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
 
       const existingVideoUrls = videoMedias.map((media) => {
         console.log("Processing video media:", media);
-        const url = getMediaUrl(media.name, "video");
+        const url = getMediaUrl(media.name);
         console.log("Generated video URL:", url);
         return url;
       });
@@ -456,7 +456,15 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
         }
       });
     };
-  }, [activity.images, activity.videos, activity.mediaUrls, activity.id, activity, setPreviewImages, setPreviewVideos]);
+  }, [
+    activity.images,
+    activity.videos,
+    activity.mediaUrls,
+    activity.id,
+    activity,
+    setPreviewImages,
+    setPreviewVideos,
+  ]);
 
   const currentImageCount =
     (activity.images?.length || 0) +

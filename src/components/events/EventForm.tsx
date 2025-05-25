@@ -469,7 +469,7 @@ export const EventForm: React.FC<EventFormProps> = ({
       );
       const existingImageUrls = imageMedias.map((media) => {
         console.log("Processing image media:", media);
-        const url = getMediaUrl(media.name, "image");
+        const url = getMediaUrl(media.name);
         console.log("Generated image URL:", url);
         return url;
       });
@@ -481,7 +481,7 @@ export const EventForm: React.FC<EventFormProps> = ({
 
       const existingVideoUrls = videoMedias.map((media) => {
         console.log("Processing video media:", media);
-        const url = getMediaUrl(media.name, "video");
+        const url = getMediaUrl(media.name);
         console.log("Generated video URL:", url);
         return url;
       });
@@ -508,9 +508,20 @@ export const EventForm: React.FC<EventFormProps> = ({
       newPreviewVideos.forEach((url) => {
         if (url.startsWith("blob:")) {
           URL.revokeObjectURL(url);
-        }      });
+        }
+      });
     };
-  }, [event, event.images, event.videos, event.mediaUrls, event.id, previewImages, previewVideos, setPreviewImages, setPreviewVideos]);
+  }, [
+    event,
+    event.images,
+    event.videos,
+    event.mediaUrls,
+    event.id,
+    previewImages,
+    previewVideos,
+    setPreviewImages,
+    setPreviewVideos,
+  ]);
 
   const currentImageCount =
     (event.images?.length || 0) +

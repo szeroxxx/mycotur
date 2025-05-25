@@ -72,7 +72,7 @@ const Index = () => {
                   <EventCard
                     key={event.uuid}
                     id={event.uuid}
-                    media={event.media}
+                    // media={event.media}
                     title={event.title}
                     date={event.date}
                     time={event.time}

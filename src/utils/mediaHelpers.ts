@@ -1,6 +1,5 @@
 export const getMediaUrl = (
   fileName: string,
-  type: "image" | "video" = "image"
 ): string => {
   let extractedFileName = fileName;
   if (fileName.includes("uploads\\\\")) {

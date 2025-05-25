@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 
 interface EventCardProps {
   id: string;
-  media: string;
+  // media: string;
   title: string;
   date: string;
   time: string;
@@ -16,7 +16,7 @@ interface EventCardProps {
 }
 
 const EventCard: React.FC<EventCardProps> = ({
-  media,
+  // media,
   title,
   date,
   time,
