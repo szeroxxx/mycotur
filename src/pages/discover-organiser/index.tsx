@@ -1,106 +1,76 @@
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import PublicLayout from "@/components/layout/PublicLayout";
 import FilterBar from "@/components/organiser/FilterBar";
 import OrganiserCard from "@/components/organiser/OrganiserCard";
 
+interface Organizer {
+  id: number;
+  uuid: string;
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+  about: string | null;
+  address: string | null;
+  facebook: string | null;
+  instagram: string | null;
+  youtube: string | null;
+  categories: {
+    id: number;
+    title: string;
+    description: string;
+  }[];
+  profileImage: string | null;
+  totalEvents: number;
+}
+
 const DiscoverOrganiserPage = () => {
-  const organisers = [
-    {
-      id: 1,
-      name: "Organiser name will show in this two lines if longer",
-      totalEvents: 3,
-      colorDots: ["#F59E0B", "#EF4444", "#10B981"],
-      categories: [
-        "Category Title",
-        "Category Title",
-        "Category Title long as this is",
-        "Category Title long as this is",
-        "Category Title long",
-        "Category Title",
-      ],
-      description:
-        "This section will display all updates made by the organiser, including any changes to their profile details or newly added activity links. As the organiser shares more updates, they will automatically appear here, keeping participants informed about the latest offerings, schedules, or announcements.",
-    },
-    {
-      id: 2,
-      name: "Organiser name will show in this two lines if longer",
-      totalEvents: 4,
-      colorDots: ["#F59E0B", "#EF4444", "#10B981"],
-      categories: [
-        "Category Title",
-        "Category Title",
-        "Category Title long as this is",
-        "Category Title long as this is",
-        "Category Title long",
-        "Category Title",
-      ],
-      description:
-        "This section will display all updates made by the organiser, including any changes to their profile details or newly added activity links. As the organiser shares more updates, they will automatically appear here, keeping participants informed about the latest offerings, schedules, or announcements.",
-    },
-    {
-      id: 3,
-      name: "Organiser name will show in this two lines if longer",
-      totalEvents: 4,
-      colorDots: ["#F59E0B", "#EF4444", "#10B981"],
-      categories: [
-        "Category Title",
-        "Category Title",
-        "Category Title long as this is",
-        "Category Title long as this is",
-        "Category Title long",
-        "Category Title",
-      ],
-      description:
-        "This section will display all updates made by the organiser, including any changes to their profile details or newly added activity links. As the organiser shares more updates, they will automatically appear here, keeping participants informed about the latest offerings, schedules, or announcements.",
-    },
-    {
-      id: 4,
-      name: "Organiser name will show in this two lines if longer",
-      totalEvents: 2,
-      colorDots: ["#F59E0B", "#EF4444", "#10B981"],
-      categories: [
-        "Category Title",
-        "Category Title",
-        "Category Title long as this is",
-        "Category Title long as this is",
-        "Category Title long",
-        "Category Title",
-      ],
-      description:
-        "This section will display all updates made by the organiser, including any changes to their profile details or newly added activity links. As the organiser shares more updates, they will automatically appear here, keeping participants informed about the latest offerings, schedules, or announcements.",
-    },
-    {
-      id: 5,
-      name: "Organiser name will show in this two lines if longer",
-      totalEvents: 5,
-      colorDots: ["#F59E0B", "#EF4444", "#10B981"],
-      categories: [
-        "Category Title",
-        "Category Title",
-        "Category Title long as this is",
-        "Category Title long as this is",
-        "Category Title long",
-        "Category Title",
-      ],
-      description:
-        "This section will display all updates made by the organiser, including any changes to their profile details or newly added activity links. As the organiser shares more updates, they will automatically appear here, keeping participants informed about the latest offerings, schedules, or announcements.",
-    },
-    {
-      id: 6,
-      name: "Organiser name will show in this two lines if longer",
-      totalEvents: 3,
-      colorDots: ["#F59E0B", "#EF4444", "#10B981"],
-      categories: [
-        "Category Title",
-        "Category Title",
-        "Category Title long as this is",
-        "Category Title long as this is",
-        "Category Title long",
-        "Category Title",
-      ],
-      description:
-        "This section will display all updates made by the organiser, including any changes to their profile details or newly added activity links. As the organiser shares more updates, they will automatically appear here, keeping participants informed about the latest offerings, schedules, or announcements.",
-    },
-  ];
+  const [organisers, setOrganisers] = useState<Organizer[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchOrganisers = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:3500/server/api/visitor/organization"
+        );
+        setOrganisers(response.data);
+      } catch (error) {
+        console.error("Error fetching organisers:", error);
+        setError(
+          error instanceof Error
+            ? error.message
+            : "An error occurred while fetching organisers"
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrganisers();
+  }, []);
+
+  if (loading) {
+    return (
+      <PublicLayout>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-lg text-gray-600">Loading organisers...</div>
+        </div>
+      </PublicLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <PublicLayout>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-lg text-red-600">Error: {error}</div>
+        </div>
+      </PublicLayout>
+    );
+  }
 
   return (
     <PublicLayout>
@@ -110,15 +80,24 @@ const DiscoverOrganiserPage = () => {
         {organisers.map((organiser) => (
           <OrganiserCard
             key={organiser.id}
-            id={organiser.id}
+            uuid={organiser.uuid}
             name={organiser.name}
-            totalEvents={organiser.totalEvents}
+            about={organiser.about}
+            address={organiser.address}
+            facebook={organiser.facebook}
+            instagram={organiser.instagram}
+            youtube={organiser.youtube}
             categories={organiser.categories}
-            description={organiser.description}
-            colorDots={organiser.colorDots}
+            totalEvents={organiser.totalEvents}
           />
         ))}
       </div>
+
+      {organisers.length === 0 && (
+        <div className="text-center py-10">
+          <p className="text-gray-600">No organisers found.</p>
+        </div>
+      )}
     </PublicLayout>
   );
 };

@@ -95,7 +95,7 @@ export const useProfile = (): UseProfileReturn => {
         facebook: data.social?.facebook,
         instagram: data.social?.instagram,
         youtube: data.social?.youtube,
-        categories: data.categories || [], // sending array of UUIDs directly
+        categories: data.categories || [],
       };
 
       const uuid = localStorage.getItem("userUuid");
@@ -229,6 +229,32 @@ export const useProfile = (): UseProfileReturn => {
       throw error;
     }
   }, [showToast]);
+
+  // const fetchCategoriesActivity = useCallback(async () => {
+  //   try {
+  //     const session = await getSession();
+  //     if (!session?.user?.uuid) {
+  //       showToast("error", "User session not found");
+  //       return;
+  //     }
+  //     const uuid = localStorage.getItem("userUuid");
+  //     const response = await axios.get(`${URL}/api/category-activity`, {
+  //       headers: {
+  //         Authorization: `Bearer ${session.user.accessToken}`,
+  //         "Content-Type": "application/json",
+  //         userid: uuid,
+  //       },
+  //     });
+  //     if (response.data && response.data.data) {
+  //       return response.data.data;
+  //     }
+  //     return [];
+  //   } catch (error) {
+  //     console.error("Error fetching categories:", error);
+  //     showToast("error", "Failed to fetch categories");
+  //     throw error;
+  //   }
+  // }, [showToast]);
 
   const fetchLocations = useCallback(async (): Promise<LocationData[]> => {
     try {

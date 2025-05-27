@@ -2,6 +2,7 @@ import React from "react";
 import { User, MapPin } from "lucide-react";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { useRouter } from "next/router";
 
 interface ActivityCardProps {
   id: number;
@@ -15,6 +16,7 @@ interface ActivityCardProps {
 }
 
 const ActivityCard: React.FC<ActivityCardProps> = ({
+  id,
   title,
   user,
   location,
@@ -23,6 +25,15 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
   isSelected,
   onClick,
 }) => {
+  const router = useRouter();
+
+  const handleCardClick = () => {
+    // Call the existing onClick for map selection
+    onClick();
+    // Navigate to detail page with the activity ID as UUID
+    router.push(`/activity-details/${id}`);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -34,7 +45,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
           ? "border-[rgba(194,91,52)] shadow-md"
           : "border-[#E5E7EB] hover:border-[rgba(194,91,52)]"
       }`}
-      onClick={onClick}
+      onClick={handleCardClick}
     >
       <div className="relative h-40">
         <Image

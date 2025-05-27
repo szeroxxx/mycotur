@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { Agent, Toast, PaginationInfo } from "../types/agent";
 import axiosInstance from "../utils/axiosConfig";
+import axios from "axios";
 const ITEMS_PER_PAGE = 10;
 
 interface ApiAgentResponse {
@@ -85,21 +86,37 @@ export const useAgents = () => {
 
         if (response.data && response.data.message === "User created") {
           await fetchAgents();
-          showToast("success", "Agent added successfully");
-
+          showToast("success", "Agent invited successfully");
           return {
             ...agent,
             id: response.data.id || Date.now().toString(),
           };
-        } else {
-          showToast("error", "Agent not get invited, please try again");
-          return null;
         }
-      } catch (error) {
-        console.error("Error creating agent:", error);
-        const errorMessage =
-          error instanceof Error ? error.message : "Failed to create agent";
-        showToast("error", errorMessage);
+
+        return null;
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 400) {
+            const errorData = error.response.data as {
+              error?: string;
+              data?: { details?: Array<{ message: string }> };
+            };
+            if (typeof errorData.error === "string") {
+              showToast("error", errorData.error);
+            } else if (errorData.data?.details?.[0]?.message) {
+              showToast("error", errorData.data.details[0].message);
+            } else {
+              showToast("error", "Invalid input data");
+            }
+          } else if (error.response?.status === 500) {
+            showToast("error", "Internal server error. Please try again later");
+          } else {
+            showToast("error", "Failed to invite agent. Please try again");
+          }
+        } else {
+          console.error("Error creating agent:", error);
+          showToast("error", "An unexpected error occurred");
+        }
         throw error;
       }
     },

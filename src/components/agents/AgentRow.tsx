@@ -19,7 +19,7 @@ export const AgentRow: React.FC<AgentRowProps> = ({
       <td className="py-4 px-6 whitespace-nowrap text-sm text-[rgba(68,63,63)]">{agent.email}</td>
       <td className="py-4 px-6 whitespace-nowrap">
         <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${
-          agent.status === 'Active' 
+          agent.status === 'active' 
             ? 'bg-[rgba(240,253,244)] text-[rgba(22,163,74)]' 
             : 'bg-[rgba(254,243,199)] text-[rgba(217,119,6)]'
         }`}>

@@ -88,7 +88,6 @@ const ActivitiesPage: React.FC = () => {
     checkProfile();
     getCategories();
   }, []);
-
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -124,6 +123,18 @@ const ActivitiesPage: React.FC = () => {
           ...prev!,
           mediaUrls: typeof value === 'string' ? JSON.parse(value) : value,
         }));
+      } else if (name === "images" && Array.isArray(value)) {
+        // Handle direct array updates for images
+        setSelectedActivity((prev: Activity | null) => ({
+          ...prev!,
+          images: value,
+        }));
+      } else if (name === "videos" && Array.isArray(value)) {
+        // Handle direct array updates for videos
+        setSelectedActivity((prev: Activity | null) => ({
+          ...prev!,
+          videos: value,
+        }));
       } else {
         setSelectedActivity((prev: Activity | null) => ({
           ...prev!,
@@ -132,18 +143,17 @@ const ActivitiesPage: React.FC = () => {
       }
     }
   };
+  // const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   if (!e.target.files || !selectedActivity) return;
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || !selectedActivity) return;
+  //   const existingImages = selectedActivity.images || [];
+  //   const newImages = Array.from(e.target.files);
 
-    const existingImages = selectedActivity.images || [];
-    const newImages = Array.from(e.target.files);
-
-    setSelectedActivity((prev) => ({
-      ...prev!,
-      images: [...existingImages, ...newImages],
-    }));
-  };
+  //   setSelectedActivity((prev) => ({
+  //     ...prev!,
+  //     images: [...existingImages, ...newImages],
+  //   }));
+  // };
 
   const handleEdit = (activity: Activity) => {
     console.log("Editing activity:", activity);
@@ -356,7 +366,7 @@ const ActivitiesPage: React.FC = () => {
                 categories={categories}
                 onSubmit={handleSubmit}
                 onChange={handleInputChange}
-                onImageUpload={handleImageUpload}
+                // onImageUpload={handleImageUpload}
                 onCancel={() => {
                   setIsModalOpen(false);
                   setSelectedActivity(null);

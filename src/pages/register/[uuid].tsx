@@ -31,14 +31,17 @@ const RegisterPage: React.FC = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       if (!uuid) return;
-
       try {
         const response = await axios.get(`${URL}/api/user-info/${uuid}`);
-        console.log('response::: ', response);
         setUserData(response.data);
       } catch (err) {
-        console.error("Error fetching user data:", err);
-        setError("Failed to load user information. Please try again.");
+        if (axios.isAxiosError(err) && err.response?.status === 400) {
+          setError("User not found");
+        } else {
+          console.error("Error fetching user data:", err);
+          setError("Failed to load user information. Please try again.");
+        }
+   
       } finally {
         setIsLoading(false);
       }
@@ -66,12 +69,12 @@ const RegisterPage: React.FC = () => {
         `${URL}/api/reset-password/${uuid}`,
         {
           password: password,
-          password1: password
+          password1: password,
         },
         {
           headers: {
-            'Content-Type': 'application/json'
-          }
+            "Content-Type": "application/json",
+          },
         }
       );
 
@@ -150,7 +153,11 @@ const RegisterPage: React.FC = () => {
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                    {showPassword ? (
+                      <FiEyeOff size={18} />
+                    ) : (
+                      <FiEye size={18} />
+                    )}
                   </button>
                 </div>
               </div>
@@ -173,7 +180,11 @@ const RegisterPage: React.FC = () => {
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   >
-                    {showConfirmPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                    {showConfirmPassword ? (
+                      <FiEyeOff size={18} />
+                    ) : (
+                      <FiEye size={18} />
+                    )}
                   </button>
                 </div>
               </div>

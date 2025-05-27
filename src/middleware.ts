@@ -4,7 +4,7 @@ import { getToken } from "next-auth/jwt";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
+  
   const publicRoutes = [
     '/',
     '/home',
@@ -12,9 +12,17 @@ export async function middleware(request: NextRequest) {
     '/activity-map',
     '/event-calender',
     '/discover-organiser',
+    '/activity-details',
+    '/event-detail',
   ];
-
   if (pathname.startsWith('/discover-organiser/')) {
+    return NextResponse.next();
+  }
+  if (pathname.startsWith('/activity-details/')) {
+    return NextResponse.next();
+  }
+
+  if (pathname.startsWith('/event-detail/')) {
     return NextResponse.next();
   }
 
@@ -63,6 +71,8 @@ export const config = {
     '/about',
     '/activity-map',
     '/event-calender',
-    '/discover-organiser/:path*'
+    '/discover-organiser/:path*',
+    '/activity-details/:path*',
+    '/event-detail/:path*'
   ]
 };

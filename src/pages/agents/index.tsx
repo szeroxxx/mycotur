@@ -13,7 +13,7 @@ const emptyAgent: Agent = {
   id: "",
   name: "",
   email: "",
-  status: "Active",
+  status: "active",
 };
 
 const AgentsPage: React.FC = () => {

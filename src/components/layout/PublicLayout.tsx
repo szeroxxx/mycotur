@@ -7,9 +7,9 @@ interface PublicLayoutProps {
 
 const PublicLayout: FC<PublicLayoutProps> = ({ children }) => {
   return (
-    <div className="min-h-screen bg-[rgba(255,255,255)] overflow-hidden ">
+    <div className="min-h-screen bg-[rgba(255,255,255)]">
       <PublicNavbar />
-      <main className="container mx-auto px-4 overflow-x-hidden overflow-y-auto scrollbar-hide pt-2 pb-2">
+      <main className="px-8 pt-22 pb-2 bg-[rgba(244,242,242)]" style={{ paddingTop: '80px' }}>
         {children}
       </main>
     </div>

@@ -53,8 +53,6 @@ const ActivityMapPage = () => {
         }
       } catch (error) {
         console.error("Error searching location:", error);
-      } finally {
-        console.log("setIsLoading(false);::: ");
       }
     },
     [setSearchLocation]
@@ -62,43 +60,40 @@ const ActivityMapPage = () => {
 
   const handleFilterChange = useCallback(
     (type: "location" | "category", value: string) => {
-      const newLocationFilter =
-        type === "location"
-          ? value === "Location"
-            ? ""
-            : value
-          : locationFilter;
-      const newCategoryFilter =
-        type === "category"
-          ? value === "Event Category"
-            ? ""
-            : value
-          : categoryFilter;
-
-      setLocationFilter(newLocationFilter);
-      setCategoryFilter(newCategoryFilter);
-
-      filterActivities(searchTerm, newLocationFilter, newCategoryFilter);
+      if (type === "location") {
+        setLocationFilter(value === "Location" ? "" : value);
+      } else {
+        setCategoryFilter(value === "Event Category" ? "" : value);
+      }
     },
-    [searchTerm, locationFilter, categoryFilter, filterActivities]
+    []
   );
 
+  // Separate useEffect for filtering activities
   useEffect(() => {
+    filterActivities(searchTerm, locationFilter, categoryFilter);
+  }, [searchTerm, locationFilter, categoryFilter, filterActivities]);
+
+  // Separate useEffect for location search with debounce
+  useEffect(() => {
+    if (!searchTerm) {
+      setSearchLocation(null);
+      return;
+    }
+
     const delayDebounceFn = setTimeout(() => {
-      if (searchTerm) {
-        handleLocationSearch(searchTerm);
-      }
-      filterActivities(searchTerm, locationFilter, categoryFilter);
+      handleLocationSearch(searchTerm);
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [
-    searchTerm,
-    locationFilter,
-    categoryFilter,
-    filterActivities,
-    handleLocationSearch,
-  ]);
+  }, [searchTerm, handleLocationSearch]);
+
+  // When filters change, apply them
+  useEffect(() => {
+    if (locationFilter || categoryFilter) {
+      filterActivities(searchTerm, locationFilter, categoryFilter);
+    }
+  }, [locationFilter, categoryFilter]);
 
   return (
     <PublicLayout>

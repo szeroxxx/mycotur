@@ -12,19 +12,23 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const router = useRouter();
   const { status } = useSession();
   const session = useSessionStorage();
-  
-  const publicRoutes = [
+    const publicRoutes = [
     '/login',
     '/admin/login',
     '/home',
     '/activity-map',
     '/event-calender',
     '/discover-organiser',
-    '/about'
+    '/about',
+    '/activity-details',
+    '/event-detail'
   ];
-  
   const isPublicRoute = publicRoutes.some(route => 
-    router.pathname === route || router.pathname.startsWith('/register/')
+    router.pathname === route || 
+    router.pathname.startsWith('/register/') ||
+    router.pathname.startsWith('/discover-organiser/') ||
+    router.pathname.startsWith('/activity-details/') ||
+    router.pathname.startsWith('/event-detail/')
   );
 
   if (status === 'loading') {

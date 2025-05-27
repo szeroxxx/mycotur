@@ -6,7 +6,7 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace("/home");
+    router.replace("/activity-map");
   }, [router]);
 
   return null;

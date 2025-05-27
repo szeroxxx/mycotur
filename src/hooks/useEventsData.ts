@@ -1,7 +1,22 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { getMediaUrl } from "../utils/mediaHelpers";
 
 import { CalendarEvent } from "../types/calendar-event";
+
+interface RawEventData {
+  uuid: string;
+  title: string;
+  media?: string;
+  date: string;
+  time: string;
+  location: string;
+  owner?: string;
+  category: string;
+  description: string;
+  lat: string;
+  lon: string;
+}
 
 export const useEventsData = () => {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -14,6 +29,26 @@ export const useEventsData = () => {
     category: "Event Category"
   });
 
+  // Separate function for mapping events
+  const mapEventsData = (data: RawEventData[]): CalendarEvent[] => {
+    return data.map((item) => ({
+      uuid: item.uuid,
+      title: item.title,
+      image: item.media
+        ? getMediaUrl(item.media)
+        : "/default-event-image.jpg",
+      date: item.date,
+      time: item.time,
+      location: item.location,      owner: item.owner || "Unknown",
+      category: item.category,
+      description: item.description,
+      lat: item.lat,
+      lon: item.lon,
+    }));
+  };
+
+
+
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -21,8 +56,9 @@ export const useEventsData = () => {
         const URL = process.env.NEXTAUTH_BACKEND_URL;
         const response = await axios.get(`${URL}/api/visitor/event`);
         if (response.data && Array.isArray(response.data.data)) {
-          setEvents(response.data.data);
-          setFilteredEvents(response.data.data);
+          const mappedEvents = mapEventsData(response.data.data);
+          setEvents(mappedEvents);
+          setFilteredEvents(mappedEvents);
         }
         setLoading(false);
       } catch (err) {

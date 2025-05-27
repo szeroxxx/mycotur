@@ -138,9 +138,6 @@ const ProfilePage: React.FC = () => {
 
   const handleSave = async () => {
     try {
-      if (!profileData.name.trim()) {
-        throw new Error("Name is required");
-      }
 
       if (!validateSocialInputs()) {
         return;
@@ -277,6 +274,7 @@ const ProfilePage: React.FC = () => {
                           name: e.target.value,
                         }))
                       }
+                      required
                       className="w-full p-2 text-[rgb(68,63,63)] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#D45B20]"
                     />
                   ) : (

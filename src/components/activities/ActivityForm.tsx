@@ -25,7 +25,6 @@ interface ActivityFormProps {
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => void;
-  onImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onCancel: () => void;
 }
 
@@ -55,7 +54,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
   categories,
   onSubmit,
   onChange,
-  onImageUpload,
+
   onCancel,
 }) => {
   const [locationInput, setLocationInput] = useState(activity.location || "");
@@ -143,54 +142,54 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
     console.log("Current activity mediaUrls:", activity.mediaUrls);
 
     try {
-      const newImages = [...(activity.images || [])];
-      const newMediaUrls = [...(activity.mediaUrls || [])];
+      // Create copies of current arrays
+      const currentImages = [...(activity.images || [])];
+      const currentMediaUrls = [...(activity.mediaUrls || [])];
 
-      const existingImageCount =
-        activity.mediaUrls?.filter((media) => media.type.startsWith("image"))
-          .length || 0;
+      // Get existing images from mediaUrls (already uploaded images)
+      const existingImages = currentMediaUrls.filter((media) =>
+        media.type.startsWith("image")
+      );
+
+      const existingImageCount = existingImages.length;
 
       if (index < existingImageCount) {
-        const imageMediaUrls =
-          activity.mediaUrls?.filter((media) =>
-            media.type.startsWith("image")
-          ) || [];
-        const mediaToRemove = imageMediaUrls[index];
-
-        const mediaIndex = newMediaUrls.findIndex(
+        // Removing an existing uploaded image
+        const imageToRemove = existingImages[index];
+        const mediaIndex = currentMediaUrls.findIndex(
           (media) =>
-            media.name === mediaToRemove.name &&
-            media.type === mediaToRemove.type
+            media.name === imageToRemove.name &&
+            media.type === imageToRemove.type
         );
         if (mediaIndex > -1) {
-          newMediaUrls.splice(mediaIndex, 1);
+          currentMediaUrls.splice(mediaIndex, 1);
         }
       } else {
+        // Removing a newly selected image (not yet uploaded)
         const newImageIndex = index - existingImageCount;
-        if (newImageIndex >= 0 && newImageIndex < newImages.length) {
-          newImages.splice(newImageIndex, 1);
+        if (newImageIndex >= 0 && newImageIndex < currentImages.length) {
+          currentImages.splice(newImageIndex, 1);
         }
-      }
-
+      } // Create proper events to update parent state
       const imageEvent = {
         target: {
           name: "images",
-          value: "",
-          type: "file",
-          files: newImages,
-        } as unknown as EventTarget & HTMLInputElement,
-      } as React.ChangeEvent<HTMLInputElement>;
+          value: currentImages,
+        },
+      } as unknown as React.ChangeEvent<HTMLInputElement>;
 
-      console.log("newMediaUrls::: ", newMediaUrls);
       const mediaEvent = {
         target: {
           name: "mediaUrls",
-          value: newMediaUrls,
-        } as unknown as EventTarget & HTMLInputElement,
-      } as React.ChangeEvent<HTMLInputElement>;
+          value: currentMediaUrls,
+        },
+      } as unknown as React.ChangeEvent<HTMLInputElement>;
 
       onChange(imageEvent);
       onChange(mediaEvent);
+
+      console.log("Updated images:", currentImages);
+      console.log("Updated mediaUrls:", currentMediaUrls);
     } catch (error) {
       console.error("Error in handleImageRemove:", error);
       setUploadError("Failed to remove image. Please try again.");
@@ -200,53 +199,54 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
     console.log("Removing video at index:", index);
 
     try {
-      const newVideos = [...(activity.videos || [])];
-      const newMediaUrls = [...(activity.mediaUrls || [])];
 
-      const existingVideoCount =
-        activity.mediaUrls?.filter((media) => media.type.startsWith("video"))
-          .length || 0;
+      const currentVideos = [...(activity.videos || [])];
+      const currentMediaUrls = [...(activity.mediaUrls || [])];
+
+
+      const existingVideos = currentMediaUrls.filter((media) =>
+        media.type.startsWith("video")
+      );
+
+      const existingVideoCount = existingVideos.length;
 
       if (index < existingVideoCount) {
-        const videoMediaUrls =
-          activity.mediaUrls?.filter((media) =>
-            media.type.startsWith("video")
-          ) || [];
-        const mediaToRemove = videoMediaUrls[index];
 
-        const mediaIndex = newMediaUrls.findIndex(
+        const videoToRemove = existingVideos[index];
+        const mediaIndex = currentMediaUrls.findIndex(
           (media) =>
-            media.name === mediaToRemove.name &&
-            media.type === mediaToRemove.type
+            media.name === videoToRemove.name &&
+            media.type === videoToRemove.type
         );
         if (mediaIndex > -1) {
-          newMediaUrls.splice(mediaIndex, 1);
+          currentMediaUrls.splice(mediaIndex, 1);
         }
       } else {
-        const newVideoIndex = index - existingVideoCount;
-        if (newVideoIndex >= 0 && newVideoIndex < newVideos.length) {
-          newVideos.splice(newVideoIndex, 1);
-        }
-      }
 
+        const newVideoIndex = index - existingVideoCount;
+        if (newVideoIndex >= 0 && newVideoIndex < currentVideos.length) {
+          currentVideos.splice(newVideoIndex, 1);
+        }
+      } 
       const videoEvent = {
         target: {
           name: "videos",
-          value: "",
-          type: "file",
-          files: newVideos,
-        } as unknown as EventTarget & HTMLInputElement,
-      } as React.ChangeEvent<HTMLInputElement>;
+          value: currentVideos,
+        },
+      } as unknown as React.ChangeEvent<HTMLInputElement>;
 
       const mediaEvent = {
         target: {
           name: "mediaUrls",
-          value: newMediaUrls,
-        } as unknown as EventTarget & HTMLInputElement,
-      } as React.ChangeEvent<HTMLInputElement>;
+          value: currentMediaUrls,
+        },
+      } as unknown as React.ChangeEvent<HTMLInputElement>;
 
       onChange(videoEvent);
       onChange(mediaEvent);
+
+      console.log("Updated videos:", currentVideos);
+      console.log("Updated mediaUrls:", currentMediaUrls);
     } catch (error) {
       console.error("Error in handleVideoRemove:", error);
       setUploadError("Failed to remove video. Please try again.");
@@ -261,18 +261,15 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
     const imageFiles: File[] = [];
     const videoFiles: File[] = [];
 
-    // First check file types
     for (const file of newFiles) {
       if (ALLOWED_IMAGE_TYPES.includes(file.type)) {
         if (file.size > 10 * 1024 * 1024) {
-          // 10MB limit for images
           setUploadError(`Image ${file.name} exceeds 10MB limit`);
           return;
         }
         imageFiles.push(file);
       } else if (ALLOWED_VIDEO_TYPES.includes(file.type)) {
         if (file.size > 15 * 1024 * 1024) {
-          // 15MB limit for videos
           setUploadError(`Video ${file.name} exceeds 15MB limit`);
           return;
         }
@@ -283,7 +280,8 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
         );
         return;
       }
-    } // Check total file counts
+    }
+
     const existingImages = activity.images || [];
     const existingVideos = activity.videos || [];
     const existingImageUrls =
@@ -325,25 +323,27 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
 
     setIsUploading(true);
     try {
+      // Update images if any
       if (imageFiles.length > 0) {
+        const updatedImages = [...existingImages, ...imageFiles];
         const imageEvent = {
           target: {
             name: "images",
-            files: imageFiles as unknown as FileList,
-            type: "file",
+            value: updatedImages,
           },
-        } as React.ChangeEvent<HTMLInputElement>;
-        onImageUpload(imageEvent);
+        } as unknown as React.ChangeEvent<HTMLInputElement>;
+        onChange(imageEvent);
       }
 
+      // Update videos if any
       if (videoFiles.length > 0) {
+        const updatedVideos = [...existingVideos, ...videoFiles];
         const videoEvent = {
           target: {
             name: "videos",
-            files: videoFiles as unknown as FileList,
-            type: "file",
+            value: updatedVideos,
           },
-        } as React.ChangeEvent<HTMLInputElement>;
+        } as unknown as React.ChangeEvent<HTMLInputElement>;
         onChange(videoEvent);
       }
     } finally {
@@ -374,8 +374,8 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
       document.removeEventListener("keydown", handleEscapeKey);
     };
   }, [locationRef]);
-
   useEffect(() => {
+    // Clean up previous URLs
     previewImages.forEach((url) => {
       if (url.startsWith("blob:")) {
         URL.revokeObjectURL(url);
@@ -392,20 +392,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
 
     console.log("Activity data in effect:", activity);
 
-    if (activity.images && activity.images.length > 0) {
-      console.log("Processing new image files:", activity.images);
-      const fileUrls = activity.images.map((file) => URL.createObjectURL(file));
-      newPreviewImages.push(...fileUrls);
-    }
-
-    if (activity.videos && activity.videos.length > 0) {
-      console.log("Processing new video files:", activity.videos);
-      const videoUrls = activity.videos.map((file) =>
-        URL.createObjectURL(file)
-      );
-      newPreviewVideos.push(...videoUrls);
-    }
-
+    // First, add existing uploaded media (from mediaUrls)
     if (activity.mediaUrls && activity.mediaUrls.length > 0) {
       console.log("Processing existing media URLs:", activity.mediaUrls);
 
@@ -438,6 +425,21 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
       newPreviewVideos.push(...existingVideoUrls);
     }
 
+    // Then, add newly selected files (from images/videos arrays)
+    if (activity.images && activity.images.length > 0) {
+      console.log("Processing new image files:", activity.images);
+      const fileUrls = activity.images.map((file) => URL.createObjectURL(file));
+      newPreviewImages.push(...fileUrls);
+    }
+
+    if (activity.videos && activity.videos.length > 0) {
+      console.log("Processing new video files:", activity.videos);
+      const videoUrls = activity.videos.map((file) =>
+        URL.createObjectURL(file)
+      );
+      newPreviewVideos.push(...videoUrls);
+    }
+
     console.log("Final preview images:", newPreviewImages);
     console.log("Final preview videos:", newPreviewVideos);
 
@@ -445,6 +447,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
     setPreviewVideos(newPreviewVideos);
 
     return () => {
+      // Clean up blob URLs when component unmounts or effect re-runs
       newPreviewImages.forEach((url) => {
         if (url.startsWith("blob:")) {
           URL.revokeObjectURL(url);
@@ -456,15 +459,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
         }
       });
     };
-  }, [
-    activity.images,
-    activity.videos,
-    activity.mediaUrls,
-    activity.id,
-    activity,
-    setPreviewImages,
-    setPreviewVideos,
-  ]);
+  }, [activity.images, activity.videos, activity.mediaUrls, activity.id]);
 
   const currentImageCount =
     (activity.images?.length || 0) +

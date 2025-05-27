@@ -170,6 +170,7 @@ export const useActivities = () => {
             formData.append("videos", video);
           });
         }
+        console.log("formData::: ", formData);
 
         const uuid = localStorage.getItem("userUuid");
 
@@ -279,6 +280,8 @@ export const useActivities = () => {
             }
           });
         }
+        console.log("activity::: ", activity);
+        console.log("formData::: ", formData);
         const config = {
           method: "put",
           maxBodyLength: Infinity,

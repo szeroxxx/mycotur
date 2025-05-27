@@ -29,7 +29,6 @@ const emptyEvent: Event = {
   images: [],
   videos: [],
   mediaUrls: [],
-  
 };
 interface Category {
   uuid: string;
@@ -66,7 +65,7 @@ const EventsPage: React.FC = () => {
     deleteEvent,
     showToast,
   } = useEvents();
-  console.log('eventsxssssssssss::: ', events);
+  console.log("eventsxssssssssss::: ", events);
   const { checkProfileCompletion, fetchCategories } = useProfile();
 
   useEffect(() => {
@@ -90,7 +89,7 @@ const EventsPage: React.FC = () => {
     >
   ) => {
     const { name, value } = e.target;
-    console.log('name, value::: ', name, value);
+    console.log("name, value::: ", name, value);
     if (selectedEvent) {
       setSelectedEvent((prev) => ({
         ...prev!,
@@ -134,7 +133,7 @@ const EventsPage: React.FC = () => {
           )
         : "",
     };
-    console.log('formattedEvent::: ', formattedEvent);
+    console.log("formattedEvent::: ", formattedEvent);
     setSelectedEvent(formattedEvent);
     setIsModalOpen(true);
   };
@@ -266,8 +265,11 @@ const EventsPage: React.FC = () => {
               className="w-full md:w-48 px-4 py-2  text-[rgba(142,133,129)] border border-[rgba(199,195,193)] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
             >
               <option value="">Categories</option>
-              <option value="Experiences">Experiences</option>
-              <option value="Cultural">Cultural</option>
+              {categories.map((category) => (
+                <option key={category.uuid} value={category.title}>
+                  {category.title}
+                </option>
+              ))}
             </select>
           </div>
           <button

@@ -2,21 +2,23 @@ import React from "react";
 import { User, MapPin, Clock, CalendarDays } from "lucide-react";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
-
+import { useRouter } from "next/router";
+import Image from "next/image";
 interface EventCardProps {
   id: string;
-  // media: string;
   title: string;
   date: string;
   time: string;
   location: string;
   owner: string;
+  image: string;
   isSelected: boolean;
   onClick: () => void;
 }
 
 const EventCard: React.FC<EventCardProps> = ({
-  // media,
+  id,
+  image,
   title,
   date,
   time,
@@ -25,6 +27,13 @@ const EventCard: React.FC<EventCardProps> = ({
   isSelected,
   onClick,
 }) => {
+  const router = useRouter();
+  const handleCardClick = () => {
+    // Call existing onClick for the calendar selection
+    onClick();
+    // Navigate to event detail page
+    router.push(`/event-detail/${id}`);
+  };
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -36,15 +45,20 @@ const EventCard: React.FC<EventCardProps> = ({
           ? "border-[rgba(194,91,52)] shadow-md"
           : "border-[#E5E7EB] hover:border-[rgba(194,91,52)]"
       }`}
-      onClick={onClick}
+      onClick={handleCardClick}
     >
       <div className="relative h-40">
-        <motion.img
-          whileHover={{ scale: 1.05 }}
-          transition={{ duration: 0.3 }}
-          src={`https://images.unsplash.com/photo-1556910103-1c02745aae4d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80`}
+        <Image
+          src={image}
           alt={title}
-          className="w-full h-full object-cover"
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="object-cover rounded-[8px]"
+          loading="lazy"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = "/default-activity-image.jpg";
+          }}
         />
         <motion.div
           initial={{ x: 20, opacity: 0 }}

@@ -3,23 +3,34 @@ import { Youtube, Facebook, Instagram } from "lucide-react";
 import Link from "next/link";
 
 interface OrganiserCardProps {
-  id: number;
+  uuid: string;
   name: string;
+  about: string | null;
+  address: string | null;
+  facebook: string | null;
+  instagram: string | null;
+  youtube: string | null;
+  categories: {
+    id: number;
+    title: string;
+    description: string;
+  }[];
   totalEvents: number;
-  categories: string[];
-  description: string;
-  colorDots?: string[];
 }
 
 const OrganiserCard: React.FC<OrganiserCardProps> = ({
-  id,
+  uuid,
   name,
-  totalEvents,
+  about,
+  address,
+  facebook,
+  instagram,
+  youtube,
   categories,
-  description,
+  totalEvents,
 }) => {
   return (
-    <Link href={`/discover-organiser/${id}`} className="block">
+    <div className="block">
       <div className="bg-white rounded-xl shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow duration-200">
         <div className="p-4 space-y-4">
           <div className="flex items-start gap-4">
@@ -46,29 +57,54 @@ const OrganiserCard: React.FC<OrganiserCardProps> = ({
               </div>
 
               <div className="flex space-x-2 mt-2">
-                <Youtube className="h-5 w-5 text-orange-500" />
-                <Facebook className="h-5 w-5 text-orange-500" />
-                <Instagram className="h-5 w-5 text-orange-500" />
+                {youtube && (
+                  <a href={youtube} target="_blank" rel="noopener noreferrer">
+                    <Youtube className="h-5 w-5 text-orange-500" />
+                  </a>
+                )}
+                {facebook && (
+                  <a href={facebook} target="_blank" rel="noopener noreferrer">
+                    <Facebook className="h-5 w-5 text-orange-500" />
+                  </a>
+                )}
+                {instagram && (
+                  <a href={instagram} target="_blank" rel="noopener noreferrer">
+                    <Instagram className="h-5 w-5 text-orange-500" />
+                  </a>
+                )}
               </div>
+
+              {address && (
+                <div className="text-xs text-gray-500">
+                  <span>📍 {address}</span>
+                </div>
+              )}
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-x-2 gap-y-1">
-            {categories.map((category, index) => (
-              <div key={index} className="text-xs text-gray-600 line-clamp-1">
-                {category}
+            {categories.map((category) => (
+              <div
+                key={category.id}
+                className="text-xs text-gray-600 line-clamp-1"
+              >
+                {category.title}
               </div>
             ))}
           </div>
 
-          <p className="text-xs text-gray-600 leading-relaxed">{description}</p>
+          <p className="text-xs text-gray-600 leading-relaxed">
+            {about || "No description available."}
+          </p>
 
-          <button className="w-full py-3 bg-gray-800 text-white text-sm rounded-md hover:bg-gray-700 transition-colors">
-            Get Contact Information
-          </button>
+          <Link href={`/discover-organiser/${uuid}`} className="block">
+            <button className="w-full py-3 bg-gray-800 text-white text-sm rounded-md hover:bg-gray-700 transition-colors">
+              Get Contact Information
+            </button>
+          </Link>
         </div>
       </div>
-    </Link>
+    </div>
   );
 };
 
