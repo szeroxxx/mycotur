@@ -4,7 +4,15 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   images: {
-    domains: ["localhost", "images.unsplash.com", "avilamycotour.es"],
+    // domains: ["localhost", "images.unsplash.com", "avilamycotour.es"],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'avilamycotour.es',
+        port: '',
+        pathname: '/server/api/image/**',
+      },
+    ],
   },
   env: {
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
