@@ -30,7 +30,8 @@ export const useOrganizers = () => {
   useEffect(() => {
     const fetchOrganizers = async () => {
       try {
-        const response = await axios.get('http://localhost:3500/server/api/visitor/organization');
+        const URL = process.env.NEXTAUTH_BACKEND_URL;
+        const response = await axios.get(`${URL}/api/visitor/organization`);
         setOrganizers(response.data);
         setError(null);
       } catch (err) {
