@@ -45,7 +45,7 @@ const ActivitiesPage: React.FC = () => {
   const [activityToDelete, setActivityToDelete] = useState<Activity | null>(
     null
   );
-  const { checkProfileCompletion, fetchCategories } = useProfile();
+  const { checkProfileCompletion, fetchCategoriesActivity } = useProfile();
 
   useEffect(() => {
     const checkProfile = async () => {
@@ -58,7 +58,6 @@ const ActivitiesPage: React.FC = () => {
         if (parsedUserData.role !== "agent") return;
 
         const status = await checkProfileCompletion();
-        console.log("status::: ", status);
         if (status) {
           setProfileStatus(status);
         }
@@ -68,19 +67,8 @@ const ActivitiesPage: React.FC = () => {
     };
     const getCategories = async () => {
       try {
-        const userData = localStorage.getItem("userData");
-        const fetchedCategories = await fetchCategories();
-        if (userData) {
-          const parsedUserData = JSON.parse(userData);
-          if (parsedUserData.role === "agent") {
-            const filteredCategories = fetchedCategories.filter((category) =>
-              parsedUserData.categories?.includes(category.uuid)
-            );
-            setCategories(filteredCategories);
-          } else {
-            setCategories(fetchedCategories);
-          }
-        }
+        const fetchedCategories = await fetchCategoriesActivity();
+        setCategories(fetchedCategories);
       } catch (error) {
         console.error("Error loading categories:", error);
       }

@@ -66,7 +66,7 @@ const EventsPage: React.FC = () => {
     showToast,
   } = useEvents();
   console.log("eventsxssssssssss::: ", events);
-  const { checkProfileCompletion, fetchCategories } = useProfile();
+  const { checkProfileCompletion, fetchCategoriesActivity } = useProfile();
 
   useEffect(() => {
     if (isModalOpen) {
@@ -188,11 +188,9 @@ const EventsPage: React.FC = () => {
       try {
         const userData = localStorage.getItem("userData");
         if (!userData) return;
-
         const parsedUserData = JSON.parse(userData);
         setIsAgent(parsedUserData.role === "agent");
         if (parsedUserData.role !== "agent") return;
-
         const status = await checkProfileCompletion();
         console.log("status::: ", status);
         if (status) {
@@ -205,19 +203,8 @@ const EventsPage: React.FC = () => {
 
     const getCategories = async () => {
       try {
-        const userData = localStorage.getItem("userData");
-        const fetchedCategories = await fetchCategories();
-        if (userData) {
-          const parsedUserData = JSON.parse(userData);
-          if (parsedUserData.role === "agent") {
-            const filteredCategories = fetchedCategories.filter((category) =>
-              parsedUserData.categories?.includes(category.uuid)
-            );
-            setCategories(filteredCategories);
-          } else {
-            setCategories(fetchedCategories);
-          }
-        }
+        const fetchedCategories = await fetchCategoriesActivity();
+        setCategories(fetchedCategories);
       } catch (error) {
         console.error("Error loading categories:", error);
       }

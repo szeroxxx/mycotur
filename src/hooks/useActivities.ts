@@ -68,6 +68,7 @@ export const useActivities = () => {
 
         const response = await axios.request<ApiResponse>(config);
 
+        console.log('response.data.data::: ', response.data.data);
         const mappedActivities: Activity[] = response.data.data.map((item) => ({
           id: item.id.toString(),
           title: item.title,

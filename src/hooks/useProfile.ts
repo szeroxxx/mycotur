@@ -22,6 +22,7 @@ interface LocationData {
 }
 
 interface ProfileData {
+  profilePicture: string;
   name: string;
   email: string;
   about: string;
@@ -50,6 +51,7 @@ interface UseProfileReturn {
   fetchProfile: () => Promise<ProfileData>;
   checkProfileCompletion: () => Promise<ProfileCompletion>;
   fetchCategories: () => Promise<CategoryData[]>;
+  fetchCategoriesActivity: () => Promise<CategoryData[]>;
   fetchLocations: () => Promise<LocationData[]>;
   toast: Toast | null;
 }
@@ -230,31 +232,32 @@ export const useProfile = (): UseProfileReturn => {
     }
   }, [showToast]);
 
-  // const fetchCategoriesActivity = useCallback(async () => {
-  //   try {
-  //     const session = await getSession();
-  //     if (!session?.user?.uuid) {
-  //       showToast("error", "User session not found");
-  //       return;
-  //     }
-  //     const uuid = localStorage.getItem("userUuid");
-  //     const response = await axios.get(`${URL}/api/category-activity`, {
-  //       headers: {
-  //         Authorization: `Bearer ${session.user.accessToken}`,
-  //         "Content-Type": "application/json",
-  //         userid: uuid,
-  //       },
-  //     });
-  //     if (response.data && response.data.data) {
-  //       return response.data.data;
-  //     }
-  //     return [];
-  //   } catch (error) {
-  //     console.error("Error fetching categories:", error);
-  //     showToast("error", "Failed to fetch categories");
-  //     throw error;
-  //   }
-  // }, [showToast]);
+  const fetchCategoriesActivity = useCallback(async () => {
+    try {
+      const session = await getSession();
+      if (!session?.user?.uuid) {
+        showToast("error", "User session not found");
+        return;
+      }
+      const uuid = localStorage.getItem("userUuid");
+      const response = await axios.get(`${URL}/api/categories-drop`, {
+        headers: {
+          Authorization: `Bearer ${session.user.accessToken}`,
+          "Content-Type": "application/json",
+          userid: uuid,
+        },
+      });
+      console.log('responxxxxse::: ', response);
+      if (response.data && response.data.data) {
+        return response.data.data;
+      }
+      return [];
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      showToast("error", "Failed to fetch categories");
+      throw error;
+    }
+  }, [showToast]);
 
   const fetchLocations = useCallback(async (): Promise<LocationData[]> => {
     try {
@@ -277,6 +280,7 @@ export const useProfile = (): UseProfileReturn => {
     fetchProfile,
     checkProfileCompletion,
     fetchCategories,
+    fetchCategoriesActivity,
     fetchLocations,
     toast,
   };

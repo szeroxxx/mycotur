@@ -14,9 +14,9 @@ interface StatCardProps {
 
 interface DashboardData {
   totalAgents: number;
-  totalForms: string;
+  totalForms: number;
   totalActivities: number;
-  totalClicks: string;
+  totalClicks: number;
   totalEvents: number;
 }
 
@@ -37,27 +37,30 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon }) => {
 const Dashboard: React.FC = () => {
   const [dashboardData, setDashboardData] = useState<DashboardData>({
     totalAgents: 0,
-    totalForms: "N/A",
+    totalForms: 0,
     totalActivities: 0,
-    totalClicks: "N/A",
+    totalClicks: 0,
     totalEvents: 0,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAgent, setIsAgent] = useState(false);
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-         const uuid = localStorage.getItem("userUuid");
+        const uuid = localStorage.getItem("userUuid");
         const response = await axiosInstance.get("/api/dashboard", {
-            headers: {
-              userid: uuid,
-            },
-          });
+          headers: {
+            userid: uuid,
+          },
+        });
         setDashboardData((prevData) => ({
           ...prevData,
+          totalForms: response.data.totalrsvp,
           totalAgents: response.data.totalAgents,
           totalActivities: response.data.totalActivities,
           totalEvents: response.data.totalEvents,
+          totalClicks: response.data.totalClicks,
         }));
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
@@ -77,6 +80,10 @@ const Dashboard: React.FC = () => {
         setLoading(false);
       }
     };
+    const userData = localStorage.getItem("userData");
+    if (!userData) return;
+    const parsedUserData = JSON.parse(userData);
+    setIsAgent(parsedUserData.role === "agent");
 
     fetchDashboardData();
   }, []);
@@ -97,17 +104,21 @@ const Dashboard: React.FC = () => {
     );
   }
 
+  console.log("isAgent::: ", isAgent);
+
   return (
     <>
       <Head>
         <title>Dashboard | Mycotur</title>
       </Head>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-5xl mx-auto">
-        <StatCard
-          title="Total Agents"
-          value={dashboardData.totalAgents}
-          icon={<FiUsers size={20} />}
-        />
+        {!isAgent && (
+          <StatCard
+            title="Total Agents"
+            value={dashboardData.totalAgents}
+            icon={<FiUsers size={20} />}
+          />
+        )}{" "}
         <StatCard
           title="Total Number of Form submission"
           value={dashboardData.totalForms}

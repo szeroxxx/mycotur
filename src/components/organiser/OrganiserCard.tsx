@@ -1,12 +1,17 @@
-import React from "react";
-import { Youtube, Facebook, Instagram } from "lucide-react";
-import Link from "next/link";
+import React, { useState } from "react";
+import { RiInstagramFill } from "react-icons/ri";
+import { IoLogoFacebook } from "react-icons/io5";
+import { IoLogoYoutube } from "react-icons/io";
+import ContactModal from "@/components/activity-detail/ContactModal";
+import axiosInstance from "@/utils/axiosConfig";
 
 interface OrganiserCardProps {
+  // id: number;
   uuid: string;
   name: string;
   about: string | null;
-  address: string | null;
+  // address: string | null;
+  email: string;
   facebook: string | null;
   instagram: string | null;
   youtube: string | null;
@@ -19,25 +24,50 @@ interface OrganiserCardProps {
 }
 
 const OrganiserCard: React.FC<OrganiserCardProps> = ({
+  // id,
   uuid,
   name,
   about,
-  address,
+  // address,
+  email,
   facebook,
   instagram,
   youtube,
   categories,
   totalEvents,
 }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const recordClick = async (organizerId: string) => {
+    try {
+      await axiosInstance.post("/api/clicks", {
+        organizerId: organizerId,
+      });
+    } catch (error) {
+      console.error("Failed to record click:", error);
+    }
+  };
+
+  const handleOpen = async () => {
+    await recordClick(uuid);
+    setIsOpen(true);
+  };
+
+  const handleClose = () => {
+    setIsOpen(false);
+  };
+
   return (
-    <div className="block">
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow duration-200">
-        <div className="p-4 space-y-4">
-          <div className="flex items-start gap-4">
+    <div className="block h-full">
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow duration-200 h-full flex flex-col">
+        <div className="p-4 flex flex-col h-full">
+          <div className="flex items-start gap-4 mb-4">
             <div className="w-20 h-20 bg-gray-200 rounded-md shrink-0"></div>
 
-            <div className="space-y-2">
-              <h3 className="font-medium text-gray-800 line-clamp-2">{name}</h3>
+            <div className="space-y-2 flex-1 min-h-0">
+              <h3 className="font-medium text-2xl text-[rgba(68,63,63)] line-clamp-2 min-h-[2.5rem]">
+                {name}
+              </h3>
               <div className="flex items-center text-xs text-gray-500">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -53,57 +83,82 @@ const OrganiserCard: React.FC<OrganiserCardProps> = ({
                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                   />
                 </svg>
-                <span>Total Event ({totalEvents})</span>
+                <span className="text-xs text-[rgba(100,92,90)]">
+                  Total Event ({totalEvents})
+                </span>
               </div>
 
-              <div className="flex space-x-2 mt-2">
+              <div className="flex space-x-2">
                 {youtube && (
                   <a href={youtube} target="_blank" rel="noopener noreferrer">
-                    <Youtube className="h-5 w-5 text-orange-500" />
+                    <IoLogoYoutube className="h-5 w-5 text-[rgba(229,114,0)] border-[0.5px] border-[rgba(235,235,235)] rounded" />
                   </a>
                 )}
                 {facebook && (
                   <a href={facebook} target="_blank" rel="noopener noreferrer">
-                    <Facebook className="h-5 w-5 text-orange-500" />
+                    <IoLogoFacebook className="h-5 w-5 text-[rgba(229,114,0)] border-[0.5px] border-[rgba(235,235,235)] rounded" />
                   </a>
                 )}
                 {instagram && (
                   <a href={instagram} target="_blank" rel="noopener noreferrer">
-                    <Instagram className="h-5 w-5 text-orange-500" />
+                    <RiInstagramFill className="h-5 w-5 text-[rgba(229,114,0)] border-[0.5px] border-[rgba(235,235,235)] rounded" />
                   </a>
                 )}
               </div>
 
-              {address && (
+              {/* {address && (
                 <div className="text-xs text-gray-500">
                   <span>📍 {address}</span>
                 </div>
-              )}
+              )} */}
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-x-2 gap-y-1">
-            {categories.map((category) => (
+          <div className="grid grid-cols-2 gap-x-2 gap-y-1 mb-4 min-h-[3rem]">
+            {categories.slice(0, 4).map((category) => (
               <div
                 key={category.id}
-                className="text-xs text-gray-600 line-clamp-1"
+                className="text-xs text-[rgba(68,63,63)] line-clamp-1 border-[0.5px] border-[rgba(218,218,218)] rounded-lg px-2 py-1  hover:bg-[rgba(229,229,229)] transition-colors duration-200"
               >
                 {category.title}
               </div>
             ))}
+            {categories.length > 4 && (
+              <div className="text-xs text-[rgba(100,92,90)] col-span-2">
+                +{categories.length - 4} more categories
+              </div>
+            )}
           </div>
 
-          <p className="text-xs text-gray-600 leading-relaxed">
-            {about || "No description available."}
-          </p>
+          {/* About section - flexible height but constrained */}
+          <div className="flex-1 mb-4">
+            <p className="text-xs text-gray-600 leading-relaxed line-clamp-3">
+              {about || "No description available."}
+            </p>
+          </div>
 
-          <Link href={`/discover-organiser/${uuid}`} className="block">
-            <button className="w-full py-3 bg-gray-800 text-white text-sm rounded-md hover:bg-gray-700 transition-colors">
-              Get Contact Information
-            </button>
-          </Link>
+          {/* Button section - fixed at bottom */}
+          <div className="mt-auto">
+            <div className="block">
+              <button
+                onClick={handleOpen}
+                className="w-full py-3 bg-gray-800 text-white text-sm rounded-md hover:bg-gray-700 transition-colors"
+              >
+                Get Contact Information
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      </div>      {/* Contact Modal */}
+      <ContactModal 
+        isOpen={isOpen}
+        onClose={handleClose}
+        contactInfo={{
+          email: email,
+          facebook: facebook || undefined,
+          instagram: instagram || undefined,
+        }}
+      />
     </div>
   );
 };

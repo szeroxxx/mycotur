@@ -1,8 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
 import { Calendar, MapPin } from "lucide-react";
 import { RiInstagramFill } from "react-icons/ri";
 import { IoLogoFacebook } from "react-icons/io5";
 import { IoLogoYoutube } from "react-icons/io";
+import dynamic from "next/dynamic";
+
+const DirectionsMap = dynamic(() => import("@/components/maps/DirectionsMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-8 m-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[rgba(229,114,0)] mx-auto"></div>
+          <p className="mt-2 text-sm text-gray-600">Loading map...</p>
+        </div>
+      </div>
+    </div>
+  ),
+});
 
 interface EventDate {
   id: string;
@@ -52,6 +67,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({
   organizer,
   location,
 }) => {
+  const [isDirectionsOpen, setIsDirectionsOpen] = useState(false);
   return (
     <div className="space-y-6">
       <div>
@@ -152,26 +168,62 @@ const EventDetails: React.FC<EventDetailsProps> = ({
       </div>{" "}
       {/* Event Address */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">
+        <h3 className="text-lg font-semibold text-[rgba(68,63,63)] mb-4">
           Event Address
         </h3>
-        <div className="w-full h-48 bg-gray-100 rounded-lg relative overflow-hidden">
-          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-            <span className="text-gray-400">Map will be displayed here</span>
-          </div>
-          <div className="absolute bottom-4 left-4">
-            <div className="flex items-center gap-2 text-sm">
-              <MapPin className="w-4 h-4 text-gray-600" />
-              <span className="text-gray-600">Get Directions</span>
+        <div
+          className={`w-full h-48 bg-gray-100 rounded-lg relative overflow-hidden transition-colors ${
+            location.coordinates
+              ? "cursor-pointer hover:bg-gray-50"
+              : "cursor-not-allowed"
+          }`}
+          onClick={() => location.coordinates && setIsDirectionsOpen(true)}
+        >
+          <div className="w-full h-full bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
+            <div className="text-center">
+              <div className="w-12 h-12 bg-[rgba(229,114,0)] rounded-full flex items-center justify-center mx-auto mb-2">
+                <MapPin className="w-6 h-6 text-white" />
+              </div>
+              <span className="text-[rgba(68,63,63)] font-medium">
+                {location.coordinates
+                  ? "Click to view on map"
+                  : "Location not available"}
+              </span>
             </div>
           </div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-            <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center">
-              <MapPin className="w-4 h-4 text-white" />
+
+          <div
+            className={`absolute bottom-4 left-4 bg-white rounded-lg px-3 py-2 shadow-sm border border-gray-200 ${
+              !location.coordinates ? "opacity-50" : ""
+            }`}
+          >
+            <div className="flex items-center gap-2 text-sm">
+              <MapPin className="w-4 h-4 text-[rgba(229,114,0)]" />
+              <span className="text-[rgba(68,63,63)] font-medium">
+                {location.coordinates
+                  ? "Get Directions"
+                  : "Directions unavailable"}
+              </span>
             </div>
           </div>
         </div>
-        <p className="text-sm text-gray-600 mt-2">{location.address}</p>
+        <p className="text-sm text-[rgba(100,92,90)] mt-2">
+          {location.address}
+        </p>
+
+        {isDirectionsOpen && location.coordinates && (
+          <DirectionsMap
+            eventLocation={{
+              address: location.address,
+              coordinates: {
+                lat: location.coordinates.lat,
+                lng: location.coordinates.lng,
+              },
+            }}
+            isOpen={isDirectionsOpen}
+            onClose={() => setIsDirectionsOpen(false)}
+          />
+        )}
       </div>
     </div>
   );

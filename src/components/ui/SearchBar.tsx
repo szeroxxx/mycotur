@@ -16,13 +16,13 @@ interface Location {
 
 const defaultLocation: Location = {
   uuid: "",
-  location: "Location"
+  location: "Location",
 };
 
 const defaultCategory: Category = {
   uuid: "",
   title: "Event Category",
-  description: ""
+  description: "",
 };
 
 interface SearchBarProps {
@@ -31,8 +31,6 @@ interface SearchBarProps {
   onFilterChange: (type: "location" | "category", value: string) => void;
   onSearch: () => void;
   className?: string;
-  value?: string;
-  onChange?: (value: string) => void;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -41,8 +39,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
   onFilterChange,
   onSearch,
   className = "",
-  // value = "",
-  // onChange,
 }) => {
   const { fetchCategories, fetchLocations } = useProfile();
   const [categories, setCategories] = useState<Category[]>([defaultCategory]);
@@ -54,22 +50,25 @@ const SearchBar: React.FC<SearchBarProps> = ({
       try {
         const [categoriesData, locationsData] = await Promise.all([
           fetchCategories(),
-          fetchLocations()
+          fetchLocations(),
         ]);
-        
+
         setCategories([defaultCategory, ...categoriesData]);
         setLocations([defaultLocation, ...locationsData]);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [fetchCategories, fetchLocations]);
 
-  const handleFilterChange = (type: "location" | "category", value: string): void => {
+  const handleFilterChange = (
+    type: "location" | "category",
+    value: string
+  ): void => {
     onFilterChange(type, value);
   };
 
@@ -82,33 +81,20 @@ const SearchBar: React.FC<SearchBarProps> = ({
   }
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
       className={`bg-white rounded-[20px] shadow-md p-4 ${className}`}
     >
-      <motion.div 
+      {" "}      <motion.div
         className="flex gap-2"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.2, duration: 0.3 }}
       >
-        {/* <motion.div 
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          className="relative"
-        >
-          <div 
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
-            onClick={onSearch}
-          >
-            <IoSearchOutline size={18} className="text-[rgba(68,63,63)]" />
-          </div>
-        </motion.div> */}
-
-        <motion.div 
-          className="flex-1"
+        <motion.div
+          className="w-32"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
@@ -125,8 +111,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
           </motion.select>
         </motion.div>
 
-        <motion.div 
-          className="flex-1"
+        <motion.div
+          className="w-36"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
@@ -146,9 +132,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
         <motion.button
           onClick={onSearch}
           className="bg-[rgba(194,91,52)] text-white px-4 py-2 rounded-lg"
-          whileHover={{ 
+          whileHover={{
             scale: 1.05,
-            backgroundColor: "#cc6600"
+            backgroundColor: "#cc6600",
           }}
           whileTap={{ scale: 0.95 }}
           initial={{ opacity: 0, scale: 0.5 }}

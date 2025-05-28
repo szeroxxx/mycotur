@@ -6,8 +6,6 @@ import { useActivitiesData } from "@/hooks/useActivitiesData";
 import SearchBar from "@/components/ui/SearchBar";
 import dynamic from "next/dynamic";
 
-const LOCATIONIQ_API_KEY = process.env.NEXT_PUBLIC_LOCATIONIQ_API_KEY;
-
 const DynamicMapView = dynamic(
   () => import("@/components/activity-map/MapView"),
   { ssr: false }
@@ -22,41 +20,8 @@ const ActivityMapPage = () => {
     setSelectedActivity,
     setSearchLocation,
   } = useActivitiesData();
-
-  const [searchTerm, setSearchTerm] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
-
-  const handleLocationSearch = useCallback(
-    async (query: string) => {
-      if (!query) {
-        setSearchLocation(null);
-        return;
-      }
-
-      try {
-        const response = await fetch(
-          `https://us1.locationiq.com/v1/search.php?key=${LOCATIONIQ_API_KEY}&q=${encodeURIComponent(
-            query
-          )}&format=json&limit=1`
-        );
-
-        if (!response.ok) {
-          throw new Error("Location search failed");
-        }
-
-        const data = await response.json();
-
-        if (data && data[0]) {
-          const { lat, lon } = data[0];
-          setSearchLocation({ lat: parseFloat(lat), lon: parseFloat(lon) });
-        }
-      } catch (error) {
-        console.error("Error searching location:", error);
-      }
-    },
-    [setSearchLocation]
-  );
 
   const handleFilterChange = useCallback(
     (type: "location" | "category", value: string) => {
@@ -68,30 +33,16 @@ const ActivityMapPage = () => {
     },
     []
   );
-
-  // Separate useEffect for filtering activities
   useEffect(() => {
-    filterActivities(searchTerm, locationFilter, categoryFilter);
-  }, [searchTerm, locationFilter, categoryFilter, filterActivities]);
+    filterActivities("", locationFilter, categoryFilter);
+  }, [locationFilter, categoryFilter, filterActivities]);
 
-  // Separate useEffect for location search with debounce
   useEffect(() => {
-    if (!searchTerm) {
-      setSearchLocation(null);
-      return;
-    }
-
-    const delayDebounceFn = setTimeout(() => {
-      handleLocationSearch(searchTerm);
-    }, 500);
-
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchTerm, handleLocationSearch]);
-
-  // When filters change, apply them
+    setSearchLocation(null);
+  }, [setSearchLocation]);
   useEffect(() => {
     if (locationFilter || categoryFilter) {
-      filterActivities(searchTerm, locationFilter, categoryFilter);
+      filterActivities("", locationFilter, categoryFilter);
     }
   }, [locationFilter, categoryFilter]);
 
@@ -104,17 +55,15 @@ const ActivityMapPage = () => {
         <div className="w-1/3 flex flex-col bg-[rgba(255,255,255)] border-r border-[rgba(226,225,223)]">
           <div className="p-4 flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide">
             <div className="space-y-4">
+              {" "}
               <SearchBar
                 locationFilter={locationFilter || "Location"}
                 categoryFilter={categoryFilter || "Event Category"}
                 onFilterChange={handleFilterChange}
                 onSearch={() =>
-                  filterActivities(searchTerm, locationFilter, categoryFilter)
+                  filterActivities("", locationFilter, categoryFilter)
                 }
-                onChange={setSearchTerm}
-                value={searchTerm}
               />
-
               <div className="space-y-4 mt-4">
                 {loading ? (
                   <div className="text-center py-8">Loading activities...</div>

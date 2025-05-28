@@ -54,6 +54,7 @@ const ProfilePage: React.FC = () => {
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [profileData, setProfileData] = useState({
+    profilePicture: "",
     name: session?.user?.name || "",
     email: session?.user?.email || "",
     about: "",
@@ -71,6 +72,7 @@ const ProfilePage: React.FC = () => {
         const profileData = await fetchProfile();
         console.log("profileData::: ", profileData);
         setProfileData({
+          profilePicture: profileData.profilePicture || "",
           name: profileData.name,
           email: profileData.email,
           about: profileData.about || "",
@@ -138,7 +140,6 @@ const ProfilePage: React.FC = () => {
 
   const handleSave = async () => {
     try {
-
       if (!validateSocialInputs()) {
         return;
       }

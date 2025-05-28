@@ -81,9 +81,22 @@ const ActivityDetailPage: React.FC = () => {
     if (!success) {
       setRsvpError("Failed to submit RSVP");
     }
-
   };
-  const handleGetContactInfo = () => {
+
+  const recordClick = async (organizerId: string) => {
+    try {
+      await axiosInstance.post("/api/clicks", {
+        organizerId: organizerId,
+      });
+    } catch (error) {
+      console.error("Failed to record click:", error);
+    }
+  };
+
+  const handleGetContactInfo = async () => {
+    if (activityData?.organizer?.id) {
+      await recordClick(activityData.organizer.id);
+    }
     setIsContactModalOpen(true);
   };
 
