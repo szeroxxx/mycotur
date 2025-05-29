@@ -4,6 +4,8 @@ import { useSession } from "next-auth/react";
 import { FiUser, FiMail, FiMapPin, FiEdit2, FiX } from "react-icons/fi";
 import { FaFacebookF, FaInstagram, FaYoutube } from "react-icons/fa";
 import { useProfile } from "@/hooks/useProfile";
+import { useData } from "@/contexts/DataContext";
+import { getMediaUrl } from "@/utils/mediaHelpers";
 import { CircleCheck } from "lucide-react";
 interface Category {
   uuid: string;
@@ -46,13 +48,13 @@ const ProfilePage: React.FC = () => {
     changePassword,
     requestPasswordReset,
     fetchProfile,
-    fetchCategories,
+    uploadProfileImage,
     toast,
   } = useProfile();
+  const { categories } = useData();
   const [isEditing, setIsEditing] = useState(false);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [profileData, setProfileData] = useState({
     profilePicture: "",
     name: session?.user?.name || "",
@@ -88,16 +90,7 @@ const ProfilePage: React.FC = () => {
         console.error("Error loading profile:", error);
       }
     };
-    const getCategories = async () => {
-      try {
-        const fetchedCategories = await fetchCategories();
-        setCategories(fetchedCategories);
-      } catch (error) {
-        console.error("Error loading categories:", error);
-      }
-    };
     if (session?.user) {
-      getCategories();
       loadProfile();
     }
   }, [session?.user]);
@@ -108,6 +101,8 @@ const ProfilePage: React.FC = () => {
   const [passwordError, setPasswordError] = useState("");
 
   const [socialErrors, setSocialErrors] = useState<SocialErrors>({});
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const validatePassword = () => {
     if (newPassword.length < 8) {
@@ -207,6 +202,31 @@ const ProfilePage: React.FC = () => {
       }));
     }
   };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingImage(true);
+    setUploadError(null);
+
+    try {
+      const profileImagePath = await uploadProfileImage(file);
+      setProfileData((prev) => ({
+        ...prev,
+        profilePicture: profileImagePath,
+      }));
+    } catch (error) {
+      setUploadError(
+        error instanceof Error ? error.message : "Failed to upload image"
+      );
+    } finally {
+      setIsUploadingImage(false);
+      // Reset the input value to allow re-uploading the same file
+      e.target.value = "";
+    }
+  };
+
   return (
     <>
       <Head>
@@ -254,10 +274,67 @@ const ProfilePage: React.FC = () => {
               </button>
             </div>
           )}
-        </div>
-
+        </div>{" "}
         <div className="bg-white rounded-lg shadow-md">
           <div className="p-6 space-y-6">
+            {" "}
+            {/* Profile Image Section */}
+            <div className="flex flex-col items-center space-y-4 pb-6 border-b border-[rgba(226,225,223)]">
+              <div className="relative group">
+                <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-[rgba(226,225,223)] bg-[rgba(253,250,246)] shadow-lg">
+                  {profileData.profilePicture ? (
+                    <img
+                      src={getMediaUrl(profileData.profilePicture)}
+                      alt="Profile"
+                      className="w-full h-full object-cover transition-opacity group-hover:opacity-90"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <FiUser size={48} className="text-[rgba(194,91,52)]" />
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={() =>
+                    document.getElementById("profile-image-input")?.click()
+                  }
+                  disabled={isUploadingImage}
+                  className="absolute -bottom-2 -right-2 w-10 h-10 bg-[#D45B20] hover:bg-[#C44D16] text-white rounded-full flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
+                  title="Change profile picture"
+                >
+                  {isUploadingImage ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <FiEdit2 size={18} />
+                  )}
+                </button>
+                <input
+                  id="profile-image-input"
+                  type="file"
+                  accept="image/jpeg,image/jpg,image/png,image/webp"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+              </div>
+              <div className="text-center">
+                <p className="text-sm text-[rgba(100,92,90)] mb-1">
+                  Profile Picture
+                </p>
+                <p className="text-xs text-[rgba(100,92,90)]">
+                  Click the edit button to upload a new image
+                </p>
+                <p className="text-xs text-[rgba(100,92,90)]">
+                  Supported: JPG, PNG, WebP (max 5MB)
+                </p>
+              </div>
+              {uploadError && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3 max-w-sm">
+                  <p className="text-red-600 text-sm text-center">
+                    {uploadError}
+                  </p>
+                </div>
+              )}
+            </div>
             <div className="space-y-4">
               <div className="flex items-center space-x-4 p-4 bg-[rgba(253,250,246)] rounded-lg">
                 <div className="p-3 bg-[rgba(255,255,255)] rounded-full border border-[rgba(226,225,223)]">

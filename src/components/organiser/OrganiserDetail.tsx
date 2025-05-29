@@ -170,7 +170,7 @@ const OrganiserDetail: React.FC<OrganiserDetailProps> = ({ organiser }) => {
             
             <div className="mt-8">
               <h3 className="text-lg font-semibold mb-2">View organizer details and contact them for more information</h3>
-              <Button className="w-full bg-black text-white py-2 rounded font-medium mt-4">
+              <Button className="w-full bg-[rgba(68,63,63)] text-[rgba(255,255,255)] py-2 rounded font-medium mt-4">
                 Get Contact Information
               </Button>
             </div>

@@ -57,7 +57,7 @@ export const useActivitiesData = () => {
       description: item.description,
       image: item.image
         ? getMediaUrl(item.image)
-        : "/default-activity-image.jpg",
+        : "/default-activity-image.png",
       lat: parseFloat(item.lat),
       lon: parseFloat(item.lon),
     }));

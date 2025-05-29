@@ -357,10 +357,13 @@ export const useEvents = () => {
         formData.append("location", event.location || "");
         if (event.lat) {
           formData.append("lat", event.lat.toString());
-        }
-        if (event.lon) {
+        }        if (event.lon) {
           formData.append("lon", event.lon.toString());
         }
+        if (event.mediaUrls && event.mediaUrls.length > 0) {
+          formData.append("mediaUrls", JSON.stringify(event.mediaUrls));
+        }
+        
         const response = await axiosInstance.put(
           `${URL}/api/event/${event.id}`,
           formData

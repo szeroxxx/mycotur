@@ -126,8 +126,7 @@ const DiscoverOrganiserPage = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredOrganisers.map((organiser) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">        {filteredOrganisers.map((organiser) => (
           <OrganiserCard
             key={organiser.id}
             // id={organiser.id}
@@ -141,6 +140,7 @@ const DiscoverOrganiserPage = () => {
             youtube={organiser.youtube}
             categories={organiser.categories}
             totalEvents={organiser.totalEvents}
+            profileImage={organiser.profileImage}
           />
         ))}
       </div>

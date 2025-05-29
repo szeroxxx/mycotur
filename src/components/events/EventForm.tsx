@@ -41,7 +41,6 @@ interface EventFormProps {
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => void;
-  onImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onCancel: () => void;
   activities: Activity[];
   onActivitySelect?: (activity: Activity | undefined) => void;
@@ -59,12 +58,10 @@ export const EventForm: React.FC<EventFormProps> = ({
   categories,
   onSubmit,
   onChange,
-  onImageUpload,
   onCancel,
   activities,
   onActivitySelect,
 }) => {
-  console.log("event::: ", event);
   const [locationInput, setLocationInput] = useState(event.location || "");
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -76,6 +73,24 @@ export const EventForm: React.FC<EventFormProps> = ({
   const [hoverVideoIndex, setHoverVideoIndex] = useState<number | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const logMediaState = (action: string) => {
+    console.log(`--- ${action} ---`);
+    console.log("Current images:", event.images?.length || 0);
+    console.log("Current videos:", event.videos?.length || 0);
+    console.log("Current mediaUrls:", event.mediaUrls?.length || 0);
+    console.log(
+      "MediaUrls images:",
+      event.mediaUrls?.filter((m) => m.type.startsWith("image")).length || 0
+    );
+    console.log(
+      "MediaUrls videos:",
+      event.mediaUrls?.filter((m) => m.type.startsWith("video")).length || 0
+    );
+    console.log("Preview images:", previewImages.length);
+    console.log("Preview videos:", previewVideos.length);
+    console.log("--- End ---");
+  };
 
   const handleAutoFillActivitySelect = (
     e: React.ChangeEvent<HTMLSelectElement>
@@ -203,112 +218,231 @@ export const EventForm: React.FC<EventFormProps> = ({
     setSuggestions([]);
     setShowSuggestions(false);
   };
-
   const handleImageRemove = (index: number) => {
     try {
-      const newImages = [...(event.images || [])];
-      const newMediaUrls = [...(event.mediaUrls || [])];
+      const totalImageCount = previewImages.length;
+      if (index < 0 || index >= totalImageCount) {
+        console.error(
+          "Invalid image index:",
+          index,
+          "Total images:",
+          totalImageCount
+        );
+        setUploadError("Invalid image selection. Please try again.");
+        return;
+      }
+      const currentImages = [...(event.images || [])];
+      const currentMediaUrls = [...(event.mediaUrls || [])];
+      const existingImages = currentMediaUrls.filter((media) =>
+        media.type.startsWith("image")
+      );
+      const existingImageCount = existingImages.length;
 
-      const existingImageCount =
-        event.mediaUrls?.filter((media) => media.type.startsWith("image"))
-          .length || 0;
+      console.log("State analysis:");
+      console.log("- Existing saved images:", existingImageCount);
+      console.log("- New uploaded images:", currentImages.length);
+      console.log("- Total preview images:", totalImageCount);
+      console.log("- Index to remove:", index);
 
       if (index < existingImageCount) {
-        const imageMediaUrls =
-          event.mediaUrls?.filter((media) => media.type.startsWith("image")) ||
-          [];
-        const mediaToRemove = imageMediaUrls[index];
+        // Removing an existing saved image
+        console.log("🔴 Removing EXISTING image at index:", index);
+        const imageToRemove = existingImages[index];
+        console.log("Image to remove:", imageToRemove);
 
-        const mediaIndex = newMediaUrls.findIndex(
-          (media) =>
-            media.name === mediaToRemove.name &&
-            media.type === mediaToRemove.type
+        // Create new array without the removed image
+        const updatedMediaUrls = currentMediaUrls.filter((media) => {
+          if (media.type.startsWith("image")) {
+            const shouldKeep = !(
+              media.name === imageToRemove.name &&
+              media.type === imageToRemove.type
+            );
+            if (!shouldKeep) {
+              console.log("Removing from mediaUrls:", media);
+            }
+            return shouldKeep;
+          }
+          return true; // Keep all non-image media
+        });
+
+        console.log(
+          "Updated mediaUrls count:",
+          updatedMediaUrls.length,
+          "vs original:",
+          currentMediaUrls.length
         );
-        if (mediaIndex > -1) {
-          newMediaUrls.splice(mediaIndex, 1);
-        }
+
+        // Update only mediaUrls array
+        const mediaEvent = {
+          target: {
+            name: "mediaUrls",
+            value: updatedMediaUrls,
+          },
+        } as unknown as React.ChangeEvent<HTMLInputElement>;
+        onChange(mediaEvent);
       } else {
+        // Removing a newly uploaded image
         const newImageIndex = index - existingImageCount;
-        if (newImageIndex >= 0 && newImageIndex < newImages.length) {
-          newImages.splice(newImageIndex, 1);
+        console.log("🟡 Removing NEW image at adjusted index:", newImageIndex);
+
+        if (newImageIndex >= 0 && newImageIndex < currentImages.length) {
+          const updatedImages = currentImages.filter((_, idx) => {
+            const shouldKeep = idx !== newImageIndex;
+            if (!shouldKeep) {
+              console.log("Removing from images array at index:", idx);
+            }
+            return shouldKeep;
+          });
+
+          console.log(
+            "Updated images count:",
+            updatedImages.length,
+            "vs original:",
+            currentImages.length
+          );
+
+          // Update only images array
+          const imageEvent = {
+            target: {
+              name: "images",
+              value: updatedImages,
+            },
+          } as unknown as React.ChangeEvent<HTMLInputElement>;
+          onChange(imageEvent);
+        } else {
+          console.error(
+            "Invalid new image index:",
+            newImageIndex,
+            "Available:",
+            currentImages.length
+          );
+          setUploadError("Failed to remove image. Invalid selection.");
+          return;
         }
       }
 
-      const imageEvent = {
-        target: {
-          name: "images",
-          value: "",
-          type: "file",
-          files: newImages,
-        } as unknown as EventTarget & HTMLInputElement,
-      } as React.ChangeEvent<HTMLInputElement>;
-
-      console.log("newMediaUrls::: ", newMediaUrls);
-      const mediaEvent = {
-        target: {
-          name: "mediaUrls",
-          value: newMediaUrls,
-        } as unknown as EventTarget & HTMLInputElement,
-      } as React.ChangeEvent<HTMLInputElement>;
-
-      onChange(imageEvent);
-      onChange(mediaEvent);
+      setUploadError(null);
+      console.log("✅ Image removal completed successfully");
     } catch (error) {
-      console.error("Error in handleImageRemove:", error);
+      console.error("❌ Error in handleImageRemove:", error);
       setUploadError("Failed to remove image. Please try again.");
     }
   };
-
   const handleVideoRemove = (index: number) => {
-    try {
-      const newVideos = [...(event.videos || [])];
-      const newMediaUrls = [...(event.mediaUrls || [])];
+    console.log("=== REMOVING VIDEO AT INDEX:", index, "===");
+    logMediaState("Before video removal");
 
-      const existingVideoCount =
-        event.mediaUrls?.filter((media) => media.type.startsWith("video"))
-          .length || 0;
+    try {
+      // Validate index
+      const totalVideoCount = previewVideos.length;
+      if (index < 0 || index >= totalVideoCount) {
+        console.error(
+          "Invalid video index:",
+          index,
+          "Total videos:",
+          totalVideoCount
+        );
+        setUploadError("Invalid video selection. Please try again.");
+        return;
+      }
+
+      // Create defensive copies
+      const currentVideos = [...(event.videos || [])];
+      const currentMediaUrls = [...(event.mediaUrls || [])];
+
+      // Get existing videos from mediaUrls (these are already saved videos)
+      const existingVideos = currentMediaUrls.filter((media) =>
+        media.type.startsWith("video")
+      );
+      const existingVideoCount = existingVideos.length;
+
+      console.log("Video state analysis:");
+      console.log("- Existing saved videos:", existingVideoCount);
+      console.log("- New uploaded videos:", currentVideos.length);
+      console.log("- Total preview videos:", totalVideoCount);
+      console.log("- Index to remove:", index);
 
       if (index < existingVideoCount) {
-        const videoMediaUrls =
-          event.mediaUrls?.filter((media) => media.type.startsWith("video")) ||
-          [];
-        const mediaToRemove = videoMediaUrls[index];
+        // Removing an existing saved video
+        console.log("🔴 Removing EXISTING video at index:", index);
+        const videoToRemove = existingVideos[index];
+        console.log("Video to remove:", videoToRemove);
 
-        const mediaIndex = newMediaUrls.findIndex(
-          (media) =>
-            media.name === mediaToRemove.name &&
-            media.type === mediaToRemove.type
+        // Create new array without the removed video
+        const updatedMediaUrls = currentMediaUrls.filter((media) => {
+          if (media.type.startsWith("video")) {
+            const shouldKeep = !(
+              media.name === videoToRemove.name &&
+              media.type === videoToRemove.type
+            );
+            if (!shouldKeep) {
+              console.log("Removing from mediaUrls:", media);
+            }
+            return shouldKeep;
+          }
+          return true; // Keep all non-video media
+        });
+
+        console.log(
+          "Updated mediaUrls count:",
+          updatedMediaUrls.length,
+          "vs original:",
+          currentMediaUrls.length
         );
-        if (mediaIndex > -1) {
-          newMediaUrls.splice(mediaIndex, 1);
-        }
+
+        // Update only mediaUrls array
+        const mediaEvent = {
+          target: {
+            name: "mediaUrls",
+            value: updatedMediaUrls,
+          },
+        } as unknown as React.ChangeEvent<HTMLInputElement>;
+        onChange(mediaEvent);
       } else {
+        // Removing a newly uploaded video
         const newVideoIndex = index - existingVideoCount;
-        if (newVideoIndex >= 0 && newVideoIndex < newVideos.length) {
-          newVideos.splice(newVideoIndex, 1);
+        console.log("🟡 Removing NEW video at adjusted index:", newVideoIndex);
+
+        if (newVideoIndex >= 0 && newVideoIndex < currentVideos.length) {
+          const updatedVideos = currentVideos.filter((_, idx) => {
+            const shouldKeep = idx !== newVideoIndex;
+            if (!shouldKeep) {
+              console.log("Removing from videos array at index:", idx);
+            }
+            return shouldKeep;
+          });
+
+          console.log(
+            "Updated videos count:",
+            updatedVideos.length,
+            "vs original:",
+            currentVideos.length
+          );
+
+          // Update only videos array
+          const videoEvent = {
+            target: {
+              name: "videos",
+              value: updatedVideos,
+            },
+          } as unknown as React.ChangeEvent<HTMLInputElement>;
+          onChange(videoEvent);
+        } else {
+          console.error(
+            "Invalid new video index:",
+            newVideoIndex,
+            "Available:",
+            currentVideos.length
+          );
+          setUploadError("Failed to remove video. Invalid selection.");
+          return;
         }
       }
 
-      const videoEvent = {
-        target: {
-          name: "videos",
-          value: "",
-          type: "file",
-          files: newVideos,
-        } as unknown as EventTarget & HTMLInputElement,
-      } as React.ChangeEvent<HTMLInputElement>;
-
-      const mediaEvent = {
-        target: {
-          name: "mediaUrls",
-          value: newMediaUrls,
-        } as unknown as EventTarget & HTMLInputElement,
-      } as React.ChangeEvent<HTMLInputElement>;
-
-      onChange(videoEvent);
-      onChange(mediaEvent);
+      setUploadError(null);
+      console.log("✅ Video removal completed successfully");
     } catch (error) {
-      console.error("Error in handleVideoRemove:", error);
+      console.error("❌ Error in handleVideoRemove:", error);
       setUploadError("Failed to remove video. Please try again.");
     }
   };
@@ -378,30 +512,50 @@ export const EventForm: React.FC<EventFormProps> = ({
         return;
       }
     }
-
     setIsUploading(true);
     try {
+      console.log("📁 Processing media upload...");
+      logMediaState("Before upload");
+
+      // Update images if any
       if (imageFiles.length > 0) {
+        const updatedImages = [...existingImages, ...imageFiles];
+        console.log(
+          "Adding",
+          imageFiles.length,
+          "new images. Total will be:",
+          updatedImages.length
+        );
+
         const imageEvent = {
           target: {
             name: "images",
-            files: imageFiles as unknown as FileList,
-            type: "file",
+            value: updatedImages,
           },
-        } as React.ChangeEvent<HTMLInputElement>;
-        onImageUpload(imageEvent);
+        } as unknown as React.ChangeEvent<HTMLInputElement>;
+        onChange(imageEvent);
       }
 
+      // Update videos if any
       if (videoFiles.length > 0) {
+        const updatedVideos = [...existingVideos, ...videoFiles];
+        console.log(
+          "Adding",
+          videoFiles.length,
+          "new videos. Total will be:",
+          updatedVideos.length
+        );
+
         const videoEvent = {
           target: {
             name: "videos",
-            files: videoFiles as unknown as FileList,
-            type: "file",
+            value: updatedVideos,
           },
-        } as React.ChangeEvent<HTMLInputElement>;
+        } as unknown as React.ChangeEvent<HTMLInputElement>;
         onChange(videoEvent);
       }
+
+      console.log("✅ Media upload processing completed");
     } finally {
       setIsUploading(false);
     }
@@ -431,8 +585,11 @@ export const EventForm: React.FC<EventFormProps> = ({
       document.removeEventListener("keydown", handleEscapeKey);
     };
   }, []);
-
   useEffect(() => {
+    console.log("🔄 Regenerating preview arrays...");
+    logMediaState("Before preview regeneration");
+
+    // Clean up previous URLs
     previewImages.forEach((url) => {
       if (url.startsWith("blob:")) {
         URL.revokeObjectURL(url);
@@ -447,54 +604,56 @@ export const EventForm: React.FC<EventFormProps> = ({
     const newPreviewImages: string[] = [];
     const newPreviewVideos: string[] = [];
 
-    console.log("Activity data in effect:", event);
-
-    if (event.images && event.images.length > 0) {
-      console.log("Processing new image files:", event.images);
-      const fileUrls = event.images.map((file) => URL.createObjectURL(file));
-      newPreviewImages.push(...fileUrls);
-    }
-
-    if (event.videos && event.videos.length > 0) {
-      console.log("Processing new video files:", event.videos);
-      const videoUrls = event.videos.map((file) => URL.createObjectURL(file));
-      newPreviewVideos.push(...videoUrls);
-    }
-
+    // Process existing media URLs first
     if (event.mediaUrls && event.mediaUrls.length > 0) {
-      console.log("Processing existing media URLs:", event.mediaUrls);
-
       const imageMedias = event.mediaUrls.filter((media) =>
         media.type.startsWith("image")
       );
       const existingImageUrls = imageMedias.map((media) => {
-        console.log("Processing image media:", media);
         const url = getMediaUrl(media.name);
-        console.log("Generated image URL:", url);
+        console.log("Adding existing image URL:", url);
         return url;
       });
 
       const videoMedias = event.mediaUrls.filter((media) =>
         media.type.startsWith("video")
       );
-      console.log("Found vidseo medias:", videoMedias);
 
       const existingVideoUrls = videoMedias.map((media) => {
-        console.log("Processing video media:", media);
         const url = getMediaUrl(media.name);
-        console.log("Generated video URL:", url);
+        console.log("Adding existing video URL:", url);
         return url;
       });
-
-      console.log("Existing image URLs:", existingImageUrls);
-      console.log("Existing video URLs:", existingVideoUrls);
 
       newPreviewImages.push(...existingImageUrls);
       newPreviewVideos.push(...existingVideoUrls);
     }
 
-    console.log("Final preview images:", newPreviewImages);
-    console.log("Final preview videos:", newPreviewVideos);
+    // Process new uploaded files
+    if (event.images && event.images.length > 0) {
+      const fileUrls = event.images.map((file) => {
+        const url = URL.createObjectURL(file);
+        console.log("Adding new image blob URL:", url);
+        return url;
+      });
+      newPreviewImages.push(...fileUrls);
+    }
+
+    if (event.videos && event.videos.length > 0) {
+      const videoUrls = event.videos.map((file) => {
+        const url = URL.createObjectURL(file);
+        console.log("Adding new video blob URL:", url);
+        return url;
+      });
+      newPreviewVideos.push(...videoUrls);
+    }
+
+    console.log(
+      "Final preview arrays - Images:",
+      newPreviewImages.length,
+      "Videos:",
+      newPreviewVideos.length
+    );
 
     setPreviewImages(newPreviewImages);
     setPreviewVideos(newPreviewVideos);
@@ -511,17 +670,7 @@ export const EventForm: React.FC<EventFormProps> = ({
         }
       });
     };
-  }, [
-    event,
-    event.images,
-    event.videos,
-    event.mediaUrls,
-    event.id,
-    previewImages,
-    previewVideos,
-    setPreviewImages,
-    setPreviewVideos,
-  ]);
+  }, [event.images, event.videos, event.mediaUrls, event.id]);
 
   const currentImageCount =
     (event.images?.length || 0) +
@@ -712,10 +861,6 @@ export const EventForm: React.FC<EventFormProps> = ({
           />
         </div>
       </div>
-      <p className="text-[rgba(68,63,63)] text-[12px] mb-4 font-sm">
-        <RequiredIndicator /> Please include atleast one piece of contact
-        information?{" "}
-      </p>
       <div>
         <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
           Fees
@@ -749,7 +894,6 @@ export const EventForm: React.FC<EventFormProps> = ({
           Event Images & Videos
         </label>
         <div>
-          {/* Images Preview */}
           {previewImages.length > 0 && (
             <div className="mb-4">
               <h4 className="text-sm font-medium text-[rgba(68,63,63)] mb-2">
@@ -763,11 +907,12 @@ export const EventForm: React.FC<EventFormProps> = ({
                     onMouseEnter={() => setHoverIndex(index)}
                     onMouseLeave={() => setHoverIndex(null)}
                   >
+                    {" "}
                     <Image
                       src={url}
                       alt={`Preview ${index + 1}`}
-                      layout="fill"
-                      objectFit="cover"
+                      fill
+                      style={{ objectFit: "cover" }}
                       className="transition-transform duration-200 group-hover:scale-105"
                     />
                     <div
@@ -793,8 +938,6 @@ export const EventForm: React.FC<EventFormProps> = ({
               </div>
             </div>
           )}
-
-          {/* Videos Preview */}
           {previewVideos.length > 0 && (
             <div className="mb-4">
               <h4 className="text-sm font-medium text-[rgba(68,63,63)] mb-2">
@@ -844,8 +987,6 @@ export const EventForm: React.FC<EventFormProps> = ({
               </div>
             </div>
           )}
-
-          {/* Upload Area */}
           <div
             className={`border-2 border-dashed border-[#E5E7EB] rounded-lg p-8 text-center transition-colors
             ${isUploading ? "bg-gray-50" : "hover:border-[#D45B20]"}`}

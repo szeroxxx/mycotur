@@ -202,7 +202,7 @@ const RegisterPage: React.FC = () => {
         <div className="hidden lg:block lg:w-7/12 xl:w-8/12 relative">
           <div className="absolute inset-0 overflow-hidden p-3">
             <Image
-              src="/back.png"
+              src="/back1.jpeg"
               alt="Decorative mushroom background"
               fill
               className="object-cover rounded-[24px]"

@@ -28,9 +28,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
   const router = useRouter();
 
   const handleCardClick = () => {
-    // Call the existing onClick for map selection
     onClick();
-    // Navigate to detail page with the activity ID as UUID
     router.push(`/activity-details/${id}`);
   };
 
@@ -57,7 +55,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
           loading="lazy"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
-            target.src = "/default-activity-image.jpg";
+            target.src = "/default-activity-image.png";
           }}
         />
         <motion.div

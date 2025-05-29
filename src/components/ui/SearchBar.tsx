@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useMemo } from "react";
 import { IoSearchOutline } from "react-icons/io5";
 import { motion } from "framer-motion";
-import { useProfile } from "@/hooks/useProfile";
+import { useData } from "@/contexts/DataContext";
 
 interface Category {
   uuid: string;
@@ -31,6 +31,7 @@ interface SearchBarProps {
   onFilterChange: (type: "location" | "category", value: string) => void;
   onSearch: () => void;
   className?: string;
+  variant?: "compact" | "full"; // compact for sidebars, full for header
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -39,31 +40,18 @@ const SearchBar: React.FC<SearchBarProps> = ({
   onFilterChange,
   onSearch,
   className = "",
+  variant = "full",
 }) => {
-  const { fetchCategories, fetchLocations } = useProfile();
-  const [categories, setCategories] = useState<Category[]>([defaultCategory]);
-  const [locations, setLocations] = useState<Location[]>([defaultLocation]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { categories, locations, isLoading, error } = useData();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [categoriesData, locationsData] = await Promise.all([
-          fetchCategories(),
-          fetchLocations(),
-        ]);
-
-        setCategories([defaultCategory, ...categoriesData]);
-        setLocations([defaultLocation, ...locationsData]);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [fetchCategories, fetchLocations]);
+  const categoryOptions = useMemo(
+    () => [defaultCategory, ...categories],
+    [categories]
+  );
+  const locationOptions = useMemo(
+    () => [defaultLocation, ...locations],
+    [locations]
+  );
 
   const handleFilterChange = (
     type: "location" | "category",
@@ -80,6 +68,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
     );
   }
 
+  if (error) {
+    return (
+      <div className="bg-white rounded-[20px] shadow-md p-4 flex items-center justify-center">
+        <p className="text-red-500">Error loading data</p>
+      </div>
+    );
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -87,14 +83,15 @@ const SearchBar: React.FC<SearchBarProps> = ({
       transition={{ duration: 0.5, ease: "easeOut" }}
       className={`bg-white rounded-[20px] shadow-md p-4 ${className}`}
     >
-      {" "}      <motion.div
+      {" "}
+      <motion.div
         className="flex gap-2"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.2, duration: 0.3 }}
       >
-        <motion.div
-          className="w-32"
+        {" "}        <motion.div
+          className={variant === "compact" ? "flex-1 min-w-0" : "w-32"}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
@@ -103,16 +100,16 @@ const SearchBar: React.FC<SearchBarProps> = ({
             onChange={(e) => handleFilterChange("location", e.target.value)}
             className="w-full text-[12px] px-4 py-2 text-[rgba(68,63,63)] rounded-lg cursor-pointer hover:border-[rgba(194,91,52)] border-2 border-transparent transition-all duration-200"
           >
-            {locations.map((location) => (
+            {" "}
+            {locationOptions.map((location) => (
               <option key={location.uuid} value={location.location}>
                 {location.location}
               </option>
             ))}
           </motion.select>
         </motion.div>
-
         <motion.div
-          className="w-36"
+          className={variant === "compact" ? "flex-1 min-w-0" : "w-36"}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
@@ -121,17 +118,17 @@ const SearchBar: React.FC<SearchBarProps> = ({
             onChange={(e) => handleFilterChange("category", e.target.value)}
             className="w-full text-[12px] px-4 py-2 text-[rgba(68,63,63)] rounded-lg cursor-pointer hover:border-[rgba(194,91,52)] border-2 border-transparent transition-all duration-200"
           >
-            {categories.map((category) => (
+            {" "}
+            {categoryOptions.map((category) => (
               <option key={category.uuid} value={category.title}>
                 {category.title}
               </option>
             ))}
           </motion.select>
-        </motion.div>
-
+        </motion.div>{" "}
         <motion.button
           onClick={onSearch}
-          className="bg-[rgba(194,91,52)] text-white px-4 py-2 rounded-lg"
+          className="bg-[rgba(194,91,52)] text-white px-4 py-2 rounded-lg flex-shrink-0"
           whileHover={{
             scale: 1.05,
             backgroundColor: "#cc6600",

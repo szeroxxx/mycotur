@@ -54,13 +54,14 @@ const Index = () => {
         {/* <div className="container mx-auto p-4">
         <div className="flex flex-col lg:flex-row gap-6"> */}
         <div className="w-full lg:w-1/3 space-y-4 ">
+          {" "}
           <SearchBar
             locationFilter={locationFilter}
             categoryFilter={categoryFilter}
             onFilterChange={handleFilterChange}
             onSearch={handleSearch}
+            variant="compact"
           />
-
           <div className="space-y-4 mt-4 overflow-y-auto overflow-x-hidden scrollbar-hide max-h-[calc(100vh-16rem)]">
             {loading ? (
               <div className="text-center py-8">Loading events...</div>

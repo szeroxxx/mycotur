@@ -11,13 +11,15 @@ import { CircleCheck } from "lucide-react";
 import { useEventDetail } from "@/hooks/useEventDetail";
 import axios from "axios";
 import axiosInstance from "@/utils/axiosConfig";
+import { Button } from "@/components/ui/button";
 
 import { RSVPFormData } from "@/components/event-detail/RSVPForm";
+
 const submitRSVP = async (
   rsvpData: RSVPFormData,
   organizerData: { email: string; id: string },
   showToast: (type: "success" | "error", message: string) => void
-): Promise<boolean>=> {
+): Promise<boolean> => {
   try {
     const response = await axiosInstance.post("/api/rsvp", {
       ...rsvpData,
@@ -49,7 +51,6 @@ const EventDetailPage: React.FC = () => {
   const router = useRouter();
   const { uuid } = router.query;
   const { eventData, loading, error } = useEventDetail(uuid as string);
-
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [rsvpError, setRsvpError] = useState<string | null>(null);
   const [toast, setToast] = useState<{
@@ -61,6 +62,7 @@ const EventDetailPage: React.FC = () => {
     setToast({ type, message });
     setTimeout(() => setToast(null), 3000);
   };
+
   const handleSubmit = async (data: RSVPFormData) => {
     console.log("data::: ", data);
     if (!eventData || !uuid) return;
@@ -79,11 +81,33 @@ const EventDetailPage: React.FC = () => {
     if (!success) {
       setRsvpError("Failed to submit RSVP");
     }
-
   };
 
-  const handleGetContactInfo = () => {
+  const recordClick = async (organizerId: string) => {
+    try {
+      await axiosInstance.post("/api/clicks", {
+        organizerId: organizerId,
+      });
+    } catch (error) {
+      console.error("Failed to record click:", error);
+    }
+  };
+
+  const handleGetContactInfo = async () => {
+    if (eventData?.organizer?.id) {
+      await recordClick(eventData.organizer.id);
+    }
     setIsContactModalOpen(true);
+  };
+
+  const isEventInPast = () => {
+    if (!eventData?.eventDate?.date) return false;
+    const eventDate = new Date(eventData.eventDate.date);
+    const today = new Date();
+    // Remove time components for date comparison
+    eventDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+    return eventDate < today;
   };
 
   if (loading) {
@@ -170,11 +194,34 @@ const EventDetailPage: React.FC = () => {
               />
             </div>
             <div className="lg:col-span-1">
-              <RSVPForm
-                onSubmit={handleSubmit}
-                onGetContactInfo={handleGetContactInfo}
-                error={rsvpError}
-              />
+              {isEventInPast() ? (
+                <div className="mt-2 px-6 py-6 bg-[rgba(255,255,255)] rounded-xl shadow-lg border border-[rgba(244,242,242)]">
+                  <h3
+                    className="text-lg font-semibold mb-4 leading-tight"
+                    style={{ color: "rgba(68, 63, 63, 1)" }}
+                  >
+                    This event is{" "}
+                    <span style={{ color: "rgba(22, 163, 74, 1)" }}>
+                      Completed
+                    </span>{" "}
+                    you can View organiser details and contact them for more
+                    information
+                  </h3>
+                  <Button
+                    variant="outline"
+                    className="w-full bg-[rgba(68,63,63)] text-[rgba(255,255,255)] hover:bg-gray-900 border-gray-800 py-3 font-medium rounded-md transition-colors"
+                    onClick={handleGetContactInfo}
+                  >
+                    Get Contact Information
+                  </Button>
+                </div>
+              ) : (
+                <RSVPForm
+                  onSubmit={handleSubmit}
+                  onGetContactInfo={handleGetContactInfo}
+                  error={rsvpError}
+                />
+              )}
             </div>
           </div>
         </div>

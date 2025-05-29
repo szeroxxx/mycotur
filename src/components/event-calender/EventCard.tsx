@@ -57,7 +57,7 @@ const EventCard: React.FC<EventCardProps> = ({
           loading="lazy"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
-            target.src = "/default-activity-image.jpg";
+            target.src = "/default-activity-image.png";
           }}
         />
         <motion.div

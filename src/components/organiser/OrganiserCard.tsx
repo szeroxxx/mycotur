@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { RiInstagramFill } from "react-icons/ri";
 import { IoLogoFacebook } from "react-icons/io5";
 import { IoLogoYoutube } from "react-icons/io";
+import { FiUser } from "react-icons/fi";
 import ContactModal from "@/components/activity-detail/ContactModal";
 import axiosInstance from "@/utils/axiosConfig";
+import { getMediaUrl } from "@/utils/mediaHelpers";
 
 interface OrganiserCardProps {
   // id: number;
@@ -21,6 +23,7 @@ interface OrganiserCardProps {
     description: string;
   }[];
   totalEvents: number;
+  profileImage: string | null;
 }
 
 const OrganiserCard: React.FC<OrganiserCardProps> = ({
@@ -35,6 +38,7 @@ const OrganiserCard: React.FC<OrganiserCardProps> = ({
   youtube,
   categories,
   totalEvents,
+  profileImage,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -59,10 +63,19 @@ const OrganiserCard: React.FC<OrganiserCardProps> = ({
 
   return (
     <div className="block h-full">
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow duration-200 h-full flex flex-col">
-        <div className="p-4 flex flex-col h-full">
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow duration-200 h-full flex flex-col">        <div className="p-4 flex flex-col h-full">
           <div className="flex items-start gap-4 mb-4">
-            <div className="w-20 h-20 bg-gray-200 rounded-md shrink-0"></div>
+            <div className="w-20 h-20 rounded-md shrink-0 overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center">
+              {profileImage ? (
+                <img
+                  src={getMediaUrl(profileImage)}
+                  alt={`${name} profile`}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <FiUser size={32} className="text-gray-400" />
+              )}
+            </div>
 
             <div className="space-y-2 flex-1 min-h-0">
               <h3 className="font-medium text-2xl text-[rgba(68,63,63)] line-clamp-2 min-h-[2.5rem]">
@@ -142,7 +155,7 @@ const OrganiserCard: React.FC<OrganiserCardProps> = ({
             <div className="block">
               <button
                 onClick={handleOpen}
-                className="w-full py-3 bg-gray-800 text-white text-sm rounded-md hover:bg-gray-700 transition-colors"
+                className="w-full py-3 bg-[rgba(68,63,63)] text-[rgba(255,255,255)]s text-sm rounded-md hover:bg-gray-700 transition-colors"
               >
                 Get Contact Information
               </button>

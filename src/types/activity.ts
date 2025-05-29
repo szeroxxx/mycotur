@@ -1,6 +1,7 @@
 // types/activity.ts
 export interface Activity {
   id: string;
+  uuid: string;
   title: string;
   category: string;
   location: string;
@@ -19,6 +20,7 @@ export interface Activity {
     name: string;
     type: string;
   }[];
+  originalActivityId?: string;
 }
 
 export interface Toast {

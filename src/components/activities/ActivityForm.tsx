@@ -574,12 +574,6 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
           />
         </div>
       </div>
-
-      <p className="text-[rgba(68,63,63)] text-[12px] mb-4 font-sm">
-        <RequiredIndicator /> Please include atleast one piece of contact
-        information?{" "}
-      </p>
-
       <div>
         <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
           Fees
@@ -630,11 +624,12 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
                     onMouseEnter={() => setHoverIndex(index)}
                     onMouseLeave={() => setHoverIndex(null)}
                   >
+                    {" "}
                     <Image
                       src={url}
                       alt={`Preview ${index + 1}`}
-                      layout="fill"
-                      objectFit="cover"
+                      fill
+                      style={{ objectFit: "cover" }}
                       className="transition-transform duration-200 group-hover:scale-105"
                     />
                     <div

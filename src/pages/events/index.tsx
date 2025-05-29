@@ -82,7 +82,6 @@ const EventsPage: React.FC = () => {
       loadActivities();
     }
   }, [isModalOpen, fetchAllActivities]);
-
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -91,10 +90,30 @@ const EventsPage: React.FC = () => {
     const { name, value } = e.target;
     console.log("name, value::: ", name, value);
     if (selectedEvent) {
-      setSelectedEvent((prev) => ({
-        ...prev!,
-        [name]: value,
-      }));
+      if (name === "images" && Array.isArray(value)) {
+        // Handle direct array updates for images
+        setSelectedEvent((prev: Event | null) => ({
+          ...prev!,
+          images: value,
+        }));
+      } else if (name === "videos" && Array.isArray(value)) {
+        // Handle direct array updates for videos
+        setSelectedEvent((prev: Event | null) => ({
+          ...prev!,
+          videos: value,
+        }));
+      } else if (name === "mediaUrls" && Array.isArray(value)) {
+        // Handle direct array updates for mediaUrls
+        setSelectedEvent((prev: Event | null) => ({
+          ...prev!,
+          mediaUrls: value,
+        }));
+      } else {
+        setSelectedEvent((prev) => ({
+          ...prev!,
+          [name]: value,
+        }));
+      }
     }
   };
   const handleActivitySelect = (activity: Activity | undefined) => {
@@ -112,14 +131,6 @@ const EventsPage: React.FC = () => {
     }));
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && selectedEvent) {
-      setSelectedEvent((prev) => ({
-        ...prev!,
-        images: Array.from(e.target.files || []),
-      }));
-    }
-  };
   const handleEdit = (event: Event) => {
     const formattedEvent = {
       ...event,
@@ -312,13 +323,12 @@ const EventsPage: React.FC = () => {
               >
                 ✕
               </button>
-            </div>
+            </div>{" "}
             <EventForm
               event={selectedEvent!}
               categories={categories}
               onSubmit={handleSubmit}
               onChange={handleInputChange}
-              onImageUpload={handleImageUpload}
               onCancel={() => {
                 setIsModalOpen(false);
                 setSelectedEvent(null);

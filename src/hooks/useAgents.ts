@@ -97,17 +97,11 @@ export const useAgents = () => {
       } catch (error: unknown) {
         if (axios.isAxiosError(error)) {
           if (error.response?.status === 400) {
-            const errorData = error.response.data as {
-              error?: string;
-              data?: { details?: Array<{ message: string }> };
-            };
-            if (typeof errorData.error === "string") {
-              showToast("error", errorData.error);
-            } else if (errorData.data?.details?.[0]?.message) {
-              showToast("error", errorData.data.details[0].message);
-            } else {
-              showToast("error", "Invalid input data");
-            }
+            console.log(
+              "error.response?.data.error::: ",
+              error.response?.data.error
+            );
+            showToast("error", error.response?.data.error);
           } else if (error.response?.status === 500) {
             showToast("error", "Internal server error. Please try again later");
           } else {
@@ -117,7 +111,6 @@ export const useAgents = () => {
           console.error("Error creating agent:", error);
           showToast("error", "An unexpected error occurred");
         }
-        throw error;
       }
     },
     [showToast, fetchAgents]

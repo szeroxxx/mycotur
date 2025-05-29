@@ -222,7 +222,7 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
         </h3>
         <Button
           variant="outline"
-          className="w-full bg-gray-800 text-white hover:bg-gray-900 border-gray-800 py-3 font-medium rounded-md transition-colors"
+          className="w-full bg-[rgba(68,63,63)] text-[rgba(255,255,255)] hover:bg-gray-900 border-gray-800 py-3 font-medium rounded-md transition-colors"
           onClick={handleGetContactInfo}
         >
           Get Contact Information

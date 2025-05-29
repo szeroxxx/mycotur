@@ -211,21 +211,20 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-[rgba(229,114,0)] hover:bg-[#fdc48b] text-white font-semibold py-2 px-4 rounded-md transition-colors duration-200"
+            className="w-full bg-[rgba(229,114,0)] hover:bg-[rgba(204,85,0)] text-[rgba(255,255,255)] font-semibold py-2 px-4 rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? "Submitting..." : "Submit RSVP"}
           </Button>
         </form>
       </div>
 
-      {/* Contact Section */}
       <div className="mt-2 px-6 py-6 bg-[rgba(255,255,255)] rounded-xl shadow-lg border border-[rgba(244,242,242)]">
         <h3 className="text-lg font-semibold text-gray-900 mb-4 leading-tight">
           View organiser details and contact them for more information
         </h3>
         <Button
           variant="outline"
-          className="w-full bg-gray-800 text-white hover:bg-gray-900 border-gray-800 py-3 font-medium rounded-md transition-colors"
+          className="w-full bg-[rgba(68,63,63)] text-[rgba(255,255,255)] hover:bg-gray-900 border-gray-800 py-3 font-medium rounded-md transition-colors"
           onClick={handleGetContactInfo}
         >
           Get Contact Information

@@ -16,11 +16,6 @@ interface CategoryData {
   description: string;
 }
 
-interface LocationData {
-  uuid: string;
-  location: string;
-}
-
 interface ProfileData {
   profilePicture: string;
   name: string;
@@ -50,18 +45,21 @@ interface UseProfileReturn {
   requestPasswordReset: (email: string) => Promise<void>;
   fetchProfile: () => Promise<ProfileData>;
   checkProfileCompletion: () => Promise<ProfileCompletion>;
-  fetchCategories: () => Promise<CategoryData[]>;
   fetchCategoriesActivity: () => Promise<CategoryData[]>;
-  fetchLocations: () => Promise<LocationData[]>;
+  uploadProfileImage: (file: File) => Promise<string>;
   toast: Toast | null;
 }
 
 export const useProfile = (): UseProfileReturn => {
   const [toast, setToast] = useState<Toast | null>(null);
-  const showToast = (type: "success" | "error", message: string) => {
-    setToast({ type, message });
-    setTimeout(() => setToast(null), 3000);
-  };
+
+  const showToast = useCallback(
+    (type: "success" | "error", message: string) => {
+      setToast({ type, message });
+      setTimeout(() => setToast(null), 3000);
+    },
+    []
+  );
 
   const fetchProfile = useCallback(async (): Promise<ProfileData> => {
     try {
@@ -75,10 +73,21 @@ export const useProfile = (): UseProfileReturn => {
           Authorization: `Bearer ${session.user.accessToken}`,
           "Content-Type": "application/json",
         },
-      });
-
-      if (response.data && response.data.data) {
-        return response.data.data;
+      });      if (response.data && response.data.data) {
+        const profileData = response.data.data;
+        return {
+          profilePicture: profileData.profileImage || "",
+          name: profileData.name,
+          email: profileData.email,
+          about: profileData.about || "",
+          address: profileData.address || "",
+          social: {
+            facebook: profileData.social?.facebook || "",
+            instagram: profileData.social?.instagram || "",
+            youtube: profileData.social?.youtube || "",
+          },
+          categories: profileData.categories || [],
+        };
       }
       throw new Error("Profile data not found");
     } catch (error) {
@@ -218,20 +227,6 @@ export const useProfile = (): UseProfileReturn => {
     }
   }, [showToast]);
 
-  const fetchCategories = useCallback(async (): Promise<CategoryData[]> => {
-    try {
-      const response = await axios.get(`${URL}/api/category`);
-      if (response.data && response.data.data) {
-        return response.data.data;
-      }
-      return [];
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-      showToast("error", "Failed to fetch categories");
-      throw error;
-    }
-  }, [showToast]);
-
   const fetchCategoriesActivity = useCallback(async () => {
     try {
       const session = await getSession();
@@ -247,7 +242,7 @@ export const useProfile = (): UseProfileReturn => {
           userid: uuid,
         },
       });
-      console.log('responxxxxse::: ', response);
+      console.log("responxxxxse::: ", response);
       if (response.data && response.data.data) {
         return response.data.data;
       }
@@ -256,19 +251,43 @@ export const useProfile = (): UseProfileReturn => {
       console.error("Error fetching categories:", error);
       showToast("error", "Failed to fetch categories");
       throw error;
-    }
-  }, [showToast]);
+    }  }, [showToast]);
 
-  const fetchLocations = useCallback(async (): Promise<LocationData[]> => {
+  const uploadProfileImage = useCallback(async (file: File): Promise<string> => {
     try {
-      const response = await axios.get(`${URL}/api/getLocation`);
-      if (response.data && response.data.data) {
-        return response.data.data;
+      const session = await getSession();
+      if (!session?.user?.accessToken) {
+        throw new Error("User session not found");
       }
-      return [];
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+      if (!allowedTypes.includes(file.type)) {
+        throw new Error("Only JPG, PNG, and WebP images are allowed");
+      }
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        throw new Error("Image size must be less than 5MB");
+      }
+
+      const formData = new FormData();
+      formData.append("profileImage", file);
+
+      const response = await axios.post(`${URL}/api/profile/image`, formData, {
+        headers: {
+          Authorization: `Bearer ${session.user.accessToken}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (response.data && response.data.message === "Profile image updated successfully") {
+        showToast("success", "Profile image updated successfully");
+        return response.data.data.profileImage;
+      } else {
+        throw new Error("Failed to upload profile image");
+      }
     } catch (error) {
-      console.error("Error fetching locations:", error);
-      showToast("error", "Failed to fetch locations");
+      console.error("Error uploading profile image:", error);
+      const message = error instanceof Error ? error.message : "Failed to upload profile image";
+      showToast("error", message);
       throw error;
     }
   }, [showToast]);
@@ -279,9 +298,8 @@ export const useProfile = (): UseProfileReturn => {
     requestPasswordReset,
     fetchProfile,
     checkProfileCompletion,
-    fetchCategories,
     fetchCategoriesActivity,
-    fetchLocations,
+    uploadProfileImage,
     toast,
   };
 };

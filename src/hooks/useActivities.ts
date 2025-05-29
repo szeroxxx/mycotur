@@ -11,6 +11,7 @@ interface ApiActivityMedia {
 
 interface ApiActivityResponse {
   id: number;
+  uuid: string;
   title: string;
   category: string;
   location: string;
@@ -68,9 +69,10 @@ export const useActivities = () => {
 
         const response = await axios.request<ApiResponse>(config);
 
-        console.log('response.data.data::: ', response.data.data);
+        console.log("response.data.data::: ", response.data.data);
         const mappedActivities: Activity[] = response.data.data.map((item) => ({
           id: item.id.toString(),
+          uuid: item.uuid,
           title: item.title,
           category: item.category,
           location: item.location,
@@ -158,6 +160,11 @@ export const useActivities = () => {
         }
         if (activity.lon) {
           formData.append("lon", activity.lon.toString());
+        }
+
+        // Add originalActivityId if this is a duplicate
+        if (activity.originalActivityId) {
+          formData.append("originalActivityId", activity.originalActivityId);
         }
 
         if (activity.images && activity.images.length > 0) {
@@ -258,12 +265,15 @@ export const useActivities = () => {
         formData.append("fees", activity.notes);
         formData.append("description", activity.description);
         formData.append("location", activity.location);
-
         if (activity.lat) {
           formData.append("lat", activity.lat.toString());
         }
         if (activity.lon) {
           formData.append("lon", activity.lon.toString());
+        }
+
+        if (activity.mediaUrls && activity.mediaUrls.length > 0) {
+          formData.append("mediaUrls", JSON.stringify(activity.mediaUrls));
         }
 
         if (activity.images && activity.images.length > 0) {

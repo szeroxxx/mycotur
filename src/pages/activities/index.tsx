@@ -106,10 +106,10 @@ const ActivitiesPage: React.FC = () => {
             [name]: Array.from(files),
           }));
         }
-      } else if (name === "mediaUrls") {        
+      } else if (name === "mediaUrls") {
         setSelectedActivity((prev: Activity | null) => ({
           ...prev!,
-          mediaUrls: typeof value === 'string' ? JSON.parse(value) : value,
+          mediaUrls: typeof value === "string" ? JSON.parse(value) : value,
         }));
       } else if (name === "images" && Array.isArray(value)) {
         // Handle direct array updates for images
@@ -162,7 +162,6 @@ const ActivitiesPage: React.FC = () => {
     setActivityToDelete(activity);
     setIsDeleteModalOpen(true);
   };
-
   const handleDuplicate = async (activity: Activity) => {
     const duplicatedActivity = {
       ...activity,
@@ -175,7 +174,7 @@ const ActivitiesPage: React.FC = () => {
           name: media.name,
           type: media.type,
         })) || [],
-      originalActivityId: activity.id,
+      originalActivityId: activity.uuid,
     };
 
     console.log("Duplicated activity ready:", duplicatedActivity);
@@ -239,6 +238,7 @@ const ActivitiesPage: React.FC = () => {
   const openAddModal = () => {
     const newActivity = {
       id: "",
+      uuid: "",
       title: "",
       category: "",
       location: "",
