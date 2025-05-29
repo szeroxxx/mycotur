@@ -56,17 +56,18 @@ const LeafletMapComponent: React.FC<{
   routeGeometry: [number, number][];
 }> = ({ userLocation, eventLocation, routeGeometry }) => {
   const mapRef = useRef<L.Map | null>(null);
-  const [mapLoaded, setMapLoaded] = useState(false);  useEffect(() => {
+  const [mapLoaded, setMapLoaded] = useState(false);
+  useEffect(() => {
     const initMap = async () => {
       if (typeof window === "undefined") return;
-      
+
       const L = (await import("leaflet")).default;
-      
+
       // Import CSS dynamically
       if (typeof window !== "undefined") {
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = 'https://unpkg.com/leaflet@1.7.1/dist/leaflet.css';
+        const link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.href = "https://unpkg.com/leaflet@1.7.1/dist/leaflet.css";
         document.head.appendChild(link);
       }
 
@@ -75,15 +76,28 @@ const LeafletMapComponent: React.FC<{
         _getIconUrl?: string;
       };
       delete iconDefault._getIconUrl;
-      
-      L.Icon.Default.mergeOptions({
-        iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
-        iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-        shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
-      });
 
+      L.Icon.Default.mergeOptions({
+        iconRetinaUrl:
+          "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+        iconUrl:
+          "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+        shadowUrl:
+          "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+      });
       if (!mapRef.current) {
-        const defaultCenter: [number, number] = userLocation 
+        if (
+          isNaN(eventLocation.coordinates.lat) ||
+          isNaN(eventLocation.coordinates.lng)
+        ) {
+          console.error(
+            "Invalid event location coordinates",
+            eventLocation.coordinates
+          );
+          return;
+        }
+
+        const defaultCenter: [number, number] = userLocation
           ? [userLocation.lat, userLocation.lng]
           : [eventLocation.coordinates.lat, eventLocation.coordinates.lng];
 
@@ -93,7 +107,8 @@ const LeafletMapComponent: React.FC<{
         });
 
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         }).addTo(map);
 
         mapRef.current = map;
@@ -123,12 +138,24 @@ const LeafletMapComponent: React.FC<{
           map.removeLayer(layer);
         }
       });
-
-      const eventMarker = L.marker([eventLocation.coordinates.lat, eventLocation.coordinates.lng])
+      const eventMarker = L.marker([
+        eventLocation.coordinates.lat,
+        eventLocation.coordinates.lng,
+      ])
         .addTo(map)
         .bindPopup("Event Location");
 
       if (userLocation) {
+        // Validate user location coordinates
+        if (isNaN(userLocation.lat) || isNaN(userLocation.lng)) {
+          console.warn("Invalid user location coordinates", userLocation);
+          map.setView(
+            [eventLocation.coordinates.lat, eventLocation.coordinates.lng],
+            13
+          );
+          return;
+        }
+
         const userMarker = L.marker([userLocation.lat, userLocation.lng])
           .addTo(map)
           .bindPopup("Your Location");
@@ -147,30 +174,39 @@ const LeafletMapComponent: React.FC<{
           map.fitBounds(group.getBounds().pad(0.1));
         }
       } else {
-        map.setView([eventLocation.coordinates.lat, eventLocation.coordinates.lng], 13);
+        map.setView(
+          [eventLocation.coordinates.lat, eventLocation.coordinates.lng],
+          13
+        );
       }
     };
 
     updateMap();
-  }, [mapLoaded, userLocation, eventLocation.coordinates.lat, eventLocation.coordinates.lng, routeGeometry]);
+  }, [
+    mapLoaded,
+    userLocation,
+    eventLocation.coordinates.lat,
+    eventLocation.coordinates.lng,
+    routeGeometry,
+  ]);
 
   return <div id="directions-map" className="w-full h-full" />;
 };
 
-const LeafletMap = dynamic(
-  () => Promise.resolve(LeafletMapComponent),
-  { 
-    ssr: false,
-    loading: () => <div className="w-full h-full bg-gray-100 animate-pulse" />
-  }
-);
+const LeafletMap = dynamic(() => Promise.resolve(LeafletMapComponent), {
+  ssr: false,
+  loading: () => <div className="w-full h-full bg-gray-100 animate-pulse" />,
+});
 
 const DirectionsMap: React.FC<DirectionsMapProps> = ({
   eventLocation,
   isOpen,
   onClose,
 }) => {
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [userLocation, setUserLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
   const [route, setRoute] = useState<RouteStep[]>([]);
   const [routeGeometry, setRouteGeometry] = useState<[number, number][]>([]);
   const [loading, setLoading] = useState(false);
@@ -194,7 +230,9 @@ const DirectionsMap: React.FC<DirectionsMapProps> = ({
         },
         (error) => {
           console.error("Error getting user location:", error);
-          setError("Unable to get your location. Please enable location services.");
+          setError(
+            "Unable to get your location. Please enable location services."
+          );
           setLoading(false);
         }
       );
@@ -203,9 +241,21 @@ const DirectionsMap: React.FC<DirectionsMapProps> = ({
       setLoading(false);
     }
   }, []);
-
   const getDirections = useCallback(async () => {
     if (!userLocation) return;
+
+    if (isNaN(userLocation.lat) || isNaN(userLocation.lng)) {
+      setError("Invalid user location coordinates");
+      return;
+    }
+
+    if (
+      isNaN(eventLocation.coordinates.lat) ||
+      isNaN(eventLocation.coordinates.lng)
+    ) {
+      setError("Invalid event location coordinates");
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -224,14 +274,16 @@ const DirectionsMap: React.FC<DirectionsMapProps> = ({
       }
 
       const data: LocationIQResponse = await response.json();
-      
+
       if (data.routes && data.routes.length > 0) {
         const route = data.routes[0];
         setTotalDistance(route.distance);
         setTotalDuration(route.duration);
-        
+
         if (route.geometry && route.geometry.coordinates) {
-          const coords: [number, number][] = route.geometry.coordinates.map(coord => [coord[1], coord[0]]);
+          const coords: [number, number][] = route.geometry.coordinates.map(
+            (coord) => [coord[1], coord[0]]
+          );
           setRouteGeometry(coords);
         }
 
@@ -308,7 +360,9 @@ const DirectionsMap: React.FC<DirectionsMapProps> = ({
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[rgba(229,114,0)] mx-auto mb-2"></div>
                   <p className="text-gray-600">
-                    {userLocation ? "Getting directions..." : "Getting your location..."}
+                    {userLocation
+                      ? "Getting directions..."
+                      : "Getting your location..."}
                   </p>
                 </div>
               </div>
@@ -355,20 +409,29 @@ const DirectionsMap: React.FC<DirectionsMapProps> = ({
                   <span>Route Summary</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="font-semibold">{formatDistance(totalDistance)}</span>
-                  <span className="font-semibold">{formatDuration(totalDuration)}</span>
+                  <span className="font-semibold">
+                    {formatDistance(totalDistance)}
+                  </span>
+                  <span className="font-semibold">
+                    {formatDuration(totalDuration)}
+                  </span>
                 </div>
               </div>
 
               <div className="flex-1 overflow-y-auto">
                 {route.map((step, index) => (
-                  <div key={index} className="p-3 border-b border-gray-200 hover:bg-white transition-colors">
+                  <div
+                    key={index}
+                    className="p-3 border-b border-gray-200 hover:bg-white transition-colors"
+                  >
                     <div className="flex items-start gap-3">
                       <div className="w-6 h-6 bg-[rgba(229,114,0)] text-white rounded-full flex items-center justify-center text-xs font-semibold mt-0.5">
                         {index + 1}
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm text-gray-800 mb-1">{step.instruction}</p>
+                        <p className="text-sm text-gray-800 mb-1">
+                          {step.instruction}
+                        </p>
                         <div className="flex gap-3 text-xs text-gray-500">
                           <span>{formatDistance(step.distance)}</span>
                           <span>{formatDuration(step.duration)}</span>
@@ -382,7 +445,8 @@ const DirectionsMap: React.FC<DirectionsMapProps> = ({
           )}
         </div>
       </div>
-    </div>  );
+    </div>
+  );
 };
 
 export default DirectionsMap;

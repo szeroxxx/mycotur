@@ -45,22 +45,33 @@ export const useActivitiesData = () => {
     lat: number;
     lon: number;
   } | null>(null);
-
-  // Separate function for mapping activities
   const mapActivityData = (data: RawActivityData[]): ActivityData[] => {
-    return data.map((item) => ({
-      id: item.uuid,
-      title: item.title,
-      category: item.category,
-      user: item.owner || "Unknown",
-      location: item.location,
-      description: item.description,
-      image: item.image
-        ? getMediaUrl(item.image)
-        : "/default-activity-image.png",
-      lat: parseFloat(item.lat),
-      lon: parseFloat(item.lon),
-    }));
+    return data
+      .map((item) => {
+        const lat = parseFloat(item.lat);
+        const lon = parseFloat(item.lon);
+        if (isNaN(lat) || isNaN(lon)) {
+          console.warn(
+            `Skipping activity "${item.title}" due to invalid coordinates: lat=${item.lat}, lon=${item.lon}`
+          );
+          return null;
+        }
+
+        return {
+          id: item.uuid,
+          title: item.title,
+          category: item.category,
+          user: item.owner || "Unknown",
+          location: item.location,
+          description: item.description,
+          image: item.image
+            ? getMediaUrl(item.image)
+            : "/default-activity-image.png",
+          lat,
+          lon,
+        };
+      })
+      .filter((item): item is ActivityData => item !== null); // Filter out null entries
   };
 
   // Memoized filter function
@@ -107,9 +118,10 @@ export const useActivitiesData = () => {
         setLoading(true);
         const URL = process.env.NEXTAUTH_BACKEND_URL;
         const response = await axios.get(`${URL}/api/visitor/activity`);
-
         if (response.data && Array.isArray(response.data.data)) {
+          console.log("Raw activities data:", response.data.data);
           const mappedActivities = mapActivityData(response.data.data);
+          console.log("Mapped activities with validation:", mappedActivities);
           setActivities(mappedActivities);
           setFilteredActivities(mappedActivities);
         }

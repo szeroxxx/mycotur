@@ -37,10 +37,15 @@ const LeafletMapComponent: React.FC<LeafletMapComponentProps> = ({
 
   useEffect(() => {
     if (!mapRef.current) {
-      const initialCenter =
-        locations.length > 0
-          ? [locations[0].lat, locations[0].lon]
-          : defaultCenter;
+      let initialCenter = defaultCenter;
+      if (locations.length > 0) {
+        const validLocation = locations.find(
+          (loc) => !isNaN(loc.lat) && !isNaN(loc.lon)
+        );
+        if (validLocation) {
+          initialCenter = [validLocation.lat, validLocation.lon];
+        }
+      }
 
       const mapInstance = L.map("map", {
         center: initialCenter as L.LatLngExpression,
@@ -64,6 +69,7 @@ const LeafletMapComponent: React.FC<LeafletMapComponentProps> = ({
       }
     };
   }, []);
+
   useEffect(() => {
     if (!map) return;
 
@@ -76,8 +82,16 @@ const LeafletMapComponent: React.FC<LeafletMapComponentProps> = ({
     }
 
     const bounds = L.latLngBounds([]);
+    let validLocationCount = 0;
 
     locations.forEach((loc) => {
+      if (isNaN(loc.lat) || isNaN(loc.lon)) {
+        console.warn(
+          `Skipping marker for "${loc.title}" due to invalid coordinates: lat=${loc.lat}, lon=${loc.lon}`
+        );
+        return;
+      }
+
       const position = [loc.lat, loc.lon] as [number, number];
       const marker = L.marker(position, { icon: DefaultIcon }).addTo(map)
         .bindPopup(`
@@ -93,21 +107,35 @@ const LeafletMapComponent: React.FC<LeafletMapComponentProps> = ({
 
       markersRef.current[loc.id] = marker;
       bounds.extend(position);
+      validLocationCount++;
     });
-
-    if (locations.length > 1) {
+    if (validLocationCount > 1) {
       map.fitBounds(bounds, {
         padding: [50, 50],
         animate: true,
         duration: 1,
       });
-    } else if (locations.length === 1) {
-      map.setView([locations[0].lat, locations[0].lon], 14);
+    } else if (validLocationCount === 1) {
+      const validLocation = locations.find(
+        (loc) => !isNaN(loc.lat) && !isNaN(loc.lon)
+      );
+      if (validLocation) {
+        map.setView([validLocation.lat, validLocation.lon], 14);
+      }
+    } else {
+      map.setView(defaultCenter, 12);
     }
   }, [locations, map, defaultCenter, onMarkerClick]);
 
   useEffect(() => {
     if (!map || !selectedLocation) return;
+
+    if (isNaN(selectedLocation.lat) || isNaN(selectedLocation.lon)) {
+      console.warn(
+        `Cannot center map on selected location "${selectedLocation.title}" due to invalid coordinates`
+      );
+      return;
+    }
 
     map.setView([selectedLocation.lat, selectedLocation.lon], 14, {
       animate: true,
