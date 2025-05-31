@@ -6,7 +6,7 @@ import EventHeader from "@/components/activity-detail/EventHeader";
 import PhotoGallery from "@/components/activity-detail/PhotoGallery";
 import EventDetails from "@/components/activity-detail/EventDetails";
 import RSVPForm from "@/components/activity-detail/RSVPForm";
-import ContactModal from "@/components/activity-detail/ContactModal";
+import ActivityContactModal from "@/components/activity-detail/ActivityContactModal";
 import { useActivityDetail } from "@/hooks/useActivityDetail";
 import { RSVPFormData } from "@/types/activity-detail";
 import { CircleCheck } from "lucide-react";
@@ -18,7 +18,7 @@ const submitRSVP = async (
   rsvpData: RSVPFormData,
   organizerData: { email: string; id: string },
   showToast: (type: "success" | "error", message: string) => void
-): Promise<boolean>=> {
+): Promise<boolean> => {
   try {
     const response = await axiosInstance.post("/api/rsvp", {
       ...rsvpData,
@@ -52,6 +52,7 @@ const ActivityDetailPage: React.FC = () => {
   const { activityData, loading, error } = useActivityDetail(
     typeof uuid === "string" ? uuid : undefined
   );
+  console.log('activityData::: ', activityData);
   const [rsvpError, setRsvpError] = useState<string | null>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [toast, setToast] = useState<{
@@ -138,14 +139,10 @@ const ActivityDetailPage: React.FC = () => {
         <title>Activity Details | Mycotur</title>
       </Head>
 
-      <ContactModal
+      <ActivityContactModal
         isOpen={isContactModalOpen}
         onClose={() => setIsContactModalOpen(false)}
-        contactInfo={{
-          email: activityData?.organizer?.socialLinks?.email || "",
-          facebook: activityData?.organizer?.socialLinks?.facebook || "",
-          instagram: activityData?.organizer?.socialLinks?.instagram || "",
-        }}
+        contactInfo={activityData.contact}
       />
 
       {toast && (

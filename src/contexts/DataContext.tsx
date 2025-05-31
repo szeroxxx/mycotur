@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import axios from 'axios';
+import axiosInstance from '../utils/axiosConfig';
 
 interface Category {
   uuid: string;
@@ -38,10 +38,9 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       setError(null);
       
       const URL = process.env.NEXTAUTH_BACKEND_URL;
-      
-      const [categoriesResponse, locationsResponse] = await Promise.all([
-        axios.get(`${URL}/api/category`),
-        axios.get(`${URL}/api/getLocation`)
+        const [categoriesResponse, locationsResponse] = await Promise.all([
+        axiosInstance.get(`${URL}/api/category`),
+        axiosInstance.get(`${URL}/api/getLocation`)
       ]);
 
       if (categoriesResponse.data?.data) {

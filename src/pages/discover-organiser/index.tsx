@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import axiosInstance from "../../utils/axiosConfig";
 import PublicLayout from "@/components/layout/PublicLayout";
 import SearchBar from "@/components/ui/SearchBar";
 import OrganiserCard from "@/components/organiser/OrganiserCard";
@@ -37,7 +37,7 @@ const DiscoverOrganiserPage = () => {
     const fetchOrganisers = async () => {
       try {
         const URL = process.env.NEXTAUTH_BACKEND_URL;
-        const response = await axios.get(`${URL}/api/visitor/organization`);
+        const response = await axiosInstance.get(`${URL}/api/visitor/organization`);
         setOrganisers(response.data);
         setFilteredOrganisers(response.data);
       } catch (error) {
@@ -126,7 +126,9 @@ const DiscoverOrganiserPage = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">        {filteredOrganisers.map((organiser) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {" "}
+        {filteredOrganisers.map((organiser) => (
           <OrganiserCard
             key={organiser.id}
             // id={organiser.id}

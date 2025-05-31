@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosConfig";
 import { getMediaUrl } from "../utils/mediaHelpers";
 
 // Interface for the raw activity detail data from the API
@@ -31,12 +31,14 @@ interface RawActivityDetailData {
   organizer: {
     id: string;
     name: string;
+    avatar?: string;
     eventsHosted: number;
     initials: string;
     socialLinks: {
       email: string;
       facebook: string;
       instagram: string;
+      youtube?: string;
     };
   };
 }
@@ -66,12 +68,14 @@ export interface ActivityDetailData {
   organizer: {
     id: string;
     name: string;
+    avatar?: string;
     eventsHosted: number;
     initials: string;
     socialLinks: {
       email?: string;
       facebook?: string;
       instagram?: string;
+      youtube?: string;
     };
   };
   location: {
@@ -84,17 +88,20 @@ export interface ActivityDetailData {
   contact: {
     phone: string;
     email: string;
-    fees: string;
+    link: string;
   };
 }
 
 export const useActivityDetail = (uuid: string | undefined) => {
-  const [activityData, setActivityData] = useState<ActivityDetailData | null>(null);
+  const [activityData, setActivityData] = useState<ActivityDetailData | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Map raw API data to frontend structure
-  const mapActivityDetailData = (data: RawActivityDetailData): ActivityDetailData => {
+  const mapActivityDetailData = (
+    data: RawActivityDetailData
+  ): ActivityDetailData => {
     return {
       id: data.uuid,
       title: data.title,
@@ -107,7 +114,15 @@ export const useActivityDetail = (uuid: string | undefined) => {
       category: data.category,
       eventDates: data.eventDates || [],
       seasons: {
-        availableMonths: `${data.title} adventure can be organised in between ${new Date(data.startMonth).toLocaleDateString('en-US', { month: 'long' })} to ${new Date(data.endMonth).toLocaleDateString('en-US', { month: 'long' })} (best prefer time from organiser)`,
+        availableMonths: `${
+          data.title
+        } adventure can be organised in between ${new Date(
+          data.startMonth
+        ).toLocaleDateString("en-US", { month: "long" })} to ${new Date(
+          data.endMonth
+        ).toLocaleDateString("en-US", {
+          month: "long",
+        })} (best prefer time from organiser)`,
         unavailableMonths: undefined,
       },
       description: {
@@ -116,12 +131,16 @@ export const useActivityDetail = (uuid: string | undefined) => {
       organizer: {
         id: data.organizer.id,
         name: data.organizer.name,
+        avatar: data.organizer.avatar
+          ? getMediaUrl(data.organizer.avatar)
+          : undefined,
         eventsHosted: data.organizer.eventsHosted,
         initials: data.organizer.initials,
         socialLinks: {
           email: data.organizer.socialLinks.email || undefined,
           facebook: data.organizer.socialLinks.facebook || undefined,
           instagram: data.organizer.socialLinks.instagram || undefined,
+          youtube: data.organizer.socialLinks.youtube || undefined,
         },
       },
       location: {
@@ -134,27 +153,28 @@ export const useActivityDetail = (uuid: string | undefined) => {
       contact: {
         phone: data.phone,
         email: data.email,
-        fees: data.fees,
+        link: data.link,
       },
     };
   };
 
   useEffect(() => {
     const fetchActivityDetail = async () => {
-      if (!uuid) return;
-
-      try {
+      if (!uuid) return;      try {
         setLoading(true);
         setError(null);
         const URL = process.env.NEXTAUTH_BACKEND_URL;
-        const response = await axios.get(`${URL}/api/visitor/activity-detail/${uuid}`);
+        const response = await axiosInstance.get(
+          `${URL}/api/visitor/activity-detail/${uuid}`
+        );
+        console.log("response::: ", response);
 
         if (response.data && response.data.data) {
           const mappedData = mapActivityDetailData(response.data.data);
           setActivityData(mappedData);
         }
       } catch (err) {
-        console.error('Error fetching activity detail:', err);
+        console.error("Error fetching activity detail:", err);
         setError("Failed to load activity details");
       } finally {
         setLoading(false);

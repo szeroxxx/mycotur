@@ -1,17 +1,16 @@
 import React from "react";
 
-interface ContactModalProps {
+interface ActivityContactModalProps {
   isOpen: boolean;
   onClose: () => void;
   contactInfo: {
     email: string;
-    facebook?: string;
-    instagram?: string;
-    youtube?: string;
+    phone?: string;
+    link?: string;
   };
 }
 
-const ContactModal: React.FC<ContactModalProps> = ({
+const ActivityContactModal: React.FC<ActivityContactModalProps> = ({
   isOpen,
   onClose,
   contactInfo,
@@ -38,17 +37,17 @@ const ContactModal: React.FC<ContactModalProps> = ({
           </div>{" "}
           <div>
             <label className="block text-sm font-medium text-[rgb(68,63,63)]">
-              Facebook
+              Phone
             </label>
             <div className="w-full p-1 text-[rgb(68,63,63)] ">
-              {contactInfo.facebook ? (
+              {contactInfo.phone ? (
                 <a
-                  href={contactInfo.facebook}
+                  href={contactInfo.phone}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-[#D45B20] hover:underline"
                 >
-                  {contactInfo.facebook}
+                  {contactInfo.phone}
                 </a>
               ) : (
                 "Not provided"
@@ -57,42 +56,24 @@ const ContactModal: React.FC<ContactModalProps> = ({
           </div>
           <div>
             <label className="block text-sm font-medium text-[rgb(68,63,63)] mb-1">
-              Instagram
+              Link
             </label>
             <div className="w-full p-1 text-[rgb(68,63,63)]">
-              {contactInfo.instagram ? (
+              {contactInfo.link ? (
                 <a
-                  href={contactInfo.instagram}
+                  href={contactInfo.link}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-[#D45B20] hover:underline"
                 >
-                  {contactInfo.instagram}
+                  {contactInfo.link}
                 </a>
               ) : (
                 "Not provided"
               )}
             </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-[rgb(68,63,63)] mb-1">
-              YouTube
-            </label>
-            <div className="w-full p-1 text-[rgb(68,63,63)]">
-              {contactInfo.youtube ? (
-                <a
-                  href={contactInfo.youtube}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#D45B20] hover:underline"
-                >
-                  {contactInfo.youtube}
-                </a>
-              ) : (
-                "Not provided"
-              )}
-            </div>
-          </div>
+
         </div>
 
         <div className="mt-3">
@@ -108,4 +89,4 @@ const ContactModal: React.FC<ContactModalProps> = ({
   );
 };
 
-export default ContactModal;
+export default ActivityContactModal;

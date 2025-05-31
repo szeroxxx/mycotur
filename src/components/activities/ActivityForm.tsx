@@ -3,6 +3,10 @@ import Image from "next/image";
 import { Activity } from "../../types/activity";
 import { MdDelete, MdPlayCircle } from "react-icons/md";
 import { getMediaUrl } from "../../utils/mediaHelpers";
+import {
+  googlePlacesService,
+  LocationSuggestion,
+} from "../../utils/googlePlacesService";
 
 interface Category {
   uuid: string;
@@ -28,33 +32,15 @@ interface ActivityFormProps {
   onCancel: () => void;
 }
 
-interface LocationSuggestion {
-  display_name: string;
-  display_place: string;
-  display_address: string;
-  place_id: string;
-  lat: string;
-  lon: string;
-  address: {
-    name: string;
-    state?: string;
-    country?: string;
-    city?: string;
-  };
-}
-
 const RequiredIndicator = () => (
   <span className="text-[rgba(220,38,38,1)]">*</span>
 );
-const LOCATIONIQ_API_KEY = "pk.bd1aad9ddb52d668b4630b31292a59b6";
-const LOCATIONIQ_API_URL = "https://api.locationiq.com/v1/autocomplete";
 
 export const ActivityForm: React.FC<ActivityFormProps> = ({
   activity,
   categories,
   onSubmit,
   onChange,
-
   onCancel,
 }) => {
   const [locationInput, setLocationInput] = useState(activity.location || "");
@@ -75,26 +61,12 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
     const value = e.target.value;
     setLocationInput(value);
     onChange(e);
+
     if (value.length > 2) {
       try {
-        const response = await fetch(
-          `${LOCATIONIQ_API_URL}?key=${LOCATIONIQ_API_KEY}&q=${encodeURIComponent(
-            value
-          )}&limit=5&dedupe=1`
-        );
-
-        if (!response.ok) {
-          if (response.status === 404) {
-            setSuggestions([]);
-            setShowSuggestions(false);
-            return;
-          }
-        }
-
-        const data = await response.json();
-
-        setSuggestions(data);
-        setShowSuggestions(data.length > 0);
+        const suggestions = await googlePlacesService.searchPlaces(value);
+        setSuggestions(suggestions);
+        setShowSuggestions(suggestions.length > 0);
       } catch (error) {
         console.error("Error fetching locations:", error);
         setSuggestions([]);
@@ -105,6 +77,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
       setShowSuggestions(false);
     }
   };
+
   const handleSuggestionClick = (suggestion: LocationSuggestion) => {
     const locationValue = `${suggestion.display_place}, ${suggestion.display_address}`;
 
@@ -134,6 +107,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
     setSuggestions([]);
     setShowSuggestions(false);
   };
+
   const handleImageRemove = (index: number) => {
     try {
       const currentImages = [...(activity.images || [])];
@@ -182,6 +156,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
       setUploadError("Failed to remove image. Please try again.");
     }
   };
+
   const handleVideoRemove = (index: number) => {
     try {
       const currentVideos = [...(activity.videos || [])];
@@ -230,6 +205,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
       setUploadError("Failed to remove video. Please try again.");
     }
   };
+
   const handleMediaUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
 
@@ -328,6 +304,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
       setIsUploading(false);
     }
   };
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -352,6 +329,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
       document.removeEventListener("keydown", handleEscapeKey);
     };
   }, [locationRef]);
+
   useEffect(() => {
     // Clean up previous URLs
     previewImages.forEach((url) => {
@@ -475,7 +453,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
             name="location"
             value={locationInput}
             onChange={handleLocationChange}
-            placeholder="Enter location"
+            placeholder="Enter location (e.g., Valle del Tiétar, Sierra de Gredos...)"
             className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
             required
           />
@@ -484,7 +462,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
               {suggestions.map((suggestion) => (
                 <div
                   key={suggestion.place_id}
-                  className="px-4 py-2 hover:bg-[#FFF5F1] cursor-pointer"
+                  className="px-4 py-2 hover:bg-[#FFF5F1] cursor-pointer border-b border-gray-100 last:border-b-0"
                   onClick={() => handleSuggestionClick(suggestion)}
                 >
                   <div className="font-medium text-[rgba(142,133,129)]">
@@ -497,6 +475,17 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
               ))}
             </div>
           )}
+          {showSuggestions &&
+            suggestions.length === 0 &&
+            locationInput.length > 2 && (
+              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4">
+                <div className="text-sm text-gray-500 text-center">
+                  No locations found in target regions. Try searching for places
+                  in Valle del Tiétar, La Moraña, Valle de Amblés, Sierra de
+                  Gredos, or Alberche Pinares.
+                </div>
+              </div>
+            )}
         </div>
       </div>
 
@@ -511,7 +500,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
             <div className="w-full">
               <label className="block text-sm font-sm text-[rgba(142,133,129)] mb-2">
                 Start Month
-              </label>{" "}
+              </label>
               <input
                 type="month"
                 name="startMonth"
@@ -525,7 +514,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
             <div className="w-full">
               <label className="block text-sm font-sm text-[rgba(142,133,129)] mb-2">
                 End Month
-              </label>{" "}
+              </label>
               <input
                 type="month"
                 name="endMonth"
@@ -574,6 +563,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
           />
         </div>
       </div>
+
       <div>
         <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
           Fees
@@ -624,7 +614,6 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
                     onMouseEnter={() => setHoverIndex(index)}
                     onMouseLeave={() => setHoverIndex(null)}
                   >
-                    {" "}
                     <Image
                       src={url}
                       alt={`Preview ${index + 1}`}

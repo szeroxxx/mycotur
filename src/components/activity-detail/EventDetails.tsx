@@ -5,7 +5,7 @@ import { IoLogoFacebook } from "react-icons/io5";
 import { IoLogoYoutube } from "react-icons/io";
 import dynamic from "next/dynamic";
 
-const DirectionsMap = dynamic(() => import("@/components/maps/DirectionsMap"), {
+const DirectionsMap = dynamic(() => import("@/components/maps/GoogleDirectionsMap"), {
   ssr: false,
   loading: () => (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -35,6 +35,7 @@ interface Organizer {
     email?: string;
     facebook?: string;
     instagram?: string;
+    youtube?: string;
   };
 }
 
@@ -68,6 +69,11 @@ const EventDetails: React.FC<EventDetailsProps> = ({
   location,
 }) => {
   const [isDirectionsOpen, setIsDirectionsOpen] = useState(false);
+
+  const handleEventClick = (id: string) => {
+    window.open(`/event-detail/${id}`, "_blank");
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -79,12 +85,15 @@ const EventDetails: React.FC<EventDetailsProps> = ({
             {eventDates.length > 0 ? (
               eventDates.map((eventDate) => (
                 <div key={eventDate.id} className="flex">
-                  <div className="flex p-3 items-center gap-3 text-sm bg-white rounded-lg border border-gray-100 w-fit">
-                    <Calendar className="text-[rgba(229,114,0)] flex-shrink-0" />
-                    <span className="text-[rgba(100,92,90)]">
+                  <div
+                    onClick={() => handleEventClick(eventDate.id)}
+                    className="flex p-3 items-center gap-3 text-sm bg-white rounded-lg border border-gray-100 w-fit"
+                  >
+                    <Calendar className="text-[rgba(229,114,0)] flex-shrink-0 cursor-pointer" />
+                    <span className="text-[rgba(100,92,90)] cursor-pointer">
                       {eventDate.date} at {eventDate.time}
                     </span>
-                    <span className="font-medium text-[rgba(229,114,0)]">
+                    <span className="font-medium text-[rgba(229,114,0)] cursor-pointer">
                       Read more details
                     </span>
                   </div>
@@ -148,25 +157,30 @@ const EventDetails: React.FC<EventDetailsProps> = ({
             </p>
           </div>
           <div className="flex gap-2 ">
-            {organizer.socialLinks.email && (
-              <div className="w-10 h-10 text-[rgba(229,114,0)] border border-[rgba(199,195,193)] rounded flex items-center justify-center">
+            {organizer.socialLinks.youtube && (
+              <div 
+                onClick={() => window.open(organizer.socialLinks.youtube, '_blank')}
+                className="cursor-pointer w-10 h-10 text-[rgba(229,114,0)] border border-[rgba(199,195,193)] rounded flex items-center justify-center">
                 <IoLogoYoutube className="w-6 h-6" />
               </div>
             )}
             {organizer.socialLinks.facebook && (
-              <div className="w-10 h-10 text-[rgba(229,114,0)] border border-[rgba(199,195,193)] rounded flex items-center justify-center">
+              <div
+                onClick={() => window.open(organizer.socialLinks.facebook, '_blank')}
+                className="cursor-pointer w-10 h-10 text-[rgba(229,114,0)] border border-[rgba(199,195,193)] rounded flex items-center justify-center">
                 <IoLogoFacebook className="w-6 h-6" />
               </div>
             )}
             {organizer.socialLinks.instagram && (
-              <div className="w-10 h-10 text-[rgba(229,114,0)] border border-[rgba(199,195,193)] rounded flex items-center justify-center">
+              <div
+                onClick={() => window.open(organizer.socialLinks.instagram, '_blank')}
+                className="cursor-pointer w-10 h-10 text-[rgba(229,114,0)] border border-[rgba(199,195,193)] rounded flex items-center justify-center">
                 <RiInstagramFill className="w-6 h-6" />
               </div>
             )}
           </div>
         </div>
       </div>{" "}
-      {/* Event Address */}
       <div>
         <h3 className="text-lg font-semibold text-[rgba(68,63,63)] mb-4">
           Event Address

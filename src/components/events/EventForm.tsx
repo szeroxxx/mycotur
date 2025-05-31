@@ -4,27 +4,16 @@ import { Event } from "../../types/event";
 import { Activity } from "../../types/activity";
 import { MdDelete, MdPlayCircle } from "react-icons/md";
 import { getMediaUrl } from "../../utils/mediaHelpers";
+import {
+  googlePlacesService,
+  LocationSuggestion,
+} from "../../utils/googlePlacesService";
 
 const MAX_FILE_SIZE_MB = 10;
 const MAX_IMAGES = 10;
 const MAX_VIDEOS = 3;
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const ALLOWED_VIDEO_TYPES = ["video/mp4", "video/webm", "video/mov"];
-
-interface LocationSuggestion {
-  display_name: string;
-  display_place: string;
-  display_address: string;
-  place_id: string;
-  lat: string;
-  lon: string;
-  address: {
-    name: string;
-    state?: string;
-    country?: string;
-    city?: string;
-  };
-}
 
 interface Category {
   uuid: string;
@@ -49,9 +38,6 @@ interface EventFormProps {
 const RequiredIndicator = () => (
   <span className="text-[rgba(220,38,38,1)]">*</span>
 );
-
-const LOCATIONIQ_API_KEY = "pk.bd1aad9ddb52d668b4630b31292a59b6";
-const LOCATIONIQ_API_URL = "https://api.locationiq.com/v1/autocomplete";
 
 export const EventForm: React.FC<EventFormProps> = ({
   event,
@@ -152,33 +138,18 @@ export const EventForm: React.FC<EventFormProps> = ({
   ) => {
     onChange(e);
   };
-
   const handleLocationChange = async (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const value = e.target.value;
     setLocationInput(value);
     onChange(e);
+
     if (value.length > 2) {
       try {
-        const response = await fetch(
-          `${LOCATIONIQ_API_URL}?key=${LOCATIONIQ_API_KEY}&q=${encodeURIComponent(
-            value
-          )}&limit=5&dedupe=1`
-        );
-
-        if (!response.ok) {
-          if (response.status === 404) {
-            setSuggestions([]);
-            setShowSuggestions(false);
-            return;
-          }
-        }
-
-        const data = await response.json();
-        console.log("data::: ", data);
-        setSuggestions(data);
-        setShowSuggestions(data.length > 0);
+        const suggestions = await googlePlacesService.searchPlaces(value);
+        setSuggestions(suggestions);
+        setShowSuggestions(suggestions.length > 0);
       } catch (error) {
         console.error("Error fetching locations:", error);
         setSuggestions([]);
@@ -575,16 +546,14 @@ export const EventForm: React.FC<EventFormProps> = ({
       if (event.key === "Escape") {
         setShowSuggestions(false);
       }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
+    };    document.addEventListener("mousedown", handleClickOutside);
     document.addEventListener("keydown", handleEscapeKey);
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", handleEscapeKey);
     };
-  }, []);
+  }, [locationRef]);
   useEffect(() => {
     console.log("🔄 Regenerating preview arrays...");
     logMediaState("Before preview regeneration");
@@ -795,14 +764,13 @@ export const EventForm: React.FC<EventFormProps> = ({
       <div>
         <label className="block text-sm font-sm text-[rgba(68,63,63)] mb-2">
           Location <RequiredIndicator />
-        </label>
-        <div className="relative" ref={locationRef}>
+        </label>        <div className="relative" ref={locationRef}>
           <input
             type="text"
             name="location"
             value={locationInput}
             onChange={handleLocationChange}
-            placeholder="Enter location"
+            placeholder="Enter location (e.g., Valle del Tiétar, Sierra de Gredos...)"
             className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
             required
           />
@@ -811,7 +779,7 @@ export const EventForm: React.FC<EventFormProps> = ({
               {suggestions.map((suggestion) => (
                 <div
                   key={suggestion.place_id}
-                  className="px-4 py-2 hover:bg-[#FFF5F1] cursor-pointer"
+                  className="px-4 py-2 hover:bg-[#FFF5F1] cursor-pointer border-b border-gray-100 last:border-b-0"
                   onClick={() => handleSuggestionClick(suggestion)}
                 >
                   <div className="font-medium text-[rgba(142,133,129)]">
@@ -824,6 +792,17 @@ export const EventForm: React.FC<EventFormProps> = ({
               ))}
             </div>
           )}
+          {showSuggestions &&
+            suggestions.length === 0 &&
+            locationInput.length > 2 && (
+              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4">
+                <div className="text-sm text-gray-500 text-center">
+                  No locations found in target regions. Try searching for places
+                  in Valle del Tiétar, La Moraña, Valle de Amblés, Sierra de
+                  Gredos, or Alberche Pinares.
+                </div>
+              </div>
+            )}
         </div>
       </div>
       <div>

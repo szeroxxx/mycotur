@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosConfig";
 import { getMediaUrl } from "../utils/mediaHelpers";
 
 interface RawActivityData {
@@ -74,7 +74,6 @@ export const useActivitiesData = () => {
       .filter((item): item is ActivityData => item !== null); // Filter out null entries
   };
 
-  // Memoized filter function
   const applyFilters = useCallback(
     (items: ActivityData[], currentFilters = filters) => {
       let result = [...items];
@@ -113,11 +112,10 @@ export const useActivitiesData = () => {
   );
 
   useEffect(() => {
-    const fetchActivities = async () => {
-      try {
+    const fetchActivities = async () => {      try {
         setLoading(true);
         const URL = process.env.NEXTAUTH_BACKEND_URL;
-        const response = await axios.get(`${URL}/api/visitor/activity`);
+        const response = await axiosInstance.get(`${URL}/api/visitor/activity`);
         if (response.data && Array.isArray(response.data.data)) {
           console.log("Raw activities data:", response.data.data);
           const mappedActivities = mapActivityData(response.data.data);

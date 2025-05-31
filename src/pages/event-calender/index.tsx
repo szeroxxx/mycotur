@@ -18,7 +18,8 @@ const Index = () => {
     dateHasEvent,
     events,
   } = useEventsData();
-
+  
+  console.log('filteredEvents::: ', filteredEvents);
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
   const [locationFilter, setLocationFilter] = useState("Location");
   const [categoryFilter, setCategoryFilter] = useState("Event Category");
@@ -80,6 +81,7 @@ const Index = () => {
                   date={event.date}
                   time={event.time}
                   location={event.location}
+                  category={event.category}
                   owner={event.owner}
                   image={event.image}
                   isSelected={event.uuid === selectedEvent}

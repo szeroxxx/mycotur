@@ -65,7 +65,6 @@ const EventsPage: React.FC = () => {
     deleteEvent,
     showToast,
   } = useEvents();
-  console.log("eventsxssssssssss::: ", events);
   const { checkProfileCompletion, fetchCategoriesActivity } = useProfile();
 
   useEffect(() => {
@@ -73,7 +72,6 @@ const EventsPage: React.FC = () => {
       const loadActivities = async () => {
         try {
           const allActivities = await fetchAllActivities();
-          console.log("allActivities::: ", allActivities);
           setDropdownActivities(allActivities);
         } catch (error) {
           console.error("Failed to load activities for dropdown:", error);
@@ -88,22 +86,18 @@ const EventsPage: React.FC = () => {
     >
   ) => {
     const { name, value } = e.target;
-    console.log("name, value::: ", name, value);
     if (selectedEvent) {
       if (name === "images" && Array.isArray(value)) {
-        // Handle direct array updates for images
         setSelectedEvent((prev: Event | null) => ({
           ...prev!,
           images: value,
         }));
       } else if (name === "videos" && Array.isArray(value)) {
-        // Handle direct array updates for videos
         setSelectedEvent((prev: Event | null) => ({
           ...prev!,
           videos: value,
         }));
       } else if (name === "mediaUrls" && Array.isArray(value)) {
-        // Handle direct array updates for mediaUrls
         setSelectedEvent((prev: Event | null) => ({
           ...prev!,
           mediaUrls: value,
@@ -144,7 +138,6 @@ const EventsPage: React.FC = () => {
           )
         : "",
     };
-    console.log("formattedEvent::: ", formattedEvent);
     setSelectedEvent(formattedEvent);
     setIsModalOpen(true);
   };
@@ -203,7 +196,6 @@ const EventsPage: React.FC = () => {
         setIsAgent(parsedUserData.role === "agent");
         if (parsedUserData.role !== "agent") return;
         const status = await checkProfileCompletion();
-        console.log("status::: ", status);
         if (status) {
           setProfileStatus(status);
         }
@@ -253,14 +245,24 @@ const EventsPage: React.FC = () => {
                 placeholder="Search"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full md:w-64 pl-10 pr-4 py-2 border border-[rgba(199,195,193)] shadow-sm shadow-[rgba(24,27,37,0.04)] text-[rgba(142,133,129)] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[rgba(194,91,52)] focus:border-[rgba(194,91,52)]"
+                disabled={isAgent && profileStatus?.needsUpdate}
+                className={`w-full md:w-64 pl-10 pr-4 py-2 border border-[rgba(199,195,193)] shadow-sm shadow-[rgba(24,27,37,0.04)] text-[rgba(142,133,129)] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[rgba(194,91,52)] focus:border-[rgba(194,91,52)] ${
+                  isAgent && profileStatus?.needsUpdate
+                    ? "bg-gray-100 cursor-not-allowed"
+                    : ""
+                }`}
               />
             </div>
 
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="w-full md:w-48 px-4 py-2  text-[rgba(142,133,129)] border border-[rgba(199,195,193)] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
+              disabled={isAgent && profileStatus?.needsUpdate}
+              className={`w-full md:w-48 px-4 py-2 text-[rgba(142,133,129)] border border-[rgba(199,195,193)] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20] ${
+                isAgent && profileStatus?.needsUpdate
+                  ? "bg-gray-100 cursor-not-allowed"
+                  : ""
+              }`}
             >
               <option value="">Categories</option>
               {categories.map((category) => (

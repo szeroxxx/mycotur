@@ -5,7 +5,7 @@ import { IoLogoFacebook } from "react-icons/io5";
 import { IoLogoYoutube } from "react-icons/io";
 import dynamic from "next/dynamic";
 
-const DirectionsMap = dynamic(() => import("../maps/DirectionsMap"), {
+const DirectionsMap = dynamic(() => import("../maps/GoogleDirectionsMap"), {
   ssr: false,
   loading: () => (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -148,19 +148,37 @@ const EventDetails: React.FC<EventDetailsProps> = ({
           </div>
           <div className="flex gap-2 ">
             {organizer.socialLinks.email && (
-              <div className="w-10 h-10 text-[rgba(229,114,0)] border border-[rgba(199,195,193)] rounded flex items-center justify-center">
-                <IoLogoYoutube className="w-6 h-6" />
-              </div>
+              <a
+                href={organizer.socialLinks.email}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <div className="w-10 h-10 text-[rgba(229,114,0)] border border-[rgba(199,195,193)] rounded flex items-center justify-center">
+                  <IoLogoYoutube className="w-6 h-6" />
+                </div>
+              </a>
             )}
             {organizer.socialLinks.facebook && (
-              <div className="w-10 h-10 text-[rgba(229,114,0)] border border-[rgba(199,195,193)] rounded flex items-center justify-center">
-                <IoLogoFacebook className="w-6 h-6" />
-              </div>
+              <a
+                href={organizer.socialLinks.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <div className="w-10 h-10 text-[rgba(229,114,0)] border border-[rgba(199,195,193)] rounded flex items-center justify-center">
+                  <IoLogoFacebook className="w-6 h-6" />
+                </div>
+              </a>
             )}
             {organizer.socialLinks.instagram && (
-              <div className="w-10 h-10 text-[rgba(229,114,0)] border border-[rgba(199,195,193)] rounded flex items-center justify-center">
-                <RiInstagramFill className="w-6 h-6" />
-              </div>
+              <a
+                href={organizer.socialLinks.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <div className="w-10 h-10 text-[rgba(229,114,0)] border border-[rgba(199,195,193)] rounded flex items-center justify-center">
+                  <RiInstagramFill className="w-6 h-6" />
+                </div>
+              </a>
             )}
           </div>
         </div>

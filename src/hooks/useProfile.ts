@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { Agent } from "../types/agent";
-import axios from "axios";
+import axiosInstance from "../utils/axiosConfig";
 import { getSession } from "next-auth/react";
 
 const URL = process.env.NEXTAUTH_BACKEND_URL;
@@ -66,14 +66,12 @@ export const useProfile = (): UseProfileReturn => {
       const session = await getSession();
       if (!session?.user?.uuid) {
         throw new Error("User session not found");
-      }
-
-      const response = await axios.get(`${URL}/api/profile`, {
+      }      const response = await axiosInstance.get(`${URL}/api/profile`, {
         headers: {
           Authorization: `Bearer ${session.user.accessToken}`,
           "Content-Type": "application/json",
         },
-      });      if (response.data && response.data.data) {
+      });if (response.data && response.data.data) {
         const profileData = response.data.data;
         return {
           profilePicture: profileData.profileImage || "",
@@ -117,10 +115,8 @@ export const useProfile = (): UseProfileReturn => {
       const session = await getSession();
       if (!session?.user?.accessToken) {
         throw new Error("User session not found");
-      }
-
-      console.log("updateData::: ", updateData);
-      const response = await axios.put(`${URL}/api/user/${uuid}`, updateData, {
+      }      console.log("updateData::: ", updateData);
+      const response = await axiosInstance.put(`${URL}/api/user/${uuid}`, updateData, {
         headers: {
           Authorization: `Bearer ${session.user.accessToken}`,
           "Content-Type": "application/json",
@@ -144,8 +140,7 @@ export const useProfile = (): UseProfileReturn => {
       const session = await getSession();
       if (!session?.user?.uuid || !session?.user?.accessToken) {
         throw new Error("User session not found");
-      }
-      const config = {
+      }      const config = {
         method: "put",
         url: `${URL}/api/user/reset-password/${session.user.uuid}`,
         headers: {
@@ -158,7 +153,7 @@ export const useProfile = (): UseProfileReturn => {
         },
       };
 
-      const response = await axios.request(config);
+      const response = await axiosInstance.request(config);
       if (response.status === 200) {
         showToast("success", "Password changed successfully");
       } else {
@@ -176,9 +171,7 @@ export const useProfile = (): UseProfileReturn => {
       const session = await getSession();
       if (!session?.user?.uuid || !session?.user?.accessToken) {
         throw new Error("User session not found");
-      }
-
-      const response = await axios.post(
+      }      const response = await axiosInstance.post(
         `${URL}/api/forgot-password/${session.user.uuid}`,
         { email },
         {
@@ -209,10 +202,8 @@ export const useProfile = (): UseProfileReturn => {
       if (!session?.user?.uuid) {
         showToast("error", "User session not found");
         return;
-      }
-
-      const uuid = localStorage.getItem("userUuid");
-      const response = await axios.get(`${URL}/api/profile/completion-status`, {
+      }      const uuid = localStorage.getItem("userUuid");
+      const response = await axiosInstance.get(`${URL}/api/profile/completion-status`, {
         headers: {
           Authorization: `Bearer ${session.user.accessToken}`,
           "Content-Type": "application/json",
@@ -233,9 +224,8 @@ export const useProfile = (): UseProfileReturn => {
       if (!session?.user?.uuid) {
         showToast("error", "User session not found");
         return;
-      }
-      const uuid = localStorage.getItem("userUuid");
-      const response = await axios.get(`${URL}/api/categories-drop`, {
+      }      const uuid = localStorage.getItem("userUuid");
+      const response = await axiosInstance.get(`${URL}/api/categories-drop`, {
         headers: {
           Authorization: `Bearer ${session.user.accessToken}`,
           "Content-Type": "application/json",
@@ -266,12 +256,10 @@ export const useProfile = (): UseProfileReturn => {
       const maxSize = 5 * 1024 * 1024; // 5MB
       if (file.size > maxSize) {
         throw new Error("Image size must be less than 5MB");
-      }
-
-      const formData = new FormData();
+      }      const formData = new FormData();
       formData.append("profileImage", file);
 
-      const response = await axios.post(`${URL}/api/profile/image`, formData, {
+      const response = await axiosInstance.post(`${URL}/api/profile/image`, formData, {
         headers: {
           Authorization: `Bearer ${session.user.accessToken}`,
           "Content-Type": "multipart/form-data",

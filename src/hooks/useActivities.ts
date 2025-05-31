@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { Activity, Toast, PaginationInfo } from "../types/activity";
 import axios from "axios";
+import axiosInstance from "../utils/axiosConfig";
 
 const URL = process.env.NEXTAUTH_BACKEND_URL;
 
@@ -27,10 +28,10 @@ interface ApiActivityResponse {
   media: ApiActivityMedia[];
 }
 
-interface ApiResponse {
-  data: ApiActivityResponse[];
-  pagination: PaginationInfo;
-}
+// interface ApiResponse {
+//   data: ApiActivityResponse[];
+//   pagination: PaginationInfo;
+// }
 
 export const useActivities = () => {
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -51,44 +52,40 @@ export const useActivities = () => {
     },
     []
   );
-
   const fetchActivities = useCallback(
     async (page: number = 1) => {
       try {
         setIsLoading(true);
-        const token = localStorage.getItem("token");
         const uuid = localStorage.getItem("userUuid");
-        const config = {
-          method: "get",
-          url: `${URL}/api/activity?page=${page}`,
-          headers: {
-            Authorization: `Bearer ${token}`,
-            userid: uuid,
-          },
-        };
-
-        const response = await axios.request<ApiResponse>(config);
-
-        console.log("response.data.data::: ", response.data.data);
-        const mappedActivities: Activity[] = response.data.data.map((item) => ({
-          id: item.id.toString(),
-          uuid: item.uuid,
-          title: item.title,
-          category: item.category,
-          location: item.location,
-          lat: item.lat,
-          lon: item.lon,
-          startMonth: item.startMonth?.substring(0, 7) || "",
-          endMonth: item.endMonth?.substring(0, 7) || "",
-          email: item.email,
-          phone: item.phone,
-          url: item.link,
-          notes: item.fees,
-          description: item.description,
-          images: [],
-          videos: [],
-          mediaUrls: item.media,
-        }));
+        const response = await axiosInstance.get(
+          `${URL}/api/activity?page=${page}`,
+          {
+            headers: {
+              userid: uuid,
+            },
+          }
+        );        console.log("response.data.data::: ", response.data.data);
+        const mappedActivities: Activity[] = response.data.data.map(
+          (item: ApiActivityResponse) => ({
+            id: item.id.toString(),
+            uuid: item.uuid,
+            title: item.title,
+            category: item.category,
+            location: item.location,
+            lat: item.lat,
+            lon: item.lon,
+            startMonth: item.startMonth?.substring(0, 7) || "",
+            endMonth: item.endMonth?.substring(0, 7) || "",
+            email: item.email,
+            phone: item.phone,
+            url: item.link,
+            notes: item.fees,
+            description: item.description,
+            images: [],
+            videos: [],
+            mediaUrls: item.media,
+          })
+        );
 
         setActivities(mappedActivities);
         setPagination(response.data.pagination);
@@ -110,7 +107,6 @@ export const useActivities = () => {
       activity: Omit<Activity, "id"> & { originalActivityId?: string }
     ) => {
       try {
-        const token = localStorage.getItem("token");
         const formData = new FormData();
 
         if (activity.images && activity.images.length > 0) {
@@ -179,21 +175,17 @@ export const useActivities = () => {
           });
         }
         console.log("formData::: ", formData);
-
         const uuid = localStorage.getItem("userUuid");
 
-        const config = {
-          method: "post",
-          maxBodyLength: Infinity,
-          url: `${URL}/api/activity`,
-          headers: {
-            Authorization: `Bearer ${token}`,
-            userid: uuid,
-          },
-          data: formData,
-        };
-
-        const response = await axios.request(config);
+        const response = await axiosInstance.post(
+          `${URL}/api/activity`,
+          formData,
+          {
+            headers: {
+              userid: uuid,
+            },
+          }
+        );
 
         if (response.status === 201) {
           const newActivity = {
@@ -220,7 +212,6 @@ export const useActivities = () => {
   const updateActivity = useCallback(
     async (activity: Activity) => {
       try {
-        const token = localStorage.getItem("token");
         const formData = new FormData();
 
         if (activity.images && activity.images.length > 0) {
@@ -291,19 +282,13 @@ export const useActivities = () => {
             }
           });
         }
-        console.log("activity::: ", activity);
-        console.log("formData::: ", formData);
-        const config = {
-          method: "put",
-          maxBodyLength: Infinity,
-          url: `${URL}/api/activity/${activity.id}`,
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          data: formData,
-          timeout: 60000,
-        };
-        const response = await axios.request(config);
+        const response = await axiosInstance.put(
+          `${URL}/api/activity/${activity.id}`,
+          formData,
+          {
+            timeout: 60000,
+          }
+        );
         if (response.status === 200) {
           showToast("success", "Activity updated successfully");
           await fetchActivities(pagination.currentPage);
@@ -338,7 +323,7 @@ export const useActivities = () => {
           },
         };
 
-        const response = await axios.request(config);
+        const response = await axiosInstance.request(config);
 
         if (response.status === 200) {
           showToast("success", "Activity deleted successfully");
@@ -378,7 +363,7 @@ export const useActivities = () => {
         },
       };
 
-      const response = await axios.request(config);
+      const response = await axiosInstance.request(config);
       return response.data.data.map((item: ApiActivityResponse) => ({
         id: item.id.toString(),
         title: item.title,

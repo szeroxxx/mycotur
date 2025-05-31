@@ -143,10 +143,12 @@ const EventDetailPage: React.FC = () => {
     );
   }
 
+  console.log('eventData::: ', eventData);
   return (
     <PublicLayout>
       <Head>
         <title>{eventData.title} | Mycotur</title>
+
       </Head>
 
       <ContactModal
@@ -156,6 +158,7 @@ const EventDetailPage: React.FC = () => {
           email: eventData.contact.email,
           facebook: eventData.organizer.socialLinks.facebook,
           instagram: eventData.organizer.socialLinks.instagram,
+          youtube: eventData.organizer.socialLinks.youtube,
         }}
       />
 

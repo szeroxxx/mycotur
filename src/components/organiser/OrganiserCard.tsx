@@ -170,6 +170,7 @@ const OrganiserCard: React.FC<OrganiserCardProps> = ({
           email: email,
           facebook: facebook || undefined,
           instagram: instagram || undefined,
+          youtube: youtube || undefined,
         }}
       />
     </div>

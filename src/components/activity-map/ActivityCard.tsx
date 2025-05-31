@@ -70,14 +70,20 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
 
       <div className="mt-4">
         <h3 className="text-[rgba(68,63,63)] text-lg font-medium">{title}</h3>
-        <div className="flex items-center mt-2 text-[rgba(100,92,90)] text-sm">
+        <motion.div
+          whileHover={{ x: 5 }}
+          className="flex items-center mt-2 text-[rgba(100,92,90)] text-sm"
+        >
           <User size={16} className="mr-2" />
           <span>{user}</span>
-        </div>
-        <div className="flex items-center mt-1 text-[rgba(100,92,90)] text-sm">
+        </motion.div>
+        <motion.div
+          whileHover={{ x: 5 }}
+          className="flex items-center mt-1 text-[rgba(100,92,90)] text-sm"
+        >
           <MapPin size={16} className="mr-2" />
           <span className="truncate">{location}</span>
-        </div>
+        </motion.div>
       </div>
     </motion.div>
   );

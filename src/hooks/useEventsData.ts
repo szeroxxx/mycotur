@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosConfig";
 import { getMediaUrl } from "../utils/mediaHelpers";
 
 import { CalendarEvent } from "../types/calendar-event";
@@ -50,11 +50,10 @@ export const useEventsData = () => {
 
 
   useEffect(() => {
-    const fetchEvents = async () => {
-      try {
+    const fetchEvents = async () => {      try {
         setLoading(true);
         const URL = process.env.NEXTAUTH_BACKEND_URL;
-        const response = await axios.get(`${URL}/api/visitor/event`);
+        const response = await axiosInstance.get(`${URL}/api/visitor/event`);
         if (response.data && Array.isArray(response.data.data)) {
           const mappedEvents = mapEventsData(response.data.data);
           setEvents(mappedEvents);

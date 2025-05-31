@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosConfig";
 
 const URL = process.env.NEXTAUTH_BACKEND_URL;
 
@@ -29,9 +29,7 @@ export const usePasswordReset = () => {
           oldPassword,
           newPassword,
         },
-      };
-
-      const response = await axios.request(config);
+      };      const response = await axiosInstance.request(config);
       if (response.status === 200) {
         showToast("success", "Password changed successfully");
       } else {
@@ -42,10 +40,9 @@ export const usePasswordReset = () => {
       throw err;
     }
   };
-
   const requestPasswordReset = async (email: string) => {
     try {
-      const response = await axios.post(`${URL}/api/user/reset-password`, { email });
+      const response = await axiosInstance.post(`${URL}/api/user/reset-password`, { email });
       if (response.status === 200) {
         showToast("success", "Password reset link sent to your email");
       } else {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosConfig";
 import { getMediaUrl } from "../utils/mediaHelpers";
 
 // Interface for the raw event detail data from the API
@@ -34,6 +34,7 @@ interface RawEventDetailData {
       email: string;
       facebook: string;
       instagram: string;
+      youtube: string;
     };
   };
 }
@@ -62,6 +63,7 @@ export interface EventDetailData {
       email?: string;
       facebook?: string;
       instagram?: string;
+      youtube?: string;
     };
   };
   location: {
@@ -107,6 +109,7 @@ export const useEventDetail = (uuid: string | undefined) => {
           email: data.organizer.socialLinks.email || undefined,
           facebook: data.organizer.socialLinks.facebook || undefined,
           instagram: data.organizer.socialLinks.instagram || undefined,
+          youtube: data.organizer.socialLinks.youtube || undefined,
         },
       },
       location: {
@@ -127,13 +130,11 @@ export const useEventDetail = (uuid: string | undefined) => {
 
   useEffect(() => {
     const fetchEventDetail = async () => {
-      if (!uuid) return;
-
-      try {
+      if (!uuid) return;      try {
         setLoading(true);
         setError(null);
         const URL = process.env.NEXTAUTH_BACKEND_URL;
-        const response = await axios.get(`${URL}/api/visitor/event-detail/${uuid}`);
+        const response = await axiosInstance.get(`${URL}/api/visitor/event-detail/${uuid}`);
 
         if (response.data && response.data.data) {
           const mappedData = mapEventDetailData(response.data.data);

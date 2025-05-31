@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
+import axiosInstance from "../../utils/axiosConfig";
 import Image from "next/image";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 
@@ -30,9 +31,8 @@ const RegisterPage: React.FC = () => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (!uuid) return;
-      try {
-        const response = await axios.get(`${URL}/api/user-info/${uuid}`);
+      if (!uuid) return;      try {
+        const response = await axiosInstance.get(`${URL}/api/user-info/${uuid}`);
         setUserData(response.data);
       } catch (err) {
         if (axios.isAxiosError(err) && err.response?.status === 400) {
@@ -62,10 +62,8 @@ const RegisterPage: React.FC = () => {
     if (password.length < 8) {
       setError("Password must be at least 8 characters long");
       return;
-    }
-
-    try {
-      const response = await axios.put(
+    }    try {
+      const response = await axiosInstance.put(
         `${URL}/api/reset-password/${uuid}`,
         {
           password: password,

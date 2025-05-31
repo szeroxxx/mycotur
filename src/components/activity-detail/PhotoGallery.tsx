@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft, ArrowRight, X } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { ArrowLeft, ArrowRight, X } from "lucide-react";
 
 interface Photo {
   id: string;
@@ -13,14 +13,15 @@ interface PhotoGalleryProps {
   totalPhotos?: number;
 }
 
-const PhotoGallery: React.FC<PhotoGalleryProps> = ({ 
-  photos, 
-  category = "experiences", 
-  totalPhotos 
+const PhotoGallery: React.FC<PhotoGalleryProps> = ({
+  photos,
+  category = "experiences",
+  totalPhotos,
 }) => {
-  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
+    null
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
 
   const displayPhotos = photos.slice(0, 5);
   const remainingPhotos = totalPhotos ? totalPhotos - 5 : 0;
@@ -28,13 +29,13 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
   const openModal = (index: number) => {
     setSelectedImageIndex(index);
     setIsModalOpen(true);
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedImageIndex(null);
-    document.body.style.overflow = 'unset';
+    document.body.style.overflow = "unset";
   };
 
   const goToNext = () => {
@@ -52,35 +53,35 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (!isModalOpen) return;
-      
+
       switch (event.key) {
-        case 'Escape':
+        case "Escape":
           closeModal();
           break;
-        case 'ArrowRight':
+        case "ArrowRight":
           goToNext();
           break;
-        case 'ArrowLeft':
+        case "ArrowLeft":
           goToPrevious();
           break;
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, [isModalOpen, selectedImageIndex]);
 
   return (
     <>
       <div className="grid grid-cols-2 gap-3">
-        <div 
+        <div
           className="relative overflow-hidden rounded-lg cursor-pointer transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl group"
           onClick={() => openModal(0)}
         >
           {displayPhotos[0] && (
-            <img 
-              src={displayPhotos[0].url} 
-              alt={displayPhotos[0].alt} 
+            <img
+              src={displayPhotos[0].url}
+              alt={displayPhotos[0].alt}
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           )}
@@ -91,17 +92,17 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
           </div>
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 rounded-lg"></div>
         </div>
-        
+
         <div className="grid grid-cols-2 gap-3">
           {displayPhotos.slice(1, 5).map((photo, index) => (
-            <div 
-              key={photo.id || index} 
+            <div
+              key={photo.id || index}
               className="relative overflow-hidden rounded-lg cursor-pointer transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl group"
               onClick={() => openModal(index + 1)}
             >
-              <img 
-                src={photo.url} 
-                alt={photo.alt} 
+              <img
+                src={photo.url}
+                alt={photo.alt}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
               {index === 3 && remainingPhotos > 0 && (
@@ -119,41 +120,49 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
 
       {isModalOpen && selectedImageIndex !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div 
+          <div
             className="absolute inset-0 bg-black/40 backdrop-blur-md animate-fade-in"
             onClick={closeModal}
           ></div>
-          
+
           <div className="relative z-10 max-w-6xl max-h-[90vh] mx-4 animate-scale-in">
             <button
               onClick={closeModal}
               className="absolute top-4 right-4 z-20 bg-white/20 backdrop-blur-md border border-white/30 rounded-full p-2 text-[rgba(229,114,0)] hover:bg-white/30 hover:scale-110 transition-all duration-300 shadow-lg group"
             >
-              <X size={24} className="group-hover:rotate-90 transition-transform duration-300" />
+              <X
+                size={24}
+                className="group-hover:rotate-90 transition-transform duration-300"
+              />
             </button>
 
             <button
               onClick={goToPrevious}
               disabled={selectedImageIndex === 0}
               className={`absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 backdrop-blur-md border border-white/30 rounded-full p-3 text-[rgba(229,114,0)] transition-all duration-300 shadow-lg group ${
-                selectedImageIndex === 0 
-                  ? 'opacity-30 cursor-not-allowed' 
-                  : 'hover:bg-white/30 hover:scale-110 hover:-translate-x-1'
+                selectedImageIndex === 0
+                  ? "opacity-30 cursor-not-allowed"
+                  : "hover:bg-white/30 hover:scale-110 hover:-translate-x-1"
               }`}
             >
-              <ArrowLeft size={24} className="group-hover:-translate-x-1 transition-transform duration-300" />
+              <ArrowLeft
+                size={24}
+                className="group-hover:-translate-x-1 transition-transform duration-300"
+              />
             </button>
-
-s            <button
+            <button
               onClick={goToNext}
               disabled={selectedImageIndex === photos.length - 1}
               className={`absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 backdrop-blur-md border border-white/30 rounded-full p-3 text-[rgba(229,114,0)] transition-all duration-300 shadow-lg group ${
-                selectedImageIndex === photos.length - 1 
-                  ? 'opacity-30 cursor-not-allowed' 
-                  : 'hover:bg-white/30 hover:scale-110 hover:translate-x-1'
+                selectedImageIndex === photos.length - 1
+                  ? "opacity-30 cursor-not-allowed"
+                  : "hover:bg-white/30 hover:scale-110 hover:translate-x-1"
               }`}
             >
-              <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform duration-300" />
+              <ArrowRight
+                size={24}
+                className="group-hover:translate-x-1 transition-transform duration-300"
+              />
             </button>
 
             <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-4 shadow-2xl">
@@ -162,7 +171,7 @@ s            <button
                 alt={photos[selectedImageIndex].alt}
                 className="w-full h-auto max-h-[80vh] object-contain rounded-xl shadow-lg"
               />
-              
+
               <div className="mt-4 text-center">
                 <span className="bg-white/20 backdrop-blur-md border border-white/30 px-4 py-2 rounded-full text-[rgba(229,114,0)] text-sm font-medium shadow-lg">
                   {selectedImageIndex + 1} of {photos.length}

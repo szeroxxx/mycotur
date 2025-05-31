@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axiosInstance from '../utils/axiosConfig';
 import { useState, useEffect } from 'react';
 
 export interface Organizer {
@@ -28,10 +28,9 @@ export const useOrganizers = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchOrganizers = async () => {
-      try {
+    const fetchOrganizers = async () => {      try {
         const URL = process.env.NEXTAUTH_BACKEND_URL;
-        const response = await axios.get(`${URL}/api/visitor/organization`);
+        const response = await axiosInstance.get(`${URL}/api/visitor/organization`);
         setOrganizers(response.data);
         setError(null);
       } catch (err) {
