@@ -6,6 +6,8 @@ import axiosInstance from "../utils/axiosConfig";
 const ITEMS_PER_PAGE = 10;
 const MAX_FILE_SIZE_MB = 5;
 const ALLOWED_FILE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const ALLOWED_VIDEO_TYPES = ["video/mp4", "video/webm", "video/mov"];
+const MAX_VIDEO_SIZE_MB = 15;
 
 const URL = process.env.NEXTAUTH_BACKEND_URL;
 
@@ -37,9 +39,9 @@ interface ApiEventItem {
 
 export const useEvents = () => {
   const [events, setEvents] = useState<Event[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);  const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
+  const [locationFilter, setLocationFilter] = useState("");
   const [pagination, setPagination] = useState<PaginationInfo>({
     currentPage: 1,
     totalPages: 1,
@@ -104,10 +106,12 @@ export const useEvents = () => {
 
         if (searchTerm) {
           queryParams.append("search", searchTerm);
+        }        if (categoryFilter) {
+          queryParams.append("category", categoryFilter);
         }
 
-        if (categoryFilter) {
-          queryParams.append("category", categoryFilter);
+        if (locationFilter) {
+          queryParams.append("location", locationFilter);
         }
         const uuid = localStorage.getItem("userUuid");
         const response = await axiosInstance.get(
@@ -174,18 +178,16 @@ export const useEvents = () => {
         setIsLoading(false);
       }
     },
-    [showToast, searchTerm, categoryFilter]
+    [showToast, searchTerm, categoryFilter, locationFilter]
   );
-
   useEffect(() => {
     fetchEvents(1);
-  }, [fetchEvents, searchTerm, categoryFilter]);
+  }, [fetchEvents, searchTerm, categoryFilter, locationFilter]);
 
   const createEvent = useCallback(
     async (event: Omit<Event, "id">) => {
       try {
-        const formData = new FormData();
-        if (
+        const formData = new FormData();        if (
           !event.event ||
           !event.category ||
           !event.email ||
@@ -209,6 +211,23 @@ export const useEvents = () => {
               return null;
             }
             formData.append("images", image);
+          }
+        }
+
+        if (event.videos && event.videos.length > 0) {
+          for (const video of event.videos) {
+            if (!ALLOWED_VIDEO_TYPES.includes(video.type)) {
+              showToast("error", "Only MP4, WebM and MOV videos are allowed");
+              return null;
+            }
+            if (video.size > MAX_VIDEO_SIZE_MB * 1024 * 1024) {
+              showToast(
+                "error",
+                `Videos must be less than ${MAX_VIDEO_SIZE_MB}MB`
+              );
+              return null;
+            }
+            formData.append("videos", video);
           }
         }
 
@@ -325,9 +344,7 @@ export const useEvents = () => {
   const updateEvent = useCallback(
     async (event: Event) => {
       try {
-        const formData = new FormData();
-
-        if (event.images && event.images.length > 0) {
+        const formData = new FormData();        if (event.images && event.images.length > 0) {
           for (const image of event.images) {
             if (!ALLOWED_FILE_TYPES.includes(image.type)) {
               showToast("error", "Only JPG, PNG and WebP images are allowed");
@@ -341,6 +358,23 @@ export const useEvents = () => {
               return null;
             }
             formData.append("images", image);
+          }
+        }
+
+        if (event.videos && event.videos.length > 0) {
+          for (const video of event.videos) {
+            if (!ALLOWED_VIDEO_TYPES.includes(video.type)) {
+              showToast("error", "Only MP4, WebM and MOV videos are allowed");
+              return null;
+            }
+            if (video.size > MAX_VIDEO_SIZE_MB * 1024 * 1024) {
+              showToast(
+                "error",
+                `Videos must be less than ${MAX_VIDEO_SIZE_MB}MB`
+              );
+              return null;
+            }
+            formData.append("videos", video);
           }
         }
 
@@ -410,7 +444,6 @@ export const useEvents = () => {
     },
     [fetchEvents]
   );
-
   return {
     events,
     pagination,
@@ -418,8 +451,10 @@ export const useEvents = () => {
     toast,
     searchTerm,
     categoryFilter,
+    locationFilter,
     setSearchTerm,
     setCategoryFilter,
+    setLocationFilter,
     setPage,
     createEvent,
     updateEvent,

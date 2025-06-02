@@ -20,6 +20,7 @@ interface ProfileData {
   profilePicture: string;
   name: string;
   email: string;
+  primaryMail: string;
   about: string;
   address: string;
   social: {
@@ -66,17 +67,20 @@ export const useProfile = (): UseProfileReturn => {
       const session = await getSession();
       if (!session?.user?.uuid) {
         throw new Error("User session not found");
-      }      const response = await axiosInstance.get(`${URL}/api/profile`, {
+      }
+      const response = await axiosInstance.get(`${URL}/api/profile`, {
         headers: {
           Authorization: `Bearer ${session.user.accessToken}`,
           "Content-Type": "application/json",
         },
-      });if (response.data && response.data.data) {
+      });
+      if (response.data && response.data.data) {
         const profileData = response.data.data;
         return {
           profilePicture: profileData.profileImage || "",
           name: profileData.name,
           email: profileData.email,
+          primaryMail: profileData.primaryMail || "",
           about: profileData.about || "",
           address: profileData.address || "",
           social: {
@@ -99,6 +103,7 @@ export const useProfile = (): UseProfileReturn => {
     try {
       const updateData = {
         name: data.name,
+        primaryMail: data.primaryMail,
         about: data.about,
         address: data.address,
         facebook: data.social?.facebook,
@@ -115,13 +120,18 @@ export const useProfile = (): UseProfileReturn => {
       const session = await getSession();
       if (!session?.user?.accessToken) {
         throw new Error("User session not found");
-      }      console.log("updateData::: ", updateData);
-      const response = await axiosInstance.put(`${URL}/api/user/${uuid}`, updateData, {
-        headers: {
-          Authorization: `Bearer ${session.user.accessToken}`,
-          "Content-Type": "application/json",
-        },
-      });
+      }
+      console.log("updateData::: ", updateData);
+      const response = await axiosInstance.put(
+        `${URL}/api/user/${uuid}`,
+        updateData,
+        {
+          headers: {
+            Authorization: `Bearer ${session.user.accessToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (response.data && response.data.message === "User updated") {
         showToast("success", "Profile updated successfully");
@@ -140,7 +150,8 @@ export const useProfile = (): UseProfileReturn => {
       const session = await getSession();
       if (!session?.user?.uuid || !session?.user?.accessToken) {
         throw new Error("User session not found");
-      }      const config = {
+      }
+      const config = {
         method: "put",
         url: `${URL}/api/user/reset-password/${session.user.uuid}`,
         headers: {
@@ -171,7 +182,8 @@ export const useProfile = (): UseProfileReturn => {
       const session = await getSession();
       if (!session?.user?.uuid || !session?.user?.accessToken) {
         throw new Error("User session not found");
-      }      const response = await axiosInstance.post(
+      }
+      const response = await axiosInstance.post(
         `${URL}/api/forgot-password/${session.user.uuid}`,
         { email },
         {
@@ -202,14 +214,18 @@ export const useProfile = (): UseProfileReturn => {
       if (!session?.user?.uuid) {
         showToast("error", "User session not found");
         return;
-      }      const uuid = localStorage.getItem("userUuid");
-      const response = await axiosInstance.get(`${URL}/api/profile/completion-status`, {
-        headers: {
-          Authorization: `Bearer ${session.user.accessToken}`,
-          "Content-Type": "application/json",
-          userid: uuid,
-        },
-      });
+      }
+      const uuid = localStorage.getItem("userUuid");
+      const response = await axiosInstance.get(
+        `${URL}/api/profile/completion-status`,
+        {
+          headers: {
+            Authorization: `Bearer ${session.user.accessToken}`,
+            "Content-Type": "application/json",
+            userid: uuid,
+          },
+        }
+      );
 
       return response.data;
     } catch (error) {
@@ -224,7 +240,8 @@ export const useProfile = (): UseProfileReturn => {
       if (!session?.user?.uuid) {
         showToast("error", "User session not found");
         return;
-      }      const uuid = localStorage.getItem("userUuid");
+      }
+      const uuid = localStorage.getItem("userUuid");
       const response = await axiosInstance.get(`${URL}/api/categories-drop`, {
         headers: {
           Authorization: `Bearer ${session.user.accessToken}`,
@@ -241,44 +258,64 @@ export const useProfile = (): UseProfileReturn => {
       console.error("Error fetching categories:", error);
       showToast("error", "Failed to fetch categories");
       throw error;
-    }  }, [showToast]);
-
-  const uploadProfileImage = useCallback(async (file: File): Promise<string> => {
-    try {
-      const session = await getSession();
-      if (!session?.user?.accessToken) {
-        throw new Error("User session not found");
-      }
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
-      if (!allowedTypes.includes(file.type)) {
-        throw new Error("Only JPG, PNG, and WebP images are allowed");
-      }
-      const maxSize = 5 * 1024 * 1024; // 5MB
-      if (file.size > maxSize) {
-        throw new Error("Image size must be less than 5MB");
-      }      const formData = new FormData();
-      formData.append("profileImage", file);
-
-      const response = await axiosInstance.post(`${URL}/api/profile/image`, formData, {
-        headers: {
-          Authorization: `Bearer ${session.user.accessToken}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      if (response.data && response.data.message === "Profile image updated successfully") {
-        showToast("success", "Profile image updated successfully");
-        return response.data.data.profileImage;
-      } else {
-        throw new Error("Failed to upload profile image");
-      }
-    } catch (error) {
-      console.error("Error uploading profile image:", error);
-      const message = error instanceof Error ? error.message : "Failed to upload profile image";
-      showToast("error", message);
-      throw error;
     }
   }, [showToast]);
+
+  const uploadProfileImage = useCallback(
+    async (file: File): Promise<string> => {
+      try {
+        const session = await getSession();
+        if (!session?.user?.accessToken) {
+          throw new Error("User session not found");
+        }
+        const allowedTypes = [
+          "image/jpeg",
+          "image/png",
+          "image/webp",
+          "image/jpg",
+        ];
+        if (!allowedTypes.includes(file.type)) {
+          throw new Error("Only JPG, PNG, and WebP images are allowed");
+        }
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (file.size > maxSize) {
+          throw new Error("Image size must be less than 5MB");
+        }
+        const formData = new FormData();
+        formData.append("profileImage", file);
+
+        const response = await axiosInstance.post(
+          `${URL}/api/profile/image`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${session.user.accessToken}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        if (
+          response.data &&
+          response.data.message === "Profile image updated successfully"
+        ) {
+          showToast("success", "Profile image updated successfully");
+          return response.data.data.profileImage;
+        } else {
+          throw new Error("Failed to upload profile image");
+        }
+      } catch (error) {
+        console.error("Error uploading profile image:", error);
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Failed to upload profile image";
+        showToast("error", message);
+        throw error;
+      }
+    },
+    [showToast]
+  );
 
   return {
     updateProfile,

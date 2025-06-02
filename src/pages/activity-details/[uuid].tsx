@@ -6,7 +6,7 @@ import EventHeader from "@/components/activity-detail/EventHeader";
 import PhotoGallery from "@/components/activity-detail/PhotoGallery";
 import EventDetails from "@/components/activity-detail/EventDetails";
 import RSVPForm from "@/components/activity-detail/RSVPForm";
-import ActivityContactModal from "@/components/activity-detail/ActivityContactModal";
+import ActivityContactModal from "@/components/organiser/ActivityContactModal";
 import { useActivityDetail } from "@/hooks/useActivityDetail";
 import { RSVPFormData } from "@/types/activity-detail";
 import { CircleCheck } from "lucide-react";
@@ -52,7 +52,6 @@ const ActivityDetailPage: React.FC = () => {
   const { activityData, loading, error } = useActivityDetail(
     typeof uuid === "string" ? uuid : undefined
   );
-  console.log('activityData::: ', activityData);
   const [rsvpError, setRsvpError] = useState<string | null>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [toast, setToast] = useState<{

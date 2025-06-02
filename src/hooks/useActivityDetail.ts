@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import axiosInstance from "../utils/axiosConfig";
 import { getMediaUrl } from "../utils/mediaHelpers";
 
-// Interface for the raw activity detail data from the API
 interface RawActivityDetailData {
   id: number;
   uuid: string;
@@ -22,7 +21,7 @@ interface RawActivityDetailData {
   createdAt: string;
   updatedAt: string;
   isDelete: boolean;
-  photos: string[];
+  photos: { name: string; type: string }[];
   eventDates: {
     id: string;
     date: string;
@@ -45,11 +44,11 @@ interface RawActivityDetailData {
 
 export interface ActivityDetailData {
   id: string;
-  title: string;
-  photos: {
+  title: string;  photos: {
     id: string;
     url: string;
     alt: string;
+    type: string;
   }[];
   totalPhotos: number;
   category: string;
@@ -104,11 +103,11 @@ export const useActivityDetail = (uuid: string | undefined) => {
   ): ActivityDetailData => {
     return {
       id: data.uuid,
-      title: data.title,
-      photos: data.photos.map((photo, index) => ({
+      title: data.title,      photos: data.photos.map((media, index) => ({
         id: (index + 1).toString(),
-        url: getMediaUrl(photo),
-        alt: `${data.title} - Photo ${index + 1}`,
+        url: getMediaUrl(media.name),
+        alt: `${data.title} - Media ${index + 1}`,
+        type: media.type,
       })),
       totalPhotos: data.photos.length,
       category: data.category,
@@ -167,8 +166,6 @@ export const useActivityDetail = (uuid: string | undefined) => {
         const response = await axiosInstance.get(
           `${URL}/api/visitor/activity-detail/${uuid}`
         );
-        console.log("response::: ", response);
-
         if (response.data && response.data.data) {
           const mappedData = mapActivityDetailData(response.data.data);
           setActivityData(mappedData);

@@ -97,7 +97,6 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
 
   return (
     <div className="max-w-sm mx-auto  overflow-hidden">
-      {/* Main Form Section */}
       <div className="p-6 space-y-4 bg-[rgba(255,255,255)] rounded-xl shadow-lg border border-[rgba(244,242,242)]">
         <h2 className="text-xl font-semibold text-[rgba(68,63,63)] text-center mb-6">
           RSVP Now
@@ -215,7 +214,6 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
         </form>
       </div>
 
-      {/* Contact Section */}
       <div className="mt-2 px-6 py-6 bg-[rgba(255,255,255)] rounded-xl shadow-lg border border-[rgba(244,242,242)]">
         <h3 className="text-lg font-semibold text-gray-900 mb-4 leading-tight">
           View organiser details and contact them for more information

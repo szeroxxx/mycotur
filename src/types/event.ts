@@ -10,9 +10,8 @@ export interface Event {
   email: string;
   phone: string;
   url: string;
-  fees: string;
-  images: File[];
-  videos?: File[];
+  fees: string;  images: File[];
+  videos: File[];
   mediaUrls?: {
     name: string;
     type: string;

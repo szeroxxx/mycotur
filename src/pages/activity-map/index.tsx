@@ -52,7 +52,7 @@ const ActivityMapPage = () => {
         <title>Activity Map | Mycotur</title>
       </Head>
       <div className="flex h-[calc(100vh-4rem)] overflow-hidden scrollbar-hide">
-        <div className="w-1/3 flex flex-col bg-[rgba(255,255,255)] border-r border-[rgba(226,225,223)]">
+        <div className="w-1/3 flex flex-col border-r border-[rgba(226,225,223)]">
           <div className="p-4 flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide">
             <div className="space-y-4">
               {" "}

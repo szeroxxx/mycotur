@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
@@ -12,6 +12,22 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const router = useRouter();
   const { status } = useSession();
   const session = useSessionStorage();
+  const [sidebarWidth, setSidebarWidth] = useState(256); // 64 * 4 = 256px for w-64
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const handleSidebarWidthChange = (width: number) => {
+    setSidebarWidth(width);
+  };
     const publicRoutes = [
     '/login',
     '/admin/login',
@@ -42,14 +58,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   }
   if (isPublicRoute) {
     return <>{children}</>;
-  }  
-  return (
-    <div className="fixed inset-0 flex bg-[rgba(255,255,255)] isolate">
-      <div className="h-full z-50 relative">
-        <Sidebar />
-      </div>
-      <div className="flex-1 h-full relative">
-        <main className="h-full overflow-y-auto p-6 scrollbar-hide">
+  }  return (
+    <div className="min-h-screen bg-[rgba(255,255,255)]">
+      {/* Sidebar */}
+      <Sidebar onWidthChange={handleSidebarWidthChange} />
+      
+      {/* Main content */}
+      <div 
+        className="min-h-screen transition-all duration-200 ease-in-out"
+        style={{ 
+          marginLeft: isMobile ? 0 : `${sidebarWidth}px`
+        }}
+      >
+        <main className="overflow-y-auto p-3 md:p-6 pt-16 md:pt-6 scrollbar-hide">
           {children}
         </main>
       </div>

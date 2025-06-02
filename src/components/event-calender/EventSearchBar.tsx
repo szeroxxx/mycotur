@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { Search, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { useData } from "@/contexts/DataContext";
+import { useEventLocations } from "@/hooks/useEventLocations";
 
 interface Category {
   uuid: string;
@@ -25,16 +26,16 @@ const defaultCategory: Category = {
   description: "",
 };
 
-interface SearchBarProps {
+interface EventSearchBarProps {
   locationFilter: string;
   categoryFilter: string;
   onFilterChange: (type: "location" | "category", value: string) => void;
   onSearch: () => void;
   className?: string;
-  variant?: "compact" | "full"; 
+  variant?: "compact" | "full";
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({
+const EventSearchBar: React.FC<EventSearchBarProps> = ({
   locationFilter,
   categoryFilter,
   onFilterChange,
@@ -42,12 +43,15 @@ const SearchBar: React.FC<SearchBarProps> = ({
   className = "",
   variant = "full",
 }) => {
-  const { categories, locations, isLoading, error } = useData();
+  const { categories, isLoading: categoriesLoading, error: categoriesError } = useData();
+  
+  const { locations, isLoading: locationsLoading, error: locationsError } = useEventLocations();
 
   const categoryOptions = useMemo(
     () => [defaultCategory, ...categories],
     [categories]
   );
+  
   const locationOptions = useMemo(
     () => [defaultLocation, ...locations],
     [locations]
@@ -69,6 +73,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
     onFilterChange("category", "Event Category");
   };
 
+  const isLoading = categoriesLoading || locationsLoading;
+  const error = categoriesError || locationsError;
+
   if (isLoading) {
     return (
       <div className="bg-white rounded-[20px] shadow-md p-4 flex items-center justify-center">
@@ -87,14 +94,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   return (
     <motion.div
-      // initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
       className={`bg-white rounded-[20px] shadow-md p-4 ${className}`}
     >
       <motion.div
         className="flex gap-2"
-        // initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.2, duration: 0.3 }}
       >
@@ -139,10 +144,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
             className=" text-[rgba(194,91,52)] px-4 py-2 rounded-lg flex-shrink-0"
             whileHover={{
               scale: 1.05,
-              // backgroundColor: "#4b5563",
             }}
             whileTap={{ scale: 0.95 }}
-            // initial={{ opacity: 0, scale: 0.5, x: 20 }}
             animate={{ opacity: 1, scale: 1, x: 0 }}
             exit={{ opacity: 0, scale: 0.5, x: 20 }}
             transition={{
@@ -169,7 +172,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
             backgroundColor: "#cc6600",
           }}
           whileTap={{ scale: 0.95 }}
-          // initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{
             duration: 0.3,
@@ -189,4 +191,4 @@ const SearchBar: React.FC<SearchBarProps> = ({
   );
 };
 
-export default SearchBar;
+export default EventSearchBar;

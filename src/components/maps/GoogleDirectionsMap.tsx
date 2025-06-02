@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { Loader } from "@googlemaps/js-api-loader";
 import {
   MapPin,
   Navigation,
@@ -11,9 +10,7 @@ import {
   Car,
   MapIcon,
 } from "lucide-react";
-import { GOOGLE_MAPS_API_KEY } from "@/utils/googleMapsConfig";
-
-// Type guard to ensure Google Maps API is loaded
+import { googleMapsLoader } from "@/utils/googleMapsLoader";
 declare global {
   interface Window {
     google?: typeof google;
@@ -65,24 +62,14 @@ const GoogleDirectionsMap: React.FC<DirectionsMapProps> = ({
   const [isLoaded, setIsLoaded] = useState(false);
   const [travelMode, setTravelMode] = useState<string>("DRIVING");
 
-  // Initialize Google Maps
   useEffect(() => {
     if (!isOpen) return;
 
     const initializeMap = async () => {
-      if (!mapRef.current || isLoaded) return;
-
-      try {
+      if (!mapRef.current || isLoaded) return;      try {
         setLoading(true);
-        const loader = new Loader({
-          apiKey: GOOGLE_MAPS_API_KEY,
-          version: "weekly",
-          libraries: ["places", "geometry", "routes"],
-        });
+        await googleMapsLoader.load();
 
-        await loader.load();
-
-        // Check if coordinates are valid
         if (
           isNaN(eventLocation.coordinates.lat) ||
           isNaN(eventLocation.coordinates.lng)
@@ -90,7 +77,6 @@ const GoogleDirectionsMap: React.FC<DirectionsMapProps> = ({
           throw new Error("Invalid event location coordinates");
         }
 
-        // Create map instance with better styling
         const mapInstance = new google.maps.Map(mapRef.current, {
           center: {
             lat: eventLocation.coordinates.lat,
@@ -121,7 +107,6 @@ const GoogleDirectionsMap: React.FC<DirectionsMapProps> = ({
           fullscreenControl: true,
         });
 
-        // Create directions service and renderer with better styling
         const directionsService = new google.maps.DirectionsService();
         const directionsRenderer = new google.maps.DirectionsRenderer({
           polylineOptions: {
@@ -149,7 +134,6 @@ const GoogleDirectionsMap: React.FC<DirectionsMapProps> = ({
 
         directionsRenderer.setMap(mapInstance);
 
-        // Add event location marker if no directions are shown
         const eventMarker = new google.maps.Marker({
           position: {
             lat: eventLocation.coordinates.lat,
@@ -172,7 +156,6 @@ const GoogleDirectionsMap: React.FC<DirectionsMapProps> = ({
           },
         });
 
-        // Add info window
         const infoWindow = new google.maps.InfoWindow({
           content: `
             <div style="padding: 8px; max-width: 200px;">
@@ -207,7 +190,6 @@ const GoogleDirectionsMap: React.FC<DirectionsMapProps> = ({
     eventLocation.coordinates.lng,
     isLoaded,
   ]);
-  // Get user location with enhanced error handling and fallback options
   const getUserLocation = useCallback(() => {
     setLoading(true);
     setError(null);
@@ -220,7 +202,6 @@ const GoogleDirectionsMap: React.FC<DirectionsMapProps> = ({
       return;
     }
 
-    // First try with high accuracy
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const location = {
@@ -236,7 +217,6 @@ const GoogleDirectionsMap: React.FC<DirectionsMapProps> = ({
           error
         );
 
-        // Try again with lower accuracy settings
         navigator.geolocation.getCurrentPosition(
           (position) => {
             const location = {
@@ -274,18 +254,17 @@ const GoogleDirectionsMap: React.FC<DirectionsMapProps> = ({
           {
             enableHighAccuracy: false,
             timeout: 15000,
-            maximumAge: 300000, // 5 minutes
+            maximumAge: 300000, 
           }
         );
       },
       {
         enableHighAccuracy: true,
         timeout: 8000,
-        maximumAge: 60000, // 1 minute
+        maximumAge: 60000,
       }
     );
   }, []);
-  // Get directions using Google Directions API with multiple travel modes
   const getDirections = useCallback(
     async (mode?: string) => {
       if (
@@ -313,7 +292,6 @@ const GoogleDirectionsMap: React.FC<DirectionsMapProps> = ({
       setError(null);
 
       try {
-        // Convert string travel mode to Google Maps enum
         let googleTravelMode: google.maps.TravelMode;
         const modeToUse = mode || travelMode;
 
@@ -351,7 +329,6 @@ const GoogleDirectionsMap: React.FC<DirectionsMapProps> = ({
               setTotalDistance(route.legs[0].distance?.text || "");
               setTotalDuration(route.legs[0].duration?.text || "");
 
-              // Extract step-by-step directions with better formatting
               const steps: RouteStep[] = [];
               route.legs.forEach((leg) => {
                 leg.steps?.forEach((step) => {
@@ -442,7 +419,9 @@ const GoogleDirectionsMap: React.FC<DirectionsMapProps> = ({
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
     return `${hours}h ${remainingMinutes}m`;
-  }; // Open in Google Maps
+  }; 
+  
+  // Open in Google Maps
   // const openInGoogleMaps = useCallback(() => {
   //   if (userLocation) {
   //     const origin = `${userLocation.lat},${userLocation.lng}`;
@@ -478,7 +457,6 @@ const GoogleDirectionsMap: React.FC<DirectionsMapProps> = ({
             <X className="w-6 h-6" />
           </button>
         </div>
-        {/* Travel Mode Selector */}
         {userLocation && (
           <div className="px-4 py-3 border-b bg-gray-50">
             <div className="flex items-center gap-4">
@@ -562,7 +540,6 @@ const GoogleDirectionsMap: React.FC<DirectionsMapProps> = ({
                     <button
                       onClick={() => {
                         setError(null);
-                        // Just show the map with event location
                       }}
                       className="text-[#E57200] hover:text-[rgba(194,91,52)] px-6 py-2 rounded-lg transition-colors text-sm"
                     >
@@ -674,7 +651,6 @@ const GoogleDirectionsMap: React.FC<DirectionsMapProps> = ({
             </div>
           )}
         </div>{" "}
-        {/* Footer with action buttons */}
         <div className="p-4 border-t bg-gray-50 flex justify-between items-center">
           <div className="text-sm text-gray-600">Powered by Google Maps</div>
           <div className="flex gap-3">

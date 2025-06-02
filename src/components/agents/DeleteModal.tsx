@@ -25,8 +25,8 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
             Remove Agent?
           </h3>
           <p className="text-sm text-[#6B7280] mb-6">
-            Are you sure you want to remove this agent? This action cannot be
-            undone.
+            Are you sure you want to remove this agent? All data related to this
+            agent will be permanently destroyed. This action cannot be undone.
           </p>
           <div className="flex justify-center space-x-4 w-full">
             <button

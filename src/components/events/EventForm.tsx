@@ -10,6 +10,7 @@ import {
 } from "../../utils/googlePlacesService";
 
 const MAX_FILE_SIZE_MB = 10;
+const MAX_VIDEO_SIZE_MB = 15;
 const MAX_IMAGES = 10;
 const MAX_VIDEOS = 3;
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -433,10 +434,9 @@ export const EventForm: React.FC<EventFormProps> = ({
           setUploadError(`Image ${file.name} exceeds 10MB limit`);
           return;
         }
-        imageFiles.push(file);
-      } else if (ALLOWED_VIDEO_TYPES.includes(file.type)) {
-        if (file.size > 15 * 1024 * 1024) {
-          setUploadError(`Video ${file.name} exceeds 15MB limit`);
+        imageFiles.push(file);      } else if (ALLOWED_VIDEO_TYPES.includes(file.type)) {
+        if (file.size > MAX_VIDEO_SIZE_MB * 1024 * 1024) {
+          setUploadError(`Video ${file.name} exceeds ${MAX_VIDEO_SIZE_MB}MB limit`);
           return;
         }
         videoFiles.push(file);
@@ -475,11 +475,9 @@ export const EventForm: React.FC<EventFormProps> = ({
         } more video${remaining !== 1 ? "s" : ""}.`
       );
       return;
-    }
-
-    for (const file of newFiles) {
-      if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-        setUploadError(`Files must be less than ${MAX_FILE_SIZE_MB}MB`);
+    }    for (const file of newFiles) {
+      if (file.size > MAX_VIDEO_SIZE_MB * 1024 * 1024) {
+        setUploadError(`Files must be less than ${MAX_VIDEO_SIZE_MB}MB`);
         return;
       }
     }
@@ -994,12 +992,11 @@ export const EventForm: React.FC<EventFormProps> = ({
               {isUploading
                 ? "Uploading..."
                 : "Click to upload images and videos"}
-            </label>
-            <p className="text-xs text-[#6B7280] mt-2">
+            </label>            <p className="text-xs text-[#6B7280] mt-2">
               {uploadError ? (
                 <span className="text-red-500">{uploadError}</span>
               ) : (
-                `Images: ${currentImageCount}/${MAX_IMAGES} | Videos: ${currentVideoCount}/${MAX_VIDEOS} | Max ${MAX_FILE_SIZE_MB}MB each`
+                `Images: ${currentImageCount}/${MAX_IMAGES} | Videos: ${currentVideoCount}/${MAX_VIDEOS} | Images: Max ${MAX_FILE_SIZE_MB}MB | Videos: Max ${MAX_VIDEO_SIZE_MB}MB`
               )}
             </p>
             <p className="text-xs text-[#6B7280] mt-1">

@@ -28,7 +28,7 @@ export const ActivityRow: React.FC<ActivityRowProps> = ({
         <div className="flex items-center space-x-4">
           <button
             onClick={() => onEdit(activity)}
-            className="text-[rgba(68,63,63)] hover:text-[#111827] transition-colors"
+            className="cursor-pointer text-[rgba(68,63,63)] hover:text-[#111827] transition-colors"
             title="Edit"
           >
             <FiEdit2 size={16} />
@@ -36,7 +36,7 @@ export const ActivityRow: React.FC<ActivityRowProps> = ({
           {onDuplicate && (
             <button
               onClick={() => onDuplicate(activity)}
-              className="text-[rgba(68,63,63)] hover:text-[#111827] transition-colors"
+              className="cursor-pointer text-[rgba(68,63,63)] hover:text-[#111827] transition-colors"
               title="Duplicate"
             >
               <FiCopy size={16} />
@@ -44,7 +44,7 @@ export const ActivityRow: React.FC<ActivityRowProps> = ({
           )}
           <button
             onClick={() => onDelete(activity)}
-            className="text-[rgba(68,63,63)] hover:text-[#111827] transition-colors"
+            className="cursor-pointer text-[rgba(68,63,63)] hover:text-[#111827] transition-colors"
             title="Delete"
           >
             <FiTrash2 size={16} />

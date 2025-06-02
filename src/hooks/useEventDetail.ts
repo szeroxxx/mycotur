@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import axiosInstance from "../utils/axiosConfig";
 import { getMediaUrl } from "../utils/mediaHelpers";
 
-// Interface for the raw event detail data from the API
 interface RawEventDetailData {
   id: number;
   uuid: string;
@@ -20,7 +19,7 @@ interface RawEventDetailData {
   link: string;
   fees: string;
   description: string;
-  photos: string[];
+  photos: { name: string; type: string }[];
   eventDates: {
     date: string;
     time: string;
@@ -28,6 +27,7 @@ interface RawEventDetailData {
   organizer: {
     id: string;
     name: string;
+    avatar?: string;
     eventsHosted: number;
     initials: string;
     socialLinks: {
@@ -41,11 +41,11 @@ interface RawEventDetailData {
 
 export interface EventDetailData {
   id: string;
-  title: string;
-  photos: {
+  title: string;  photos: {
     id: string;
     url: string;
     alt: string;
+    type: string;
   }[];
   totalPhotos: number;
   category: string;
@@ -59,6 +59,7 @@ export interface EventDetailData {
     name: string;
     eventsHosted: number;
     initials: string;
+    avatar?: string;
     socialLinks: {
       email?: string;
       facebook?: string;
@@ -86,15 +87,14 @@ export const useEventDetail = (uuid: string | undefined) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Map raw API data to frontend structure
   const mapEventDetailData = (data: RawEventDetailData): EventDetailData => {
     return {
       id: data.uuid,
-      title: data.title,
-      photos: data.photos.map((photo, index) => ({
+      title: data.title,      photos: data.photos.map((media, index) => ({
         id: (index + 1).toString(),
-        url: getMediaUrl(photo),
-        alt: `${data.title} - Photo ${index + 1}`,
+        url: getMediaUrl(media.name),
+        alt: `${data.title} - Media ${index + 1}`,
+        type: media.type,
       })),
       totalPhotos: data.photos.length,
       category: data.category,
@@ -103,6 +103,9 @@ export const useEventDetail = (uuid: string | undefined) => {
       organizer: {
         id: data.organizer.id,
         name: data.organizer.name,
+        avatar: data.organizer.avatar
+          ? getMediaUrl(data.organizer.avatar)
+          : undefined,
         eventsHosted: data.organizer.eventsHosted,
         initials: data.organizer.initials,
         socialLinks: {

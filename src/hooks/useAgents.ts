@@ -30,12 +30,24 @@ export const useAgents = () => {
       setTimeout(() => setToast(null), 3000);
     },
     []
-  );
-
-  const fetchAgents = useCallback(async () => {
+  );  const fetchAgents = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await axiosInstance.get("/api/user/agent");
+      
+      const queryParams = new URLSearchParams();
+      
+      if (searchTerm) {
+        queryParams.append("search", searchTerm);
+      }
+      
+      if (statusFilter) {
+        queryParams.append("status", statusFilter);
+      }
+      
+      const queryString = queryParams.toString();
+      const url = queryString ? `/api/user/agent?${queryString}` : "/api/user/agent";
+      
+      const response = await axiosInstance.get(url);
 
       const fetchedAgents = response.data.map((agent: ApiAgentResponse) => ({
         id: agent.uuid,
@@ -58,8 +70,7 @@ export const useAgents = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [showToast]);
-
+  }, [showToast, searchTerm, statusFilter]);
   useEffect(() => {
     fetchAgents();
   }, [fetchAgents]);
@@ -182,14 +193,11 @@ export const useAgents = () => {
     const end = start + pagination.pageSize;
 
     return filtered.slice(start, end);
-  }, [getFilteredAgents, pagination.currentPage, pagination.pageSize]);
-
-  const setPage = useCallback((page: number) => {
+  }, [getFilteredAgents, pagination.currentPage, pagination.pageSize]);  const setPage = useCallback((page: number) => {
     setPagination((prev) => ({
       ...prev,
       currentPage: page,
-    }));
-  }, []);
+    }));  }, []);
 
   return {
     agents: getPaginatedAgents(),

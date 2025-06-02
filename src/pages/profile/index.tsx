@@ -52,13 +52,17 @@ const ProfilePage: React.FC = () => {
     toast,
   } = useProfile();
   const { categories } = useData();
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(() => {
+    // Check if we were in editing mode before
+    return sessionStorage.getItem("isEditingProfile") === "true";
+  });
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
   const [profileData, setProfileData] = useState({
     profilePicture: "",
     name: session?.user?.name || "",
     email: session?.user?.email || "",
+    primaryMail: "",
     about: "",
     address: "",
     social: {
@@ -68,15 +72,119 @@ const ProfilePage: React.FC = () => {
     },
     categories: [] as string[],
   });
+  const loadProfile = async () => {
+    try {
+      const profileData = await fetchProfile();
+      console.log("profileData::: ", profileData);
+      const loadedData = {
+        profilePicture: profileData.profilePicture || "",
+        name: profileData.name,
+        email: profileData.email,
+        primaryMail: profileData.primaryMail || "",
+        about: profileData.about || "",
+        address: profileData.address || "",
+        social: {
+          facebook: profileData.social?.facebook || "",
+          instagram: profileData.social?.instagram || "",
+          youtube: profileData.social?.youtube || "",
+        },
+        categories: profileData.categories,
+      };
+
+      // If we're in editing mode and have saved form data, use that instead
+      if (isEditing) {
+        const savedFormData = localStorage.getItem("profileFormData");
+        if (savedFormData) {
+          try {
+            const parsedData = JSON.parse(savedFormData);
+            setProfileData(parsedData);
+            return;
+          } catch (e) {
+            console.error("Error parsing saved form data:", e);
+            localStorage.removeItem("profileFormData");
+          }
+        }
+      }
+
+      setProfileData(loadedData);
+    } catch (error) {
+      console.error("Error loading profile:", error);
+    }
+  };
+
+  // Load initial profile data and check for saved form data
   useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        const profileData = await fetchProfile();
-        console.log("profileData::: ", profileData);
+    if (session?.user) {
+      loadProfile();
+    }
+  }, [session?.user, isEditing]);
+
+  // Save form data whenever it changes and we're in edit mode
+  useEffect(() => {
+    if (isEditing && profileData.name) { // Only save if we have actual data
+      localStorage.setItem("profileFormData", JSON.stringify(profileData));
+      sessionStorage.setItem("isEditingProfile", "true");
+    }
+  }, [profileData, isEditing]);
+
+  // Save form data when user navigates away
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (isEditing) {
+        localStorage.setItem("profileFormData", JSON.stringify(profileData));
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden && isEditing) {
+        localStorage.setItem("profileFormData", JSON.stringify(profileData));
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [isEditing, profileData]);
+  // Clear saved form data after successful save
+  const handleSave = async () => {
+    try {
+      if (!validateSocialInputs()) {
+        return;
+      }
+      await updateProfile({
+        name: profileData.name,
+        primaryMail: profileData.primaryMail,
+        about: profileData.about,
+        address: profileData.address,
+        social: profileData.social,
+        categories: profileData.categories as string[],
+      });
+      setIsEditing(false);
+      localStorage.removeItem("profileFormData");
+      sessionStorage.removeItem("isEditingProfile");
+    } catch (err) {
+      console.error(
+        "Failed to update profile:",
+        err instanceof Error ? err.message : "Unknown error"
+      );
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    localStorage.removeItem("profileFormData");
+    sessionStorage.removeItem("isEditingProfile");
+    if (session?.user) {
+      fetchProfile().then(profileData => {
         setProfileData({
           profilePicture: profileData.profilePicture || "",
           name: profileData.name,
           email: profileData.email,
+          primaryMail: profileData.primaryMail || "",
           about: profileData.about || "",
           address: profileData.address || "",
           social: {
@@ -86,14 +194,13 @@ const ProfilePage: React.FC = () => {
           },
           categories: profileData.categories,
         });
-      } catch (error) {
-        console.error("Error loading profile:", error);
-      }
-    };
-    if (session?.user) {
-      loadProfile();
+      });
     }
-  }, [session?.user]);
+  };
+
+  const handleEditToggle = () => {
+    setIsEditing(true);
+  };
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -131,27 +238,6 @@ const ProfilePage: React.FC = () => {
 
     setSocialErrors(errors);
     return isValid;
-  };
-
-  const handleSave = async () => {
-    try {
-      if (!validateSocialInputs()) {
-        return;
-      }
-      await updateProfile({
-        name: profileData.name,
-        about: profileData.about,
-        address: profileData.address,
-        social: profileData.social,
-        categories: profileData.categories as string[],
-      });
-      setIsEditing(false);
-    } catch (err) {
-      console.error(
-        "Failed to update profile:",
-        err instanceof Error ? err.message : "Unknown error"
-      );
-    }
   };
 
   const handleChangePassword = async (e: React.FormEvent) => {
@@ -222,7 +308,6 @@ const ProfilePage: React.FC = () => {
       );
     } finally {
       setIsUploadingImage(false);
-      // Reset the input value to allow re-uploading the same file
       e.target.value = "";
     }
   };
@@ -232,7 +317,6 @@ const ProfilePage: React.FC = () => {
       <Head>
         <title>My Profile | Mycotur</title>
       </Head>
-
       {toast && (
         <div
           className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-[12px] text-[rgba(255,255,255)] ${
@@ -244,25 +328,23 @@ const ProfilePage: React.FC = () => {
           <CircleCheck className="mr-2" />
           <span>{toast.message}</span>
         </div>
-      )}
-
-      <div className="max-w-3xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-semibold text-[rgb(68,63,63)]">
+      )}{" "}
+      <div className="max-w-3xl mx-auto p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
+          <h1 className="text-xl sm:text-2xl font-semibold text-[rgb(68,63,63)]">
             My Profile
-          </h1>
-          {!isEditing ? (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="text-[rgba(68,63,63)] hover:text-[#D45B20] transition-colors"
+          </h1>{" "}
+          {!isEditing ? (            <button
+              onClick={handleEditToggle}
+              className="self-start sm:self-auto text-[rgba(68,63,63)] hover:text-[#D45B20] transition-colors"
             >
               <FiEdit2 size={20} />
             </button>
           ) : (
-            <div className="space-x-4">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
               <button
-                onClick={() => setIsEditing(false)}
-                className="px-4 py-2 text-[rgba(68,63,63)] hover:text-[#111827] font-medium"
+                onClick={handleCancelEdit}
+                className="px-4 py-2 text-[rgba(68,63,63)] hover:text-[#111827] font-medium text-center"
               >
                 Cancel
               </button>
@@ -276,12 +358,12 @@ const ProfilePage: React.FC = () => {
           )}
         </div>{" "}
         <div className="bg-white rounded-lg shadow-md">
-          <div className="p-6 space-y-6">
+          <div className="p-4 sm:p-6 space-y-6">
             {" "}
             {/* Profile Image Section */}
             <div className="flex flex-col items-center space-y-4 pb-6 border-b border-[rgba(226,225,223)]">
               <div className="relative group">
-                <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-[rgba(226,225,223)] bg-[rgba(253,250,246)] shadow-lg">
+                <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-[rgba(226,225,223)] bg-[rgba(253,250,246)] shadow-lg">
                   {profileData.profilePicture ? (
                     <img
                       src={getMediaUrl(profileData.profilePicture)}
@@ -290,7 +372,10 @@ const ProfilePage: React.FC = () => {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <FiUser size={48} className="text-[rgba(194,91,52)]" />
+                      <FiUser
+                        size={36}
+                        className="sm:size-12 text-[rgba(194,91,52)]"
+                      />
                     </div>
                   )}
                 </div>
@@ -299,13 +384,13 @@ const ProfilePage: React.FC = () => {
                     document.getElementById("profile-image-input")?.click()
                   }
                   disabled={isUploadingImage}
-                  className="absolute -bottom-2 -right-2 w-10 h-10 bg-[#D45B20] hover:bg-[#C44D16] text-white rounded-full flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
+                  className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 w-8 h-8 sm:w-10 sm:h-10 bg-[#D45B20] hover:bg-[#C44D16] text-white rounded-full flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
                   title="Change profile picture"
                 >
                   {isUploadingImage ? (
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   ) : (
-                    <FiEdit2 size={18} />
+                    <FiEdit2 size={14} className="sm:text-lg" />
                   )}
                 </button>
                 <input
@@ -334,13 +419,16 @@ const ProfilePage: React.FC = () => {
                   </p>
                 </div>
               )}
-            </div>
+            </div>{" "}
             <div className="space-y-4">
-              <div className="flex items-center space-x-4 p-4 bg-[rgba(253,250,246)] rounded-lg">
-                <div className="p-3 bg-[rgba(255,255,255)] rounded-full border border-[rgba(226,225,223)]">
-                  <FiUser size={24} className="text-[rgba(194,91,52)]" />
+              <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 p-3 sm:p-4 bg-[rgba(253,250,246)] rounded-lg">
+                <div className="p-3 bg-[rgba(255,255,255)] rounded-full border border-[rgba(226,225,223)] self-center sm:self-auto">
+                  <FiUser
+                    size={20}
+                    className="sm:size-6 text-[rgba(194,91,52)]"
+                  />
                 </div>
-                <div className="flex-grow">
+                <div className="flex-grow text-center sm:text-left">
                   <p className="text-sm text-[rgba(100,92,90)]">Name</p>
                   {isEditing ? (
                     <input
@@ -353,7 +441,7 @@ const ProfilePage: React.FC = () => {
                         }))
                       }
                       required
-                      className="w-full p-2 text-[rgb(68,63,63)] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#D45B20]"
+                      className="w-full p-2 text-[rgb(68,63,63)] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#D45B20] text-sm"
                     />
                   ) : (
                     <p className="text-[rgb(68,63,63)] font-medium">
@@ -363,23 +451,59 @@ const ProfilePage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-center space-x-4 p-4 bg-[rgba(253,250,246)] rounded-lg">
-                <div className="p-3 bg-[rgba(255,255,255)] rounded-full border border-[rgba(226,225,223)]">
-                  <FiMail size={24} className="text-[rgba(194,91,52)]" />
+              <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 p-3 sm:p-4 bg-[rgba(253,250,246)] rounded-lg">
+                <div className="p-3 bg-[rgba(255,255,255)] rounded-full border border-[rgba(226,225,223)] self-center sm:self-auto">
+                  <FiMail
+                    size={20}
+                    className="sm:size-6 text-[rgba(194,91,52)]"
+                  />
                 </div>
-                <div className="flex-grow">
+                <div className="flex-grow text-center sm:text-left">
                   <p className="text-sm text-[rgba(100,92,90)]">Email</p>
-                  <p className="text-[rgb(68,63,63)] font-medium">
+                  <p className="text-[rgb(68,63,63)] font-medium break-all sm:break-normal">
                     {profileData.email}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center space-x-4 p-4 bg-[rgba(253,250,246)] rounded-lg">
-                <div className="p-3 bg-[rgba(255,255,255)] rounded-full border border-[rgba(226,225,223)]">
-                  <FiMapPin size={24} className="text-[rgba(194,91,52)]" />
+              <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 p-3 sm:p-4 bg-[rgba(253,250,246)] rounded-lg">
+                <div className="p-3 bg-[rgba(255,255,255)] rounded-full border border-[rgba(226,225,223)] self-center sm:self-auto">
+                  <FiMail
+                    size={20}
+                    className="sm:size-6 text-[rgba(194,91,52)]"
+                  />
                 </div>
-                <div className="flex-grow">
+                <div className="flex-grow text-center sm:text-left">
+                  <p className="text-sm text-[rgba(100,92,90)]">Primary Mail</p>
+                  {isEditing ? (
+                    <input
+                      type="email"
+                      value={profileData.primaryMail}
+                      onChange={(e) =>
+                        setProfileData((prev) => ({
+                          ...prev,
+                          primaryMail: e.target.value,
+                        }))
+                      }
+                      placeholder="Enter your primary email"
+                      className="w-full p-2 text-[rgb(68,63,63)] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#D45B20] text-sm"
+                    />
+                  ) : (
+                    <p className="text-[rgb(68,63,63)] font-medium break-all sm:break-normal">
+                      {profileData.primaryMail || "Not provided"}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 p-3 sm:p-4 bg-[rgba(253,250,246)] rounded-lg">
+                <div className="p-3 bg-[rgba(255,255,255)] rounded-full border border-[rgba(226,225,223)] self-center sm:self-auto">
+                  <FiMapPin
+                    size={20}
+                    className="sm:size-6 text-[rgba(194,91,52)]"
+                  />
+                </div>
+                <div className="flex-grow text-center sm:text-left">
                   <p className="text-sm text-[rgba(100,92,90)]">Address</p>
                   {isEditing ? (
                     <input
@@ -392,7 +516,7 @@ const ProfilePage: React.FC = () => {
                         }))
                       }
                       placeholder="Enter your address"
-                      className="w-full p-2 text-[rgb(68,63,63)] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#D45B20]"
+                      className="w-full p-2 text-[rgb(68,63,63)] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#D45B20] text-sm"
                     />
                   ) : (
                     <p className="text-[rgb(68,63,63)] font-medium">
@@ -618,18 +742,17 @@ const ProfilePage: React.FC = () => {
             )}
           </div>
         </div>
-      </div>
-
+      </div>{" "}
       {isChangePasswordOpen && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-none flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-[rgb(68,63,63)]">
+          <div className="bg-white rounded-lg shadow-xl p-4 sm:p-6 w-full max-w-md max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4 sm:mb-6">
+              <h2 className="text-lg sm:text-xl font-semibold text-[rgb(68,63,63)]">
                 Change Password
               </h2>
               <button
                 onClick={() => setIsChangePasswordOpen(false)}
-                className="text-[rgba(100,92,90)] hover:text-[#111827]"
+                className="text-[rgba(100,92,90)] hover:text-[#111827] p-1"
               >
                 <FiX size={20} />
               </button>
@@ -673,18 +796,18 @@ const ProfilePage: React.FC = () => {
               </div>
               {passwordError && (
                 <div className="text-red-500 text-sm mt-2">{passwordError}</div>
-              )}
-              <div className="flex justify-between items-center pt-4">
+              )}{" "}
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-0 pt-4">
                 <button
                   type="button"
                   onClick={() => setIsForgotPasswordOpen(true)}
-                  className="text-[#D45B20] hover:text-[#C44D16] text-sm font-medium"
+                  className="text-[#D45B20] hover:text-[#C44D16] text-sm font-medium order-2 sm:order-1"
                 >
                   Forgot Password?
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#D45B20] hover:bg-[#C44D16] text-white rounded-lg text-sm font-medium transition-colors"
+                  className="w-full sm:w-auto px-4 py-2 bg-[#D45B20] hover:bg-[#C44D16] text-white rounded-lg text-sm font-medium transition-colors order-1 sm:order-2"
                 >
                   Update
                 </button>
@@ -692,18 +815,17 @@ const ProfilePage: React.FC = () => {
             </form>
           </div>
         </div>
-      )}
-
+      )}{" "}
       {isForgotPasswordOpen && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-none flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-[rgb(68,63,63)]">
+          <div className="bg-white rounded-lg shadow-xl p-4 sm:p-6 w-full max-w-md max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4 sm:mb-6">
+              <h2 className="text-lg sm:text-xl font-semibold text-[rgb(68,63,63)]">
                 Forgot Password?
               </h2>
               <button
                 onClick={() => setIsForgotPasswordOpen(false)}
-                className="text-[rgba(100,92,90)] hover:text-[#111827]"
+                className="text-[rgba(100,92,90)] hover:text-[#111827] p-1"
               >
                 <FiX size={20} />
               </button>
@@ -725,19 +847,18 @@ const ProfilePage: React.FC = () => {
                   className="w-full p-2 text-[rgb(68,63,63)] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#D45B20]"
                   disabled
                 />
-              </div>
-
-              <div className="flex justify-end space-x-4 pt-4">
+              </div>{" "}
+              <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 pt-4">
                 <button
                   type="button"
                   onClick={() => setIsForgotPasswordOpen(false)}
-                  className="px-4 py-2 text-[rgba(68,63,63)] hover:text-[#111827] font-medium"
+                  className="w-full sm:w-auto px-4 py-2 text-[rgba(68,63,63)] hover:text-[#111827] font-medium text-center"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#D45B20] hover:bg-[#C44D16] text-white rounded-lg text-sm font-medium transition-colors"
+                  className="w-full sm:w-auto px-4 py-2 bg-[#D45B20] hover:bg-[#C44D16] text-white rounded-lg text-sm font-medium transition-colors"
                 >
                   Continue
                 </button>

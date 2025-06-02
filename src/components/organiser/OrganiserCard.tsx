@@ -41,6 +41,7 @@ const OrganiserCard: React.FC<OrganiserCardProps> = ({
   profileImage,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const recordClick = async (organizerId: string) => {
     try {
@@ -63,7 +64,9 @@ const OrganiserCard: React.FC<OrganiserCardProps> = ({
 
   return (
     <div className="block h-full">
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow duration-200 h-full flex flex-col">        <div className="p-4 flex flex-col h-full">
+      <div className="rounded-xl shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow duration-200 h-full flex flex-col">
+        {" "}
+        <div className="p-4 flex flex-col h-full">
           <div className="flex items-start gap-4 mb-4">
             <div className="w-20 h-20 rounded-md shrink-0 overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center">
               {profileImage ? (
@@ -118,17 +121,11 @@ const OrganiserCard: React.FC<OrganiserCardProps> = ({
                   </a>
                 )}
               </div>
-
-              {/* {address && (
-                <div className="text-xs text-gray-500">
-                  <span>📍 {address}</span>
-                </div>
-              )} */}
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-x-2 gap-y-1 mb-4 min-h-[3rem]">
-            {categories.slice(0, 4).map((category) => (
+            {(isExpanded ? categories : categories.slice(0, 4)).map((category) => (
               <div
                 key={category.id}
                 className="text-xs text-[rgba(68,63,63)] line-clamp-1 border-[0.5px] border-[rgba(218,218,218)] rounded-lg px-2 py-1  hover:bg-[rgba(229,229,229)] transition-colors duration-200"
@@ -136,21 +133,30 @@ const OrganiserCard: React.FC<OrganiserCardProps> = ({
                 {category.title}
               </div>
             ))}
-            {categories.length > 4 && (
-              <div className="text-xs text-[rgba(100,92,90)] col-span-2">
+            {categories.length > 4 && !isExpanded && (
+              <div 
+                className="text-xs text-[rgba(100,92,90)] col-span-2 cursor-pointer hover:text-[rgba(229,114,0)] transition-colors duration-200"
+                onClick={() => setIsExpanded(true)}
+              >
                 +{categories.length - 4} more categories
+              </div>
+            )}
+            {isExpanded && (
+              <div 
+                className="text-xs text-[rgba(100,92,90)] col-span-2 cursor-pointer hover:text-[rgba(229,114,0)] transition-colors duration-200"
+                onClick={() => setIsExpanded(false)}
+              >
+                Show less
               </div>
             )}
           </div>
 
-          {/* About section - flexible height but constrained */}
           <div className="flex-1 mb-4">
             <p className="text-xs text-gray-600 leading-relaxed line-clamp-3">
               {about || "No description available."}
             </p>
           </div>
 
-          {/* Button section - fixed at bottom */}
           <div className="mt-auto">
             <div className="block">
               <button
@@ -162,8 +168,8 @@ const OrganiserCard: React.FC<OrganiserCardProps> = ({
             </div>
           </div>
         </div>
-      </div>      {/* Contact Modal */}
-      <ContactModal 
+      </div>
+      <ContactModal
         isOpen={isOpen}
         onClose={handleClose}
         contactInfo={{

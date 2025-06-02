@@ -74,13 +74,13 @@ export const EventRow: React.FC<EventRowProps> = ({
         <div className="flex items-center space-x-4">
           <button
             onClick={() => onEdit(event)}
-            className="text-[rgba(68,63,63)] hover:text-[#111827] transition-colors"
+            className="text-[rgba(68,63,63)] hover:text-[#111827] transition-colors cursor-pointer"
           >
             <FiEdit2 size={16} />
           </button>
           <button
             onClick={() => onDelete(event)}
-            className="text-[rgba(68,63,63)] hover:text-[#111827] transition-colors"
+            className="text-[rgba(68,63,63)] hover:text-[#111827] transition-colors cursor-pointer"
           >
             <FiTrash2 size={16} />
           </button>

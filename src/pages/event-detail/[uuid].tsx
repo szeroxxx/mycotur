@@ -6,7 +6,7 @@ import EventHeader from "@/components/activity-detail/EventHeader";
 import PhotoGallery from "@/components/activity-detail/PhotoGallery";
 import EventDetails from "@/components/event/EventDetails";
 import RSVPForm from "@/components/event-detail/RSVPForm";
-import ContactModal from "@/components/activity-detail/ContactModal";
+import EventsContactModal from "@/components/event-detail/EvnetContactModal";
 import { CircleCheck } from "lucide-react";
 import { useEventDetail } from "@/hooks/useEventDetail";
 import axios from "axios";
@@ -64,11 +64,8 @@ const EventDetailPage: React.FC = () => {
   };
 
   const handleSubmit = async (data: RSVPFormData) => {
-    console.log("data::: ", data);
     if (!eventData || !uuid) return;
-
     setRsvpError(null);
-
     const success = await submitRSVP(
       data,
       {
@@ -104,11 +101,11 @@ const EventDetailPage: React.FC = () => {
     if (!eventData?.eventDate?.date) return false;
     const eventDate = new Date(eventData.eventDate.date);
     const today = new Date();
-    // Remove time components for date comparison
     eventDate.setHours(0, 0, 0, 0);
     today.setHours(0, 0, 0, 0);
     return eventDate < today;
   };
+  console.log('eventData::: ', eventData);
 
   if (loading) {
     return (
@@ -151,15 +148,10 @@ const EventDetailPage: React.FC = () => {
 
       </Head>
 
-      <ContactModal
+      <EventsContactModal
         isOpen={isContactModalOpen}
         onClose={() => setIsContactModalOpen(false)}
-        contactInfo={{
-          email: eventData.contact.email,
-          facebook: eventData.organizer.socialLinks.facebook,
-          instagram: eventData.organizer.socialLinks.instagram,
-          youtube: eventData.organizer.socialLinks.youtube,
-        }}
+        contactInfo={eventData.contact}
       />
 
       {toast && (

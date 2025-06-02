@@ -7,7 +7,7 @@ import { CalendarEvent } from "../../types/calendar-event";
 
 import PublicLayout from "@/components/layout/PublicLayout";
 import Head from "next/head";
-import SearchBar from "@/components/ui/SearchBar";
+import EventSearchBar from "@/components/event-calender/EventSearchBar";
 
 const Index = () => {
   const {
@@ -19,7 +19,6 @@ const Index = () => {
     events,
   } = useEventsData();
   
-  console.log('filteredEvents::: ', filteredEvents);
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
   const [locationFilter, setLocationFilter] = useState("Location");
   const [categoryFilter, setCategoryFilter] = useState("Event Category");
@@ -53,10 +52,9 @@ const Index = () => {
       </Head>
       <div className="flex mt-3 gap-6 h-[calc(100vh-4rem)] overflow-hidden scrollbar-hide">
         {/* <div className="container mx-auto p-4">
-        <div className="flex flex-col lg:flex-row gap-6"> */}
-        <div className="w-full lg:w-1/3 space-y-4 ">
+        <div className="flex flex-col lg:flex-row gap-6"> */}        <div className="w-full lg:w-1/3 space-y-4 ">
           {" "}
-          <SearchBar
+          <EventSearchBar
             locationFilter={locationFilter}
             categoryFilter={categoryFilter}
             onFilterChange={handleFilterChange}

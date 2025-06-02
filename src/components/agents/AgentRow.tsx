@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiEdit2, FiTrash2 } from 'react-icons/fi';
+import { FiTrash2 } from 'react-icons/fi';
 import { Agent } from '../../types/agent';
 
 interface AgentRowProps {
@@ -10,7 +10,7 @@ interface AgentRowProps {
 
 export const AgentRow: React.FC<AgentRowProps> = ({
   agent,
-  onEdit,
+  // onEdit,
   onDelete
 }) => {
   return (
@@ -28,15 +28,15 @@ export const AgentRow: React.FC<AgentRowProps> = ({
       </td>
       <td className="py-4 px-6 whitespace-nowrap text-sm text-[rgba(68,63,63)]">
         <div className="flex items-center space-x-4">
-          <button 
+          {/* <button 
             onClick={() => onEdit(agent)}
-            className="text-[rgba(68,63,63)] hover:text-[#111827] transition-colors"
+            className="text-[rgba(68,63,63)] hover:text-[#111827] transition-colors cursor-pointer"
           >
             <FiEdit2 size={16} />
-          </button>
+          </button> */}
           <button 
             onClick={() => onDelete(agent)}
-            className="text-[rgba(68,63,63)] hover:text-[#111827] transition-colors"
+            className="text-[rgba(68,63,63)] hover:text-[#111827] transition-colors cursor-pointer"
           >
             <FiTrash2 size={16} />
           </button>

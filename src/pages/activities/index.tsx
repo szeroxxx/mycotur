@@ -7,9 +7,7 @@ import { DeleteModal } from "../../components/activities/DeleteModal";
 import { Pagination } from "../../components/pagination/Pagination";
 import { useActivities } from "../../hooks/useActivities";
 import { useProfile } from "../../hooks/useProfile";
-import { CircleCheck } from "lucide-react";
-import { FiPlus } from "react-icons/fi";
-import { IoSearchOutline } from "react-icons/io5";
+import { CircleCheck, Plus, Search} from "lucide-react";
 interface Category {
   uuid: string;
   title: string;
@@ -262,35 +260,41 @@ const ActivitiesPage: React.FC = () => {
   };
 
   return (
-    <>
+    <div className="min-h-screen">
       <Head>
         <title>Activities | Mycotur</title>
       </Head>
-
       {toast && (
         <div
-          className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-[12px] text-[rgba(255,255,255)] ${
+          className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 ${
             toast.type === "success"
               ? "bg-[rgba(22,163,74)]"
               : "bg-[rgba(179,38,30)]"
-          } flex items-center`}
+          } flex items-center max-w-sm`}
         >
-          <CircleCheck className="mr-2" />
-          <span>{toast.message}</span>
+          <CircleCheck className="mr-2 flex-shrink-0" size={20} />
+          <span className="text-sm">{toast.message}</span>
         </div>
       )}
-      <div className="p-4">
-        <div className="mb-3 flex justify-between items-center">
-          <div className="mb-4 relative ">
-            <IoSearchOutline className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[rgba(142,133,129)]" />
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6">
+        <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+          <div className="relative w-full sm:w-80 lg:w-96">
+            <Search
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[rgba(142,133,129)]"
+              size={18}
+            />
             <input
               type="text"
-              placeholder="Search"
+              placeholder="Search activities..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              disabled={isAgent && profileStatus?.needsUpdate}
-              className={`w-full md:w-64 pl-10 pr-4 py-2 border border-[rgba(199,195,193)] shadow-sm shadow-[rgba(24,27,37,0.04)] text-[rgba(142,133,129)] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[rgba(194,91,52)] focus:border-[rgba(194,91,52)] ${
-                isAgent && profileStatus?.needsUpdate
+              disabled={
+                (isAgent && profileStatus?.needsUpdate) ||
+                activities.length === 0
+              }
+              className={`w-full pl-10 pr-4 py-2.5 sm:py-3 border border-[rgba(199,195,193)] shadow-sm shadow-[rgba(24,27,37,0.04)] text-[rgba(142,133,129)] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[rgba(194,91,52)] focus:border-[rgba(194,91,52)] transition-colors ${
+                (isAgent && profileStatus?.needsUpdate) ||
+                activities.length === 0
                   ? "bg-gray-100 cursor-not-allowed"
                   : ""
               }`}
@@ -299,13 +303,13 @@ const ActivitiesPage: React.FC = () => {
           <button
             onClick={openAddModal}
             disabled={isAgent && profileStatus?.needsUpdate}
-            className={`inline-flex items-center px-4 py-2 ${
+            className={`w-full sm:w-auto flex items-center justify-center px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm font-medium transition-colors ${
               isAgent && profileStatus?.needsUpdate
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-[rgba(194,91,52)] hover:bg-[#C44D16]"
-            } text-[rgba(255,255,255)] rounded-lg text-sm font-medium transition-colors`}
+                ? "bg-gray-400 cursor-not-allowed text-white"
+                : "bg-[rgba(194,91,52)] hover:bg-[#C44D16] text-[rgba(255,255,255)] cursor-pointer"
+            }`}
           >
-            <FiPlus className="mr-2" />
+            <Plus className="mr-2" size={18} />
             Add Activity
           </button>
         </div>
@@ -331,16 +335,15 @@ const ActivitiesPage: React.FC = () => {
             </div>
           )}
         </div>
-      </div>
-
+      </div>{" "}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-none flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-none flex items-center justify-center p-2 sm:p-4 z-50">
           <div
-            className="bg-[rgba(255,255,255)] rounded-lg shadow-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto scrollbar-hide"
+            className="bg-[rgba(255,255,255)] rounded-lg shadow-xl p-4 sm:p-6 w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto scrollbar-hide"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-medium text-[rgba(68,63,63)] mb-4">
+            <div className="flex justify-between items-center mb-4 sm:mb-6">
+              <h2 className="text-lg sm:text-xl font-medium text-[rgba(68,63,63)]">
                 {selectedActivity?.id ? "Edit Activity" : "Add Activity"}
               </h2>
               <button
@@ -348,7 +351,7 @@ const ActivitiesPage: React.FC = () => {
                   setIsModalOpen(false);
                   setSelectedActivity(null);
                 }}
-                className="text-[rgba(68,63,63)] hover:text-[#111827]"
+                className="text-[rgba(68,63,63)] hover:text-[#111827] text-xl sm:text-base"
               >
                 ✕
               </button>
@@ -369,7 +372,6 @@ const ActivitiesPage: React.FC = () => {
           </div>
         </div>
       )}
-
       <DeleteModal
         isOpen={isDeleteModalOpen}
         onClose={() => {
@@ -378,7 +380,7 @@ const ActivitiesPage: React.FC = () => {
         }}
         onConfirm={confirmDelete}
       />
-    </>
+    </div>
   );
 };
 

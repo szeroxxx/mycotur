@@ -2,6 +2,7 @@ export interface Agent {
   id: string;
   name: string;
   email: string;
+  primaryMail?: string;
   status:  'invited' |'active' ;
   about?: string;
   address?: string;

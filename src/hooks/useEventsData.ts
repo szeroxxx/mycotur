@@ -26,20 +26,20 @@ export const useEventsData = () => {
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState({
     location: "Location",
-    category: "Event Category"
+    category: "Event Category",
   });
 
-  // Separate function for mapping events
   const mapEventsData = (data: RawEventData[]): CalendarEvent[] => {
     return data.map((item) => ({
       uuid: item.uuid,
       title: item.title,
       image: item.media
         ? getMediaUrl(item.media)
-        : "/default-event-image.jpg",
+        : "/default-activity-image.png",
       date: item.date,
       time: item.time,
-      location: item.location,      owner: item.owner || "Unknown",
+      location: item.location,
+      owner: item.owner || "Unknown",
       category: item.category,
       description: item.description,
       lat: item.lat,
@@ -47,10 +47,9 @@ export const useEventsData = () => {
     }));
   };
 
-
-
   useEffect(() => {
-    const fetchEvents = async () => {      try {
+    const fetchEvents = async () => {
+      try {
         setLoading(true);
         const URL = process.env.NEXTAUTH_BACKEND_URL;
         const response = await axiosInstance.get(`${URL}/api/visitor/event`);
@@ -61,7 +60,7 @@ export const useEventsData = () => {
         }
         setLoading(false);
       } catch (err) {
-        console.log('err::: ', err);
+        console.log("err::: ", err);
         setError("Failed to load events");
         setLoading(false);
       }
@@ -70,20 +69,19 @@ export const useEventsData = () => {
     fetchEvents();
   }, []);
   const filterEvents = (date?: Date, location?: string, category?: string) => {
-    // const newDate = date || selectedDate;
     const newLocation = location || filters.location;
     const newCategory = category || filters.category;
 
     setFilters({
       location: newLocation,
-      category: newCategory
+      category: newCategory,
     });
 
     let filtered = [...events];
 
     if (date) {
       setSelectedDate(date);
-      filtered = filtered.filter(event => {
+      filtered = filtered.filter((event) => {
         const eventDate = new Date(event.date);
         return (
           eventDate.getFullYear() === date.getFullYear() &&
@@ -94,15 +92,13 @@ export const useEventsData = () => {
     }
 
     if (newLocation !== "Location") {
-      filtered = filtered.filter(event => 
+      filtered = filtered.filter((event) =>
         event.location.toLowerCase().includes(newLocation.toLowerCase())
       );
     }
 
     if (newCategory !== "Event Category") {
-      filtered = filtered.filter(event => 
-        event.category === newCategory
-      );
+      filtered = filtered.filter((event) => event.category === newCategory);
     }
 
     setFilteredEvents(filtered);
@@ -110,7 +106,7 @@ export const useEventsData = () => {
   };
 
   const dateHasEvent = (date: Date) => {
-    return events.some(event => {
+    return events.some((event) => {
       const eventDate = new Date(event.date);
       return (
         eventDate.getFullYear() === date.getFullYear() &&
@@ -127,6 +123,6 @@ export const useEventsData = () => {
     loading,
     error,
     filterEvents,
-    dateHasEvent
+    dateHasEvent,
   };
 };

@@ -22,7 +22,7 @@ export const Pagination: React.FC<PaginationProps> = ({
             ${
               currentPage === 1
                 ? "text-gray-300 cursor-not-allowed"
-                : "text-gray-700 hover:bg-gray-50"
+                : "text-gray-700 hover:bg-gray-50 "
             }`}
         >
           Previous
@@ -59,7 +59,7 @@ export const Pagination: React.FC<PaginationProps> = ({
                 ${
                   currentPage === 1
                     ? "text-[rgba(68,63,63)] cursor-not-allowed"
-                    : "text-gray-500 hover:bg-[#FFF5F1] rounded-[10px]"
+                    : "text-gray-500 hover:bg-[#FFF5F1] rounded-[10px] cursor-pointer"
                 }`}
             >
               <span className="sr-only">Previous</span>
@@ -81,7 +81,7 @@ export const Pagination: React.FC<PaginationProps> = ({
               <button
                 key={page}
                 onClick={() => onPageChange(page)}
-                className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold
+                className={`cursor-pointer relative inline-flex items-center px-4 py-2 text-sm font-semibold
                   ${
                     page === currentPage
                       ? "z-10 rounded-[10px] bg-[rgba(226,225,223)] text-[rgba(68,63,63)] focus-visible:outline-offset-2 focus-visible:outline-[#D45B20]"
@@ -98,7 +98,7 @@ export const Pagination: React.FC<PaginationProps> = ({
                 ${
                   currentPage === totalPages
                     ? "text-[rgba(68,63,63)] cursor-not-allowed"
-                    : "text-gray-500 hover:bg-[#FFF5F1] rounded-[10px]"
+                    : "text-gray-500 hover:bg-[#FFF5F1] rounded-[10px] cursor-pointer"
                 }`}
             >
               <span>Next</span>

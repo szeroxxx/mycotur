@@ -1,5 +1,6 @@
 export const getMediaUrl = (
   fileName: string,
+  isPublic: boolean = false
 ): string => {
   let extractedFileName = fileName;
   if (fileName.includes("uploads\\\\")) {
@@ -19,6 +20,9 @@ export const getMediaUrl = (
   const encodedFileName = encodeURIComponent(extractedFileName);
   const URL = process.env.NEXTAUTH_BACKEND_URL;
   const baseUrl = `${URL}/api`;
+  if (isPublic) {
+    return `${baseUrl}/profile-image/${encodedFileName}`;
+  }
   const finalUrl = `${baseUrl}/image/${encodedFileName}`;
   return finalUrl;
 };

@@ -3,12 +3,13 @@ import axiosInstance from "../../utils/axiosConfig";
 import PublicLayout from "@/components/layout/PublicLayout";
 import SearchBar from "@/components/ui/SearchBar";
 import OrganiserCard from "@/components/organiser/OrganiserCard";
+import Head from "next/head";
 
 interface Organizer {
   id: number;
   uuid: string;
   name: string;
-  email: string;
+  primaryMail: string;
   role: string;
   status: string;
   about: string | null;
@@ -37,7 +38,10 @@ const DiscoverOrganiserPage = () => {
     const fetchOrganisers = async () => {
       try {
         const URL = process.env.NEXTAUTH_BACKEND_URL;
-        const response = await axiosInstance.get(`${URL}/api/visitor/organization`);
+        const response = await axiosInstance.get(
+          `${URL}/api/visitor/organization`
+        );
+        console.log("response::: ", response);
         setOrganisers(response.data);
         setFilteredOrganisers(response.data);
       } catch (error) {
@@ -116,42 +120,46 @@ const DiscoverOrganiserPage = () => {
   }
   return (
     <PublicLayout>
-      <div className="flex justify-end mb-3 mt-2 bg-[rgba(244,242,242)]">
-        {" "}
-        <SearchBar
-          locationFilter={locationFilter || "Location"}
-          categoryFilter={categoryFilter || "Event Category"}
-          onFilterChange={handleFilterChange}
-          onSearch={handleSearch}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {" "}
-        {filteredOrganisers.map((organiser) => (
-          <OrganiserCard
-            key={organiser.id}
-            // id={organiser.id}
-            uuid={organiser.uuid}
-            name={organiser.name}
-            about={organiser.about}
-            // address={organiser.address}
-            email={organiser.email}
-            facebook={organiser.facebook}
-            instagram={organiser.instagram}
-            youtube={organiser.youtube}
-            categories={organiser.categories}
-            totalEvents={organiser.totalEvents}
-            profileImage={organiser.profileImage}
+      <Head>
+        <title>Activity Map | Mycotur</title>
+      </Head>{" "}
+      <div className="bg-[#F4F2F2] min-h-screen w-full">
+        <div className="flex justify-end mb-3 mt-2">
+          <SearchBar
+            locationFilter={locationFilter || "Location"}
+            categoryFilter={categoryFilter || "Event Category"}
+            onFilterChange={handleFilterChange}
+            onSearch={handleSearch}
           />
-        ))}
-      </div>
-
-      {filteredOrganisers.length === 0 && (
-        <div className="text-center py-10">
-          <p className="text-gray-600">No organisers found.</p>
         </div>
-      )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {" "}
+          {filteredOrganisers.map((organiser) => (
+            <OrganiserCard
+              key={organiser.id}
+              // id={organiser.id}
+              uuid={organiser.uuid}
+              name={organiser.name}
+              about={organiser.about}
+              // address={organiser.address}
+              email={organiser.primaryMail}
+              facebook={organiser.facebook}
+              instagram={organiser.instagram}
+              youtube={organiser.youtube}
+              categories={organiser.categories}
+              totalEvents={organiser.totalEvents}
+              profileImage={organiser.profileImage}
+            />
+          ))}
+        </div>
+
+        {filteredOrganisers.length === 0 && (
+          <div className="text-center py-10">
+            <p className="text-gray-600">No organisers found.</p>
+          </div>
+        )}
+      </div>
     </PublicLayout>
   );
 };

@@ -50,15 +50,16 @@ const EventsPage: React.FC = () => {
   } | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const { fetchAllActivities } = useActivities();
-
   const {
     events,
     pagination,
     toast,
     searchTerm,
     categoryFilter,
+    // locationFilter,
     setSearchTerm,
     setCategoryFilter,
+    // setLocationFilter,
     setPage,
     createEvent,
     updateEvent,
@@ -186,7 +187,6 @@ const EventsPage: React.FC = () => {
     setSelectedEvent({ ...emptyEvent });
     setIsModalOpen(true);
   };
-
   useEffect(() => {
     const checkProfile = async () => {
       try {
@@ -221,7 +221,6 @@ const EventsPage: React.FC = () => {
       <Head>
         <title>Events | Mycotur</title>
       </Head>
-
       {toast && (
         <div
           className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-[12px] text-[rgba(255,255,255)] ${
@@ -233,35 +232,33 @@ const EventsPage: React.FC = () => {
           <CircleCheck className="mr-2" />
           <span>{toast.message}</span>
         </div>
-      )}
-
-      <div className="p-4">
-        <div className="mb-3 flex justify-between items-center">
-          <div className="mb-4 flex flex-wrap gap-4">
-            <div className="relative ">
-              <IoSearchOutline className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[rgba(142,133,129)]" />
+      )}{" "}
+      <div className="px-2 sm:px-4">
+        <div className="mb-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+            <div className="relative w-full sm:w-auto">
+              <IoSearchOutline className="cursor-pointer absolute left-3 top-1/2 transform -translate-y-1/2 text-[rgba(142,133,129)]" />
               <input
                 type="text"
                 placeholder="Search"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                disabled={isAgent && profileStatus?.needsUpdate}
-                className={`w-full md:w-64 pl-10 pr-4 py-2 border border-[rgba(199,195,193)] shadow-sm shadow-[rgba(24,27,37,0.04)] text-[rgba(142,133,129)] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[rgba(194,91,52)] focus:border-[rgba(194,91,52)] ${
-                  isAgent && profileStatus?.needsUpdate
+                disabled={(isAgent && profileStatus?.needsUpdate) || events.length === 0}
+                className={`w-full sm:w-64 pl-10 pr-4 py-2 border border-[rgba(199,195,193)] shadow-sm shadow-[rgba(24,27,37,0.04)] text-[rgba(142,133,129)] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[rgba(194,91,52)] focus:border-[rgba(194,91,52)] ${
+                  (isAgent && profileStatus?.needsUpdate) || events.length === 0
                     ? "bg-gray-100 cursor-not-allowed"
                     : ""
                 }`}
               />
-            </div>
-
+            </div>{" "}
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              disabled={isAgent && profileStatus?.needsUpdate}
-              className={`w-full md:w-48 px-4 py-2 text-[rgba(142,133,129)] border border-[rgba(199,195,193)] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20] ${
-                isAgent && profileStatus?.needsUpdate
+              disabled={(isAgent && profileStatus?.needsUpdate) || events.length === 0}
+              className={` w-full sm:w-48 px-4 py-2 text-[rgba(142,133,129)] border border-[rgba(199,195,193)] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20] ${
+                (isAgent && profileStatus?.needsUpdate) || events.length === 0
                   ? "bg-gray-100 cursor-not-allowed"
-                  : ""
+                  : "cursor-pointer"
               }`}
             >
               <option value="">Categories</option>
@@ -275,10 +272,10 @@ const EventsPage: React.FC = () => {
           <button
             onClick={openAddModal}
             disabled={isAgent && profileStatus?.needsUpdate}
-            className={`inline-flex items-center px-4 py-2 ${
+            className={`w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 ${
               isAgent && profileStatus?.needsUpdate
                 ? "bg-gray-400 cursor-not-allowed"
-                : "bg-[rgba(194,91,52)] hover:bg-[#C44D16]"
+                : "bg-[rgba(194,91,52)] hover:bg-[#C44D16] cursor-pointer"
             } text-[rgba(255,255,255)] rounded-lg text-sm font-medium transition-colors`}
           >
             <FiPlus className="mr-2" />
@@ -308,12 +305,11 @@ const EventsPage: React.FC = () => {
           )}
         </div>
       </div>
-
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-none flex items-center justify-center p-4 z-50">
-          <div className="bg-[rgba(255,255,255)] rounded-lg shadow-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto scrollbar-hide">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-medium text-[rgba(68,63,63)]">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-none flex items-center justify-center p-2 sm:p-4 z-50">
+          <div className="bg-[rgba(255,255,255)] rounded-lg shadow-xl p-4 sm:p-6 w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto scrollbar-hide">
+            <div className="flex justify-between items-center mb-4 sm:mb-6">
+              <h2 className="text-lg sm:text-xl font-medium text-[rgba(68,63,63)]">
                 {selectedEvent?.id ? "Edit Event" : "Add Event"}
               </h2>
               <button
@@ -321,11 +317,11 @@ const EventsPage: React.FC = () => {
                   setIsModalOpen(false);
                   setSelectedEvent(null);
                 }}
-                className="text-[rgba(68,63,63)] hover:text-[#111827]"
+                className="text-[rgba(68,63,63)] hover:text-[#111827] text-xl sm:text-base"
               >
                 ✕
               </button>
-            </div>{" "}
+            </div>
             <EventForm
               event={selectedEvent!}
               categories={categories}
@@ -341,7 +337,6 @@ const EventsPage: React.FC = () => {
           </div>
         </div>
       )}
-
       <DeleteModal
         isOpen={isDeleteModalOpen}
         onClose={() => {

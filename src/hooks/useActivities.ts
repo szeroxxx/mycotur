@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Activity, Toast, PaginationInfo } from "../types/activity";
 import axios from "axios";
 import axiosInstance from "../utils/axiosConfig";
@@ -36,8 +36,9 @@ interface ApiActivityResponse {
 export const useActivities = () => {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [toast, setToast] = useState<Toast | null>(null);
-  const [pagination, setPagination] = useState<PaginationInfo>({
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [locationFilter, setLocationFilter] = useState("");
+  const [toast, setToast] = useState<Toast | null>(null);  const [pagination, setPagination] = useState<PaginationInfo>({
     currentPage: 1,
     totalPages: 1,
     pageSize: 12,
@@ -51,20 +52,37 @@ export const useActivities = () => {
       setTimeout(() => setToast(null), 3000);
     },
     []
-  );
-  const fetchActivities = useCallback(
+  );  const fetchActivities = useCallback(
     async (page: number = 1) => {
       try {
         setIsLoading(true);
         const uuid = localStorage.getItem("userUuid");
+        
+        const queryParams = new URLSearchParams({
+          page: page.toString(),
+          limit: "12", // Use fixed page size to avoid dependency issues
+        });
+
+        if (searchTerm) {
+          queryParams.append("search", searchTerm);
+        }
+
+        if (categoryFilter) {
+          queryParams.append("category", categoryFilter);
+        }
+
+        if (locationFilter) {
+          queryParams.append("location", locationFilter);
+        }
+
         const response = await axiosInstance.get(
-          `${URL}/api/activity?page=${page}`,
+          `${URL}/api/activity?${queryParams.toString()}`,
           {
             headers: {
               userid: uuid,
             },
           }
-        );        console.log("response.data.data::: ", response.data.data);
+        );console.log("response.data.data::: ", response.data.data);
         const mappedActivities: Activity[] = response.data.data.map(
           (item: ApiActivityResponse) => ({
             id: item.id.toString(),
@@ -94,12 +112,11 @@ export const useActivities = () => {
         showToast(
           "error",
           error instanceof Error ? error.message : "Failed to fetch activities"
-        );
-      } finally {
+        );      } finally {
         setIsLoading(false);
       }
     },
-    [showToast]
+    [showToast, searchTerm, categoryFilter, locationFilter]
   );
 
   const createActivity = useCallback(
@@ -390,7 +407,6 @@ export const useActivities = () => {
       throw error;
     }
   }, []);
-
   const setPage = useCallback(
     (page: number) => {
       fetchActivities(page);
@@ -398,27 +414,38 @@ export const useActivities = () => {
     [fetchActivities]
   );
 
+  const handleSearchChange = useCallback((term: string) => {
+    setSearchTerm(term);
+  }, []);
+
+  const handleCategoryFilterChange = useCallback((category: string) => {
+    setCategoryFilter(category);
+  }, []);
+  const handleLocationFilterChange = useCallback((location: string) => {
+    setLocationFilter(location);
+  }, []);
+
+  // Initial load
   useEffect(() => {
     fetchActivities(1);
-  }, [fetchActivities]);
+  }, []);
 
-  const filteredActivities = useMemo(() => {
-    if (!searchTerm) return activities;
-
-    return activities.filter(
-      (activity) =>
-        activity.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        activity.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        activity.location.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [activities, searchTerm]);
-
+  // Refetch when filters change
+  useEffect(() => {
+    if (searchTerm || categoryFilter || locationFilter) {
+      fetchActivities(1);
+    }
+  }, [searchTerm, categoryFilter, locationFilter, fetchActivities]);
   return {
-    activities: filteredActivities,
+    activities: activities,
     pagination,
     toast,
     searchTerm,
-    setSearchTerm,
+    categoryFilter,
+    locationFilter,
+    setSearchTerm: handleSearchChange,
+    setCategoryFilter: handleCategoryFilterChange,
+    setLocationFilter: handleLocationFilterChange,
     setPage,
     createActivity,
     updateActivity,

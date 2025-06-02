@@ -117,9 +117,7 @@ export const useActivitiesData = () => {
         const URL = process.env.NEXTAUTH_BACKEND_URL;
         const response = await axiosInstance.get(`${URL}/api/visitor/activity`);
         if (response.data && Array.isArray(response.data.data)) {
-          console.log("Raw activities data:", response.data.data);
           const mappedActivities = mapActivityData(response.data.data);
-          console.log("Mapped activities with validation:", mappedActivities);
           setActivities(mappedActivities);
           setFilteredActivities(mappedActivities);
         }

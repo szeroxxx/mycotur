@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Calendar, MapPin } from "lucide-react";
 import { RiInstagramFill } from "react-icons/ri";
 import { IoLogoFacebook } from "react-icons/io5";
 import { IoLogoYoutube } from "react-icons/io";
 import dynamic from "next/dynamic";
+import { googleMapsLoader } from "@/utils/googleMapsLoader";
 
 const DirectionsMap = dynamic(() => import("../maps/GoogleDirectionsMap"), {
   ssr: false,
@@ -29,12 +30,14 @@ interface EventDetailsProps {
   organizer: {
     id: string;
     name: string;
+    avatar?: string;
     eventsHosted: number;
     initials: string;
     socialLinks: {
       email?: string;
       facebook?: string;
       instagram?: string;
+      youtube?: string;
     };
   };
   location: {
@@ -54,6 +57,14 @@ const EventDetails: React.FC<EventDetailsProps> = ({
   location,
 }) => {
   const [isDirectionsOpen, setIsDirectionsOpen] = useState(false);
+  useEffect(() => {
+    if (location.coordinates) {
+      googleMapsLoader.load().catch((error) => {
+        console.warn('Failed to preload Google Maps:', error);
+      });
+    }
+  }, [location.coordinates]);
+
   const formatDate = (dateStr: string): string => {
     const date = new Date(dateStr);
     const day = date.getDate();
@@ -132,7 +143,13 @@ const EventDetails: React.FC<EventDetailsProps> = ({
       <div>
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
-            {organizer.initials && (
+            {organizer.avatar ? (
+              <img
+                src={organizer.avatar}
+                alt={organizer.name}
+                className="w-full h-full rounded-full object-cover"
+              />
+            ) : (
               <span className="text-white font-semibold text-sm">
                 {organizer.initials}
               </span>
@@ -147,9 +164,9 @@ const EventDetails: React.FC<EventDetailsProps> = ({
             </p>
           </div>
           <div className="flex gap-2 ">
-            {organizer.socialLinks.email && (
+            {organizer.socialLinks.youtube && (
               <a
-                href={organizer.socialLinks.email}
+                href={organizer.socialLinks.youtube}
                 target="_blank"
                 rel="noopener noreferrer"
               >

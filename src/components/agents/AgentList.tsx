@@ -16,7 +16,9 @@ export const AgentList: React.FC<AgentListProps> = ({
 }) => {
   if (agents.length === 0) {
     return (
-      <div className="bg-[rgba(255,255,255)] rounded-[16px] p-8 text-center">        <Image
+      <div className="bg-[rgba(255,255,255)] rounded-[16px] p-8 text-center">
+        {" "}
+        <Image
           src="/file.svg"
           alt="No Agents"
           width={80}
@@ -26,8 +28,10 @@ export const AgentList: React.FC<AgentListProps> = ({
         <h3 className="text-lg font-medium text-[rgba(68,63,63)] mb-2">
           No Agents Found
         </h3>
-        <p className="text-sm text-[rgba(100,92,90)]">          There are no agents added yet. Click the &quot;Add Agent&quot; button to create
-          one.
+        <p className="text-sm text-[rgba(100,92,90)]">
+          {" "}
+          There are no agents added yet. Click the &quot;Add Agent&quot; button
+          to create one.
         </p>
       </div>
     );

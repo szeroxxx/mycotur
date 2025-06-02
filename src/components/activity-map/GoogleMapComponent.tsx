@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { Loader } from "@googlemaps/js-api-loader";
-import { GOOGLE_MAPS_API_KEY } from "@/utils/googleMapsConfig";
+import { googleMapsLoader } from "@/utils/googleMapsLoader";
 
 interface Location {
   id: number;
@@ -27,24 +26,13 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
   const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Default center for Madrid/Spain area
   const defaultCenter = { lat: 40.4168, lng: -3.7038 };
 
-  // Initialize Google Maps
   useEffect(() => {
     const initializeMap = async () => {
-      if (!mapRef.current || isLoaded) return;
+      if (!mapRef.current || isLoaded) return;      try {
+        await googleMapsLoader.load();
 
-      try {
-        const loader = new Loader({
-          apiKey: GOOGLE_MAPS_API_KEY,
-          version: "weekly",
-          libraries: ["places", "geometry"],
-        });
-
-        await loader.load();
-
-        // Determine initial center
         let initialCenter = defaultCenter;
         if (locations.length > 0) {
           const validLocation = locations.find(
@@ -55,7 +43,6 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
           }
         }
 
-        // Create map instance
         const mapInstance = new google.maps.Map(mapRef.current, {
           center: initialCenter,
           zoom: 12,
@@ -73,7 +60,6 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
           zoomControl: true,
         });
 
-        // Create info window
         const infoWindow = new google.maps.InfoWindow();
 
         mapInstanceRef.current = mapInstance;
@@ -87,7 +73,6 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
     initializeMap();
   }, [locations.length]);
 
-  // Clear all markers
   const clearMarkers = useCallback(() => {
     Object.values(markersRef.current).forEach((marker) => {
       marker.setMap(null);
@@ -95,7 +80,6 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
     markersRef.current = {};
   }, []);
 
-  // Create markers for locations
   useEffect(() => {
     if (!isLoaded || !mapInstanceRef.current) return;
 
@@ -120,13 +104,14 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
 
       const position = { lat: loc.lat, lng: loc.lon };
 
-      // Create custom marker icon
       const marker = new google.maps.Marker({
         position,
         map: mapInstanceRef.current,
         title: loc.title,
         icon: {
-          url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
+          url:
+            "data:image/svg+xml;charset=UTF-8," +
+            encodeURIComponent(`
             <svg width="25" height="41" viewBox="0 0 25 41" xmlns="http://www.w3.org/2000/svg">
               <path d="M12.5 0C5.596 0 0 5.596 0 12.5c0 9.688 12.5 28.5 12.5 28.5s12.5-18.813 12.5-28.5C25 5.596 19.404 0 12.5 0z" fill="#E57200"/>
               <circle cx="12.5" cy="12.5" r="6" fill="white"/>
@@ -135,14 +120,11 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
           scaledSize: new google.maps.Size(25, 41),
           anchor: new google.maps.Point(12, 41),
         },
-        animation: google.maps.Animation.DROP,
       });
 
-      // Add click listener
       marker.addListener("click", () => {
         onMarkerClick(loc);
-        
-        // Show info window
+
         if (infoWindowRef.current) {
           infoWindowRef.current.setContent(`
             <div style="padding: 8px; min-width: 200px;">
@@ -159,7 +141,6 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
       validLocationCount++;
     });
 
-    // Fit bounds to show all markers
     if (validLocationCount > 1) {
       mapInstanceRef.current.fitBounds(bounds, {
         top: 50,
@@ -181,7 +162,6 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
     }
   }, [locations, isLoaded, clearMarkers, onMarkerClick]);
 
-  // Handle selected location
   useEffect(() => {
     if (!isLoaded || !mapInstanceRef.current || !selectedLocation) return;
 
@@ -193,12 +173,10 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
     }
 
     const position = { lat: selectedLocation.lat, lng: selectedLocation.lon };
-    
-    // Center map on selected location
+
     mapInstanceRef.current.panTo(position);
     mapInstanceRef.current.setZoom(14);
 
-    // Open info window for selected marker
     const marker = markersRef.current[selectedLocation.id];
     if (marker && infoWindowRef.current) {
       infoWindowRef.current.setContent(`
@@ -211,21 +189,6 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
     }
   }, [selectedLocation, isLoaded]);
 
-  // // Custom zoom controls
-  // const handleZoomIn = useCallback(() => {
-  //   if (mapInstanceRef.current) {
-  //     const currentZoom = mapInstanceRef.current.getZoom() || 12;
-  //     mapInstanceRef.current.setZoom(currentZoom + 1);
-  //   }
-  // }, []);
-
-  // const handleZoomOut = useCallback(() => {
-  //   if (mapInstanceRef.current) {
-  //     const currentZoom = mapInstanceRef.current.getZoom() || 12;
-  //     mapInstanceRef.current.setZoom(currentZoom - 1);
-  //   }
-  // }, []);
-
   return (
     <>
       <div
@@ -233,7 +196,7 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
         style={{ height: "100%", width: "100%" }}
         className="rounded-lg"
       />
-      
+
       {/* Custom zoom controls */}
       {/* <div className="absolute top-4 right-4 z-[1000]">
         <div className="flex flex-col gap-2 bg-[rgba(229,114,0)] rounded-md shadow-md">

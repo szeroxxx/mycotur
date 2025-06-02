@@ -6,17 +6,19 @@ import "react-calendar/dist/Calendar.css";
 import type { AppProps } from "next/app";
 import Layout from "@/components/layout/Layout";
 import { SessionProvider } from "next-auth/react";
-import { Manrope } from 'next/font/google';
-import { motion, AnimatePresence } from "framer-motion";
+import { Manrope } from "next/font/google";
 import { useRouter } from "next/router";
 import { DataProvider } from "@/contexts/DataContext";
 
 const manrope = Manrope({
-  subsets: ['latin'],
-  variable: '--font-manrope',
+  subsets: ["latin"],
+  variable: "--font-manrope",
 });
 
-export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
+export default function App({
+  Component,
+  pageProps: { session, ...pageProps },
+}: AppProps) {
   const router = useRouter();
 
   return (
@@ -24,17 +26,9 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
       <SessionProvider session={session}>
         <DataProvider>
           <Layout>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={router.route}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Component {...pageProps} />
-              </motion.div>
-            </AnimatePresence>
+            <div key={router.route}>
+              <Component {...pageProps} />
+            </div>
           </Layout>
         </DataProvider>
       </SessionProvider>
