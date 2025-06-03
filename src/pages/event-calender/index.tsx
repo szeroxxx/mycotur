@@ -58,7 +58,7 @@ const Index = () => {  const {
         <title>Event Via Calender | Mycotur</title>
       </Head>
       
-      <div className="hidden lg:flex h-[calc(100vh-4rem)] overflow-hidden scrollbar-hide">
+      <div className="hidden lg:flex h-[calc(100vh-5rem)] overflow-hidden scrollbar-hide">
         <div className="w-1/3 flex flex-col border-r border-[rgba(226,225,223,0.6)]  bg-gradient-to-br from-[rgba(244,242,242)] to-[rgba(248,250,252)]">
           <div className="p-6 flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide touch-scroll">
             <div className="space-y-6">
@@ -113,9 +113,7 @@ const Index = () => {  const {
             />
           </div>
         </div>
-      </div>
-
-      <div className="lg:hidden h-[calc(100vh-4rem)] flex flex-col mb-5">
+      </div>      <div className="lg:hidden h-[calc(100vh-5rem)] flex flex-col">
         <div className="flex justify-between items-center p-4 bg-gradient-to-r from-white to-gray-50 border-b border-[rgba(226,225,223,0.4)] sticky top-0 z-20">
           <h1 className="text-lg font-semibold text-[rgba(68,63,63)]">
             Event Calendar
@@ -142,7 +140,7 @@ const Index = () => {  const {
             />
           </div>
 
-          <div className="px-4 pb-6 space-y-4">
+          <div className="px-4 pb-20 space-y-4">
             {loading ? (
               <div className="text-center py-12">
                 <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[rgba(194,91,52)]"></div>
