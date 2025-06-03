@@ -74,11 +74,11 @@ const ActivityMapPage = () => {
                       No activities found for the selected filters.
                     </p>
                   </div>
-                ) : (
-                  filteredActivities.map((activity) => (
+                ) : (                  filteredActivities.map((activity) => (
                     <ActivityCard
                       key={activity.id}
                       id={activity.id}
+                      uuid={activity.uuid}
                       title={activity.title}
                       user={activity.user}
                       location={activity.location}

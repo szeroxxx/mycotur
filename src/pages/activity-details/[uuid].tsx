@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import PublicLayout from "@/components/layout/PublicLayout";
@@ -10,6 +10,7 @@ import ActivityContactModal from "@/components/organiser/ActivityContactModal";
 import { useActivityDetail } from "@/hooks/useActivityDetail";
 import { RSVPFormData } from "@/types/activity-detail";
 import { CircleCheck } from "lucide-react";
+import { extractUuidFromSlug } from "@/utils/urlHelpers";
 
 import axios from "axios";
 import axiosInstance from "@/utils/axiosConfig";
@@ -49,9 +50,19 @@ const submitRSVP = async (
 const ActivityDetailPage: React.FC = () => {
   const router = useRouter();
   const { uuid } = router.query;
-  const { activityData, loading, error } = useActivityDetail(
-    typeof uuid === "string" ? uuid : undefined
-  );
+
+  // Extract actual UUID from slug-based URL or use direct UUID
+  const actualUuid = useMemo(() => {
+    if (typeof uuid !== "string") return undefined;
+    
+    // Try to extract UUID from slug-based URL first
+    const extractedUuid = extractUuidFromSlug(uuid);
+    
+    // If extraction successful, use it; otherwise assume it's a direct UUID (backward compatibility)
+    return extractedUuid || uuid;
+  }, [uuid]);
+
+  const { activityData, loading, error } = useActivityDetail(actualUuid);
   const [rsvpError, setRsvpError] = useState<string | null>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [toast, setToast] = useState<{
@@ -63,9 +74,8 @@ const ActivityDetailPage: React.FC = () => {
     setToast({ type, message });
     setTimeout(() => setToast(null), 3000);
   };
-
   const handleSubmit = async (data: RSVPFormData) => {
-    if (!activityData || !uuid) return;
+    if (!activityData || !actualUuid) return;
 
     setRsvpError(null);
 
@@ -168,9 +178,9 @@ const ActivityDetailPage: React.FC = () => {
               totalPhotos={activityData.totalPhotos}
             />
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">            <div className="lg:col-span-2">
               <EventDetails
+                activityTitle={activityData.title}
                 eventDates={activityData.eventDates}
                 seasons={activityData.seasons}
                 description={activityData.description}

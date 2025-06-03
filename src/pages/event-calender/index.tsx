@@ -9,16 +9,16 @@ import PublicLayout from "@/components/layout/PublicLayout";
 import Head from "next/head";
 import EventSearchBar from "@/components/event-calender/EventSearchBar";
 
-const Index = () => {
-  const {
+const Index = () => {  const {
     filteredEvents,
     loading,
     selectedDate,
+    isDateFilterActive,
     filterEvents,
     dateHasEvent,
     events,
   } = useEventsData();
-  
+
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
   const [locationFilter, setLocationFilter] = useState("Location");
   const [categoryFilter, setCategoryFilter] = useState("Event Category");
@@ -28,9 +28,17 @@ const Index = () => {
     title: event.title,
     hasEvent: true,
   }));
-
   const handleDateSelect = (date: Date) => {
-    filterEvents(date, locationFilter, categoryFilter);
+    const isSameDate = selectedDate && 
+      selectedDate.getFullYear() === date.getFullYear() &&
+      selectedDate.getMonth() === date.getMonth() &&
+      selectedDate.getDate() === date.getDate();
+    
+    if (isSameDate) {
+      filterEvents(undefined, locationFilter, categoryFilter);
+    } else {
+      filterEvents(date, locationFilter, categoryFilter);
+    }
   };
 
   const handleSearch = () => {
@@ -52,7 +60,8 @@ const Index = () => {
       </Head>
       <div className="flex mt-3 gap-6 h-[calc(100vh-4rem)] overflow-hidden scrollbar-hide">
         {/* <div className="container mx-auto p-4">
-        <div className="flex flex-col lg:flex-row gap-6"> */}        <div className="w-full lg:w-1/3 space-y-4 ">
+        <div className="flex flex-col lg:flex-row gap-6"> */}{" "}
+        <div className="w-full lg:w-1/3 space-y-4 ">
           {" "}
           <EventSearchBar
             locationFilter={locationFilter}
@@ -90,11 +99,10 @@ const Index = () => {
           </div>
         </div>
         <div className="w-full lg:w-2/3">
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <EventCalendar
+          <div className="bg-white rounded-xl shadow-sm p-6">            <EventCalendar
               events={calendarEvents}
               onDateSelect={handleDateSelect}
-              selectedDate={selectedDate}
+              selectedDate={isDateFilterActive ? selectedDate : undefined}
               checkDateHasEvent={dateHasEvent}
             />
             {/* </div> */}

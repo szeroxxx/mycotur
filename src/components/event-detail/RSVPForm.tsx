@@ -207,7 +207,7 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-[rgba(229,114,0)] hover:bg-[#fdc48b] text-white font-semibold py-2 px-4 rounded-md transition-colors duration-200"
+            className="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-2 px-4 rounded-md transition-colors duration-200"
           >
             {isSubmitting ? "Submitting..." : "Submit RSVP"}
           </Button>

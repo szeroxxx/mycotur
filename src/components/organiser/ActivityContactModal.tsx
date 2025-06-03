@@ -42,7 +42,10 @@ const ActivityContactModal: React.FC<ActivityContactModalProps> = ({
             <div className="w-full p-1 text-[rgb(68,63,63)] ">
               {contactInfo.phone ? (
                 <a
-                  href={contactInfo.phone}
+                  href={`https://wa.me/${contactInfo.phone.replace(
+                    /\s+/g,
+                    ""
+                  )}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-[#D45B20] hover:underline"
@@ -73,7 +76,6 @@ const ActivityContactModal: React.FC<ActivityContactModalProps> = ({
               )}
             </div>
           </div>
-
         </div>
 
         <div className="mt-3">

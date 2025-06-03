@@ -1,11 +1,12 @@
 import React from "react";
 import { User, MapPin } from "lucide-react";
 import Image from "next/image";
-import { motion } from "framer-motion";
 import { useRouter } from "next/router";
+import { createActivityUrl } from "../../utils/urlHelpers";
 
 interface ActivityCardProps {
-  id: number;
+  id: string;
+  uuid: string;
   title: string;
   user: string;
   location: string;
@@ -16,7 +17,8 @@ interface ActivityCardProps {
 }
 
 const ActivityCard: React.FC<ActivityCardProps> = ({
-  id,
+  // id,
+  uuid,
   title,
   user,
   location,
@@ -29,15 +31,11 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
 
   const handleCardClick = () => {
     onClick();
-    router.push(`/activity-details/${id}`);
+    router.push(createActivityUrl(title, uuid));
   };
 
   return (
-    <motion.div
-      // initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -5 }}
-      transition={{ duration: 0.3 }}
+    <div
       className={`p-4 mb-3 bg-[rgba(255,255,255)] rounded-[16px] border cursor-pointer transition-all ${
         isSelected
           ? "border-[rgba(194,91,52)] shadow-md"
@@ -58,34 +56,23 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
             target.src = "/default-activity-image.png";
           }}
         />
-        <motion.div
-          initial={{ x: 20, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          whileHover={{ scale: 1.1 }}
-          className="absolute top-2 right-2 bg-[rgba(238,242,255)] text-[rgba(79,70,229)] text-xs px-2 py-1 rounded-[20px]"
-        >
+        <div className="absolute top-2 right-2 bg-[rgba(238,242,255)] text-[rgba(79,70,229)] text-xs px-2 py-1 rounded-[20px]">
           {category}
-        </motion.div>
+        </div>
       </div>
 
       <div className="mt-4">
         <h3 className="text-[rgba(68,63,63)] text-lg font-medium">{title}</h3>
-        <motion.div
-          whileHover={{ x: 5 }}
-          className="flex items-center mt-2 text-[rgba(100,92,90)] text-sm"
-        >
+        <div className="flex items-center mt-2 text-[rgba(100,92,90)] text-sm">
           <User size={16} className="mr-2" />
           <span>{user}</span>
-        </motion.div>
-        <motion.div
-          whileHover={{ x: 5 }}
-          className="flex items-center mt-1 text-[rgba(100,92,90)] text-sm"
-        >
+        </div>
+        <div className="flex items-center mt-1 text-[rgba(100,92,90)] text-sm">
           <MapPin size={16} className="mr-2" />
           <span className="truncate">{location}</span>
-        </motion.div>
+        </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

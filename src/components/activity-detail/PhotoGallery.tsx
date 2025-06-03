@@ -126,7 +126,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
             </>
           )}
           <div className="absolute top-3 left-3 z-10">
-            <span className="bg-white/20 backdrop-blur-md border border-white/30 px-3 py-1 rounded-full text-sm font-medium text-indigo-700 shadow-lg">
+            <span className="bg-white/20 backdrop-blur-md border border-white/30 px-3 py-1 rounded-full text-sm font-medium text-white shadow-lg">
               {category}
             </span>
           </div>

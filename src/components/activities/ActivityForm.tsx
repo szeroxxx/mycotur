@@ -30,6 +30,7 @@ interface ActivityFormProps {
     >
   ) => void;
   onCancel: () => void;
+  isLoading?: boolean;
 }
 
 const RequiredIndicator = () => (
@@ -42,10 +43,13 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
   onSubmit,
   onChange,
   onCancel,
+  isLoading = false,
 }) => {
   const [locationInput, setLocationInput] = useState(activity.location || "");
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isValidLocation, setIsValidLocation] = useState(!!activity.location);
+  const [locationError, setLocationError] = useState<string | null>(null);
   const locationRef = useRef<HTMLDivElement>(null);
 
   const [previewImages, setPreviewImages] = useState<string[]>([]);
@@ -55,29 +59,66 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (activity.location && activity.location !== locationInput) {
+      setLocationInput(activity.location);
+      setIsValidLocation(true);
+      setLocationError(null);
+    }
+  }, [activity.location]);
+
   const handleLocationChange = async (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const value = e.target.value;
+
+    if (isValidLocation && value !== locationInput) {
+      setIsValidLocation(false);
+      setLocationError("Please select a location from the suggestions below");
+      const clearEvent = {
+        target: {
+          name: "location",
+          value: "",
+        },
+      } as React.ChangeEvent<HTMLInputElement>;
+      onChange(clearEvent);
+    }
+
     setLocationInput(value);
-    onChange(e);
 
     if (value.length > 2) {
       try {
         const suggestions = await googlePlacesService.searchPlaces(value);
         setSuggestions(suggestions);
         setShowSuggestions(suggestions.length > 0);
+
+        if (suggestions.length === 0) {
+          setLocationError(
+            "No valid locations found. Please search for places in Valle del Tiétar, La Moraña, Valle de Amblés, Sierra de Gredos, or Alberche Pinares."
+          );
+        } else {
+          setLocationError(
+            "Please select a location from the suggestions below"
+          );
+        }
       } catch (error) {
         console.error("Error fetching locations:", error);
         setSuggestions([]);
         setShowSuggestions(false);
+        setLocationError("Error fetching locations. Please try again.");
       }
     } else {
       setSuggestions([]);
       setShowSuggestions(false);
+      if (value.length > 0 && !isValidLocation) {
+        setLocationError(
+          "Please enter at least 3 characters to search for locations"
+        );
+      } else {
+        setLocationError(null);
+      }
     }
   };
-
   const handleSuggestionClick = (suggestion: LocationSuggestion) => {
     const locationValue = `${suggestion.display_place}, ${suggestion.display_address}`;
 
@@ -106,6 +147,8 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
     setLocationInput(locationValue);
     setSuggestions([]);
     setShowSuggestions(false);
+    setIsValidLocation(true);
+    setLocationError(null);
   };
 
   const handleImageRemove = (index: number) => {
@@ -289,7 +332,6 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
         onChange(imageEvent);
       }
 
-      // Update videos if any
       if (videoFiles.length > 0) {
         const updatedVideos = [...existingVideos, ...videoFiles];
         const videoEvent = {
@@ -331,7 +373,6 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
   }, [locationRef]);
 
   useEffect(() => {
-    // Clean up previous URLs
     previewImages.forEach((url) => {
       if (url.startsWith("blob:")) {
         URL.revokeObjectURL(url);
@@ -397,6 +438,17 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
     };
   }, [activity.images, activity.videos, activity.mediaUrls, activity.id]);
 
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!isValidLocation || !activity.location) {
+      setLocationError("Please select a valid location from the suggestions");
+      return;
+    }
+
+    onSubmit(e);
+  };
+
   const currentImageCount =
     (activity.images?.length || 0) +
     (activity.mediaUrls?.filter((media) => media.type.startsWith("image"))
@@ -405,9 +457,8 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
     (activity.videos?.length || 0) +
     (activity.mediaUrls?.filter((media) => media.type.startsWith("video"))
       .length || 0);
-
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
+    <form onSubmit={handleFormSubmit} className="space-y-6">
       <div>
         <label className="block text-sm font-sm text-[rgba(68,63,63)] mb-2">
           Activity Title <RequiredIndicator />
@@ -442,7 +493,6 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
           ))}
         </select>
       </div>
-
       <div>
         <label className="block text-sm font-sm text-[rgba(68,63,63)] mb-2">
           Location <RequiredIndicator />
@@ -453,10 +503,41 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
             name="location"
             value={locationInput}
             onChange={handleLocationChange}
-            placeholder="Enter location (e.g., Valle del Tiétar, Sierra de Gredos...)"
-            className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
+            placeholder="Start typing to search for locations (e.g., Valle del Tiétar, Sierra de Gredos...)"
+            className={`w-full px-4 py-2 text-[rgba(142,133,129)] border rounded-lg text-sm focus:outline-none focus:ring-1 ${
+              locationError && !isValidLocation
+                ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                : isValidLocation
+                ? "border-green-500 focus:ring-green-500 focus:border-green-500"
+                : "border-[#E5E7EB] focus:ring-[#D45B20] focus:border-[#D45B20]"
+            }`}
             required
           />
+          {locationError && (
+            <p className="mt-1 text-sm text-red-600">{locationError}</p>
+          )}
+          {!locationError && !isValidLocation && locationInput.length === 0 && (
+            <p className="mt-1 text-sm text-gray-500">
+              You must select a location from the suggestions that appear as you
+              type. Manual location entry is not allowed.
+            </p>
+          )}
+          {isValidLocation && (
+            <p className="mt-1 text-sm text-green-600 flex items-center">
+              <svg
+                className="w-4 h-4 mr-1"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              Valid location selected
+            </p>
+          )}
           {showSuggestions && suggestions.length > 0 && (
             <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
               {suggestions.map((suggestion) => (
@@ -529,7 +610,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
       </div>
 
       <div>
-        <label className="block text-sm font-sm text-[rgba(68,63,63)] mb-1">
+        <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
           Contact Information (People can view this detail)
           <RequiredIndicator />
         </label>
@@ -737,20 +818,53 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
           </div>
         </div>
       </div>
-
       <div className="flex justify-end space-x-4 pt-4 border-t">
         <button
           type="button"
           onClick={onCancel}
           className="px-4 py-2 text-sm font-medium text-[#6B7280] hover:text-[rgba(68,63,63)]"
+          disabled={isLoading}
         >
           Cancel
         </button>
         <button
           type="submit"
-          className="px-4 py-2 bg-[#D45B20] hover:bg-[#C44D16] text-white rounded-lg text-sm font-medium transition-colors"
+          disabled={isLoading || !isValidLocation}
+          className={`px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
+            isLoading || !isValidLocation
+              ? "bg-[#D45B20]/70 cursor-not-allowed"
+              : "bg-[#D45B20] hover:bg-[#C44D16]"
+          }`}
         >
-          {activity.id ? "Update" : "Save"}
+          {isLoading && (
+            <svg
+              className="animate-spin h-4 w-4 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              />
+            </svg>
+          )}
+          {isLoading
+            ? activity.id
+              ? "Updating..."
+              : "Saving..."
+            : activity.id
+            ? "Update"
+            : "Save"}
         </button>
       </div>
     </form>

@@ -3,7 +3,7 @@ import axiosInstance from "../utils/axiosConfig";
 import { getMediaUrl } from "../utils/mediaHelpers";
 
 interface RawActivityData {
-  uuid: number;
+  uuid: string;
   title: string;
   category: string;
   owner?: string;
@@ -15,7 +15,8 @@ interface RawActivityData {
 }
 
 export interface ActivityData {
-  id: number;
+  id: string;
+  uuid: string;
   title: string;
   category: string;
   user: string;
@@ -55,10 +56,9 @@ export const useActivitiesData = () => {
             `Skipping activity "${item.title}" due to invalid coordinates: lat=${item.lat}, lon=${item.lon}`
           );
           return null;
-        }
-
-        return {
+        }        return {
           id: item.uuid,
+          uuid: item.uuid,
           title: item.title,
           category: item.category,
           user: item.owner || "Unknown",

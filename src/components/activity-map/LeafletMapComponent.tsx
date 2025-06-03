@@ -3,6 +3,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
+import { ActivityData } from "@/hooks/useActivitiesData";
 
 const DefaultIcon = L.icon({
   iconUrl: icon.src,
@@ -11,27 +12,18 @@ const DefaultIcon = L.icon({
   iconAnchor: [12, 41],
 });
 
-interface Location {
-  id: number;
-  lat: number;
-  lon: number;
-  title: string;
-  location: string;
-}
-
 interface LeafletMapComponentProps {
-  locations: Location[];
-  selectedLocation: Location | null;
-  onMarkerClick: (location: Location) => void;
+  locations: ActivityData[];
+  selectedLocation: ActivityData | null;
+  onMarkerClick: (location: ActivityData) => void;
 }
 
 const LeafletMapComponent: React.FC<LeafletMapComponentProps> = ({
   locations,
   selectedLocation,
   onMarkerClick,
-}) => {
-  const mapRef = useRef<L.Map | null>(null);
-  const markersRef = useRef<{ [key: number]: L.Marker }>({});
+}) => {  const mapRef = useRef<L.Map | null>(null);
+  const markersRef = useRef<{ [key: string]: L.Marker }>({});
   const [map, setMap] = useState<L.Map | null>(null);
   const defaultCenter = useMemo<[number, number]>(() => [40.4168, -3.7038], []);
 

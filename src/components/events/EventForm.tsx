@@ -34,6 +34,7 @@ interface EventFormProps {
   onCancel: () => void;
   activities: Activity[];
   onActivitySelect?: (activity: Activity | undefined) => void;
+  isLoading?: boolean;
 }
 
 const RequiredIndicator = () => (
@@ -48,10 +49,13 @@ export const EventForm: React.FC<EventFormProps> = ({
   onCancel,
   activities,
   onActivitySelect,
+  isLoading = false,
 }) => {
   const [locationInput, setLocationInput] = useState(event.location || "");
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isValidLocation, setIsValidLocation] = useState(!!event.location);
+  const [locationError, setLocationError] = useState<string | null>(null);
   const locationRef = useRef<HTMLDivElement>(null);
 
   const [previewImages, setPreviewImages] = useState<string[]>([]);
@@ -61,23 +65,14 @@ export const EventForm: React.FC<EventFormProps> = ({
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
-  const logMediaState = (action: string) => {
-    console.log(`--- ${action} ---`);
-    console.log("Current images:", event.images?.length || 0);
-    console.log("Current videos:", event.videos?.length || 0);
-    console.log("Current mediaUrls:", event.mediaUrls?.length || 0);
-    console.log(
-      "MediaUrls images:",
-      event.mediaUrls?.filter((m) => m.type.startsWith("image")).length || 0
-    );
-    console.log(
-      "MediaUrls videos:",
-      event.mediaUrls?.filter((m) => m.type.startsWith("video")).length || 0
-    );
-    console.log("Preview images:", previewImages.length);
-    console.log("Preview videos:", previewVideos.length);
-    console.log("--- End ---");
-  };
+  useEffect(() => {
+    if (event.location && event.location !== locationInput) {
+      setLocationInput(event.location);
+      setIsValidLocation(true);
+      setLocationError(null);
+    }
+  }, [event.location]);
+
 
   const handleAutoFillActivitySelect = (
     e: React.ChangeEvent<HTMLSelectElement>
@@ -143,25 +138,54 @@ export const EventForm: React.FC<EventFormProps> = ({
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const value = e.target.value;
+
+    if (isValidLocation && value !== locationInput) {
+      setIsValidLocation(false);
+      setLocationError("Please select a location from the suggestions below");
+      const clearEvent = {
+        target: {
+          name: "location",
+          value: "",
+        },
+      } as React.ChangeEvent<HTMLInputElement>;
+      onChange(clearEvent);
+    }
+
     setLocationInput(value);
-    onChange(e);
 
     if (value.length > 2) {
       try {
         const suggestions = await googlePlacesService.searchPlaces(value);
         setSuggestions(suggestions);
         setShowSuggestions(suggestions.length > 0);
+
+        if (suggestions.length === 0) {
+          setLocationError(
+            "No valid locations found. Please search for places in Valle del Tiétar, La Moraña, Valle de Amblés, Sierra de Gredos, or Alberche Pinares."
+          );
+        } else {
+          setLocationError(
+            "Please select a location from the suggestions below"
+          );
+        }
       } catch (error) {
         console.error("Error fetching locations:", error);
         setSuggestions([]);
         setShowSuggestions(false);
+        setLocationError("Error fetching locations. Please try again.");
       }
     } else {
       setSuggestions([]);
       setShowSuggestions(false);
+      if (value.length > 0 && !isValidLocation) {
+        setLocationError(
+          "Please enter at least 3 characters to search for locations"
+        );
+      } else {
+        setLocationError(null);
+      }
     }
   };
-
   const handleSuggestionClick = (suggestion: LocationSuggestion) => {
     const locationValue = `${suggestion.display_place}, ${suggestion.display_address}`;
 
@@ -189,6 +213,8 @@ export const EventForm: React.FC<EventFormProps> = ({
     setLocationInput(locationValue);
     setSuggestions([]);
     setShowSuggestions(false);
+    setIsValidLocation(true);
+    setLocationError(null);
   };
   const handleImageRemove = (index: number) => {
     try {
@@ -209,20 +235,8 @@ export const EventForm: React.FC<EventFormProps> = ({
         media.type.startsWith("image")
       );
       const existingImageCount = existingImages.length;
-
-      console.log("State analysis:");
-      console.log("- Existing saved images:", existingImageCount);
-      console.log("- New uploaded images:", currentImages.length);
-      console.log("- Total preview images:", totalImageCount);
-      console.log("- Index to remove:", index);
-
       if (index < existingImageCount) {
-        // Removing an existing saved image
-        console.log("🔴 Removing EXISTING image at index:", index);
         const imageToRemove = existingImages[index];
-        console.log("Image to remove:", imageToRemove);
-
-        // Create new array without the removed image
         const updatedMediaUrls = currentMediaUrls.filter((media) => {
           if (media.type.startsWith("image")) {
             const shouldKeep = !(
@@ -234,7 +248,7 @@ export const EventForm: React.FC<EventFormProps> = ({
             }
             return shouldKeep;
           }
-          return true; // Keep all non-image media
+          return true;
         });
 
         console.log(
@@ -244,7 +258,6 @@ export const EventForm: React.FC<EventFormProps> = ({
           currentMediaUrls.length
         );
 
-        // Update only mediaUrls array
         const mediaEvent = {
           target: {
             name: "mediaUrls",
@@ -253,9 +266,7 @@ export const EventForm: React.FC<EventFormProps> = ({
         } as unknown as React.ChangeEvent<HTMLInputElement>;
         onChange(mediaEvent);
       } else {
-        // Removing a newly uploaded image
         const newImageIndex = index - existingImageCount;
-        console.log("🟡 Removing NEW image at adjusted index:", newImageIndex);
 
         if (newImageIndex >= 0 && newImageIndex < currentImages.length) {
           const updatedImages = currentImages.filter((_, idx) => {
@@ -273,7 +284,6 @@ export const EventForm: React.FC<EventFormProps> = ({
             currentImages.length
           );
 
-          // Update only images array
           const imageEvent = {
             target: {
               name: "images",
@@ -301,11 +311,7 @@ export const EventForm: React.FC<EventFormProps> = ({
     }
   };
   const handleVideoRemove = (index: number) => {
-    console.log("=== REMOVING VIDEO AT INDEX:", index, "===");
-    logMediaState("Before video removal");
-
     try {
-      // Validate index
       const totalVideoCount = previewVideos.length;
       if (index < 0 || index >= totalVideoCount) {
         console.error(
@@ -318,29 +324,17 @@ export const EventForm: React.FC<EventFormProps> = ({
         return;
       }
 
-      // Create defensive copies
       const currentVideos = [...(event.videos || [])];
       const currentMediaUrls = [...(event.mediaUrls || [])];
 
-      // Get existing videos from mediaUrls (these are already saved videos)
       const existingVideos = currentMediaUrls.filter((media) =>
         media.type.startsWith("video")
       );
       const existingVideoCount = existingVideos.length;
 
-      console.log("Video state analysis:");
-      console.log("- Existing saved videos:", existingVideoCount);
-      console.log("- New uploaded videos:", currentVideos.length);
-      console.log("- Total preview videos:", totalVideoCount);
-      console.log("- Index to remove:", index);
-
       if (index < existingVideoCount) {
-        // Removing an existing saved video
-        console.log("🔴 Removing EXISTING video at index:", index);
         const videoToRemove = existingVideos[index];
-        console.log("Video to remove:", videoToRemove);
 
-        // Create new array without the removed video
         const updatedMediaUrls = currentMediaUrls.filter((media) => {
           if (media.type.startsWith("video")) {
             const shouldKeep = !(
@@ -352,7 +346,7 @@ export const EventForm: React.FC<EventFormProps> = ({
             }
             return shouldKeep;
           }
-          return true; // Keep all non-video media
+          return true;
         });
 
         console.log(
@@ -362,7 +356,6 @@ export const EventForm: React.FC<EventFormProps> = ({
           currentMediaUrls.length
         );
 
-        // Update only mediaUrls array
         const mediaEvent = {
           target: {
             name: "mediaUrls",
@@ -371,9 +364,7 @@ export const EventForm: React.FC<EventFormProps> = ({
         } as unknown as React.ChangeEvent<HTMLInputElement>;
         onChange(mediaEvent);
       } else {
-        // Removing a newly uploaded video
         const newVideoIndex = index - existingVideoCount;
-        console.log("🟡 Removing NEW video at adjusted index:", newVideoIndex);
 
         if (newVideoIndex >= 0 && newVideoIndex < currentVideos.length) {
           const updatedVideos = currentVideos.filter((_, idx) => {
@@ -391,7 +382,6 @@ export const EventForm: React.FC<EventFormProps> = ({
             currentVideos.length
           );
 
-          // Update only videos array
           const videoEvent = {
             target: {
               name: "videos",
@@ -434,9 +424,12 @@ export const EventForm: React.FC<EventFormProps> = ({
           setUploadError(`Image ${file.name} exceeds 10MB limit`);
           return;
         }
-        imageFiles.push(file);      } else if (ALLOWED_VIDEO_TYPES.includes(file.type)) {
+        imageFiles.push(file);
+      } else if (ALLOWED_VIDEO_TYPES.includes(file.type)) {
         if (file.size > MAX_VIDEO_SIZE_MB * 1024 * 1024) {
-          setUploadError(`Video ${file.name} exceeds ${MAX_VIDEO_SIZE_MB}MB limit`);
+          setUploadError(
+            `Video ${file.name} exceeds ${MAX_VIDEO_SIZE_MB}MB limit`
+          );
           return;
         }
         videoFiles.push(file);
@@ -475,7 +468,8 @@ export const EventForm: React.FC<EventFormProps> = ({
         } more video${remaining !== 1 ? "s" : ""}.`
       );
       return;
-    }    for (const file of newFiles) {
+    }
+    for (const file of newFiles) {
       if (file.size > MAX_VIDEO_SIZE_MB * 1024 * 1024) {
         setUploadError(`Files must be less than ${MAX_VIDEO_SIZE_MB}MB`);
         return;
@@ -483,10 +477,6 @@ export const EventForm: React.FC<EventFormProps> = ({
     }
     setIsUploading(true);
     try {
-      console.log("📁 Processing media upload...");
-      logMediaState("Before upload");
-
-      // Update images if any
       if (imageFiles.length > 0) {
         const updatedImages = [...existingImages, ...imageFiles];
         console.log(
@@ -544,7 +534,8 @@ export const EventForm: React.FC<EventFormProps> = ({
       if (event.key === "Escape") {
         setShowSuggestions(false);
       }
-    };    document.addEventListener("mousedown", handleClickOutside);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
     document.addEventListener("keydown", handleEscapeKey);
 
     return () => {
@@ -553,10 +544,6 @@ export const EventForm: React.FC<EventFormProps> = ({
     };
   }, [locationRef]);
   useEffect(() => {
-    console.log("🔄 Regenerating preview arrays...");
-    logMediaState("Before preview regeneration");
-
-    // Clean up previous URLs
     previewImages.forEach((url) => {
       if (url.startsWith("blob:")) {
         URL.revokeObjectURL(url);
@@ -648,8 +635,19 @@ export const EventForm: React.FC<EventFormProps> = ({
     (event.mediaUrls?.filter((media) => media.type.startsWith("video"))
       .length || 0);
 
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!isValidLocation || !event.location) {
+      setLocationError("Please select a valid location from the suggestions");
+      return;
+    }
+
+    onSubmit(e);
+  };
+
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
+    <form onSubmit={handleFormSubmit} className="space-y-6">
       <div>
         <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
           Fetch data direct from activity details(optional)
@@ -758,20 +756,54 @@ export const EventForm: React.FC<EventFormProps> = ({
             </option>
           ))}
         </select>
-      </div>
+      </div>{" "}
       <div>
         <label className="block text-sm font-sm text-[rgba(68,63,63)] mb-2">
           Location <RequiredIndicator />
-        </label>        <div className="relative" ref={locationRef}>
+        </label>
+        <div className="relative" ref={locationRef}>
           <input
             type="text"
             name="location"
             value={locationInput}
             onChange={handleLocationChange}
-            placeholder="Enter location (e.g., Valle del Tiétar, Sierra de Gredos...)"
-            className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
+            placeholder="Search for locations in Valle del Tiétar, Sierra de Gredos..."
+            className={`w-full px-4 py-2 text-[rgba(142,133,129)] border rounded-lg text-sm focus:outline-none focus:ring-1 ${
+              isValidLocation && event.location
+                ? "border-green-500 focus:ring-green-500 focus:border-green-500"
+                : locationError
+                ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                : "border-[#E5E7EB] focus:ring-[#D45B20] focus:border-[#D45B20]"
+            }`}
             required
           />
+
+          {/* Success indicator */}
+          {isValidLocation && event.location && (
+            <div className="mt-2 text-sm text-green-600 flex items-center gap-1">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              Valid location selected
+            </div>
+          )}
+
+          {/* Error message */}
+          {locationError && (
+            <div className="mt-2 text-sm text-red-600">{locationError}</div>
+          )}
+
+          {/* Instructional text */}
+          {!isValidLocation && !locationError && (
+            <div className="mt-2 text-sm text-gray-500">
+              Type to search and select a location from Google Maps suggestions
+            </div>
+          )}
+
           {showSuggestions && suggestions.length > 0 && (
             <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
               {suggestions.map((suggestion) => (
@@ -992,7 +1024,8 @@ export const EventForm: React.FC<EventFormProps> = ({
               {isUploading
                 ? "Uploading..."
                 : "Click to upload images and videos"}
-            </label>            <p className="text-xs text-[#6B7280] mt-2">
+            </label>{" "}
+            <p className="text-xs text-[#6B7280] mt-2">
               {uploadError ? (
                 <span className="text-red-500">{uploadError}</span>
               ) : (
@@ -1004,20 +1037,54 @@ export const EventForm: React.FC<EventFormProps> = ({
             </p>
           </div>
         </div>
-      </div>
+      </div>{" "}
       <div className="flex justify-end space-x-4 pt-4 border-t">
         <button
           type="button"
           onClick={onCancel}
           className="px-4 py-2 text-sm font-medium text-[#6B7280] hover:text-[rgba(68,63,63)]"
+          disabled={isLoading}
         >
           Cancel
-        </button>
+        </button>{" "}
         <button
           type="submit"
-          className="px-4 py-2 bg-[#D45B20] hover:bg-[#C44D16] text-white rounded-lg text-sm font-medium transition-colors"
+          disabled={isLoading || !isValidLocation || !event.location}
+          className={`px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
+            isLoading || !isValidLocation || !event.location
+              ? "bg-[#D45B20]/70 cursor-not-allowed"
+              : "bg-[#D45B20] hover:bg-[#C44D16]"
+          }`}
         >
-          {event.id ? "Update" : "Save"}
+          {isLoading && (
+            <svg
+              className="animate-spin h-4 w-4 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              />
+            </svg>
+          )}
+          {isLoading
+            ? event.id
+              ? "Updating..."
+              : "Saving..."
+            : event.id
+            ? "Update"
+            : "Save"}
         </button>
       </div>
     </form>

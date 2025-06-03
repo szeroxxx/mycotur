@@ -1,23 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { Calendar, MapPin } from "lucide-react";
 import { RiInstagramFill } from "react-icons/ri";
 import { IoLogoFacebook } from "react-icons/io5";
 import { IoLogoYoutube } from "react-icons/io";
-import dynamic from "next/dynamic";
-
-const DirectionsMap = dynamic(() => import("@/components/maps/GoogleDirectionsMap"), {
-  ssr: false,
-  loading: () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-8 m-4">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[rgba(229,114,0)] mx-auto"></div>
-          <p className="mt-2 text-sm text-gray-600">Loading map...</p>
-        </div>
-      </div>
-    </div>
-  ),
-});
+import { createEventUrl } from "../../utils/urlHelpers";
 
 interface EventDate {
   id: string;
@@ -48,6 +34,7 @@ interface Location {
 }
 
 interface EventDetailsProps {
+  activityTitle: string;
   eventDates: EventDate[];
   seasons: {
     availableMonths: string;
@@ -62,16 +49,25 @@ interface EventDetailsProps {
 }
 
 const EventDetails: React.FC<EventDetailsProps> = ({
+  activityTitle,
   eventDates,
   seasons,
   description,
   organizer,
   location,
 }) => {
-  const [isDirectionsOpen, setIsDirectionsOpen] = useState(false);
+  const openInGoogleMaps = () => {
+    if (!location.coordinates) return;
+    const destination = `${location.coordinates.lat},${location.coordinates.lng}`;
+    const url = `https://www.google.com/maps/search/?api=1&query=${destination}`;
+    window.open(url, '_blank');
+  };
 
   const handleEventClick = (id: string) => {
-    window.open(`/event-detail/${id}`, "_blank");
+    // Create a title from the activity title and event date for the slug
+    const eventTitle = `${activityTitle} Event`;
+    const eventUrl = createEventUrl(eventTitle, id);
+    window.open(eventUrl, "_blank");
   };
 
   return (
@@ -184,23 +180,21 @@ const EventDetails: React.FC<EventDetailsProps> = ({
       <div>
         <h3 className="text-lg font-semibold text-[rgba(68,63,63)] mb-4">
           Event Address
-        </h3>
-        <div
+        </h3>        <div
           className={`w-full h-48 bg-gray-100 rounded-lg relative overflow-hidden transition-colors ${
             location.coordinates
               ? "cursor-pointer hover:bg-gray-50"
               : "cursor-not-allowed"
           }`}
-          onClick={() => location.coordinates && setIsDirectionsOpen(true)}
+          onClick={openInGoogleMaps}
         >
           <div className="w-full h-full bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
             <div className="text-center">
               <div className="w-12 h-12 bg-[rgba(229,114,0)] rounded-full flex items-center justify-center mx-auto mb-2">
                 <MapPin className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-[rgba(68,63,63)] font-medium">
+              </div>              <span className="text-[rgba(68,63,63)] font-medium">
                 {location.coordinates
-                  ? "Click to view on map"
+                  ? "Click to get directions"
                   : "Location not available"}
               </span>
             </div>
@@ -220,24 +214,9 @@ const EventDetails: React.FC<EventDetailsProps> = ({
               </span>
             </div>
           </div>
-        </div>
-        <p className="text-sm text-[rgba(100,92,90)] mt-2">
+        </div>        <p className="text-sm text-[rgba(100,92,90)] mt-2">
           {location.address}
         </p>
-
-        {isDirectionsOpen && location.coordinates && (
-          <DirectionsMap
-            eventLocation={{
-              address: location.address,
-              coordinates: {
-                lat: location.coordinates.lat,
-                lng: location.coordinates.lng,
-              },
-            }}
-            isOpen={isDirectionsOpen}
-            onClose={() => setIsDirectionsOpen(false)}
-          />
-        )}
       </div>
     </div>
   );

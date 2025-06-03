@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import PublicLayout from "@/components/layout/PublicLayout";
@@ -9,6 +9,7 @@ import RSVPForm from "@/components/event-detail/RSVPForm";
 import EventsContactModal from "@/components/event-detail/EvnetContactModal";
 import { CircleCheck } from "lucide-react";
 import { useEventDetail } from "@/hooks/useEventDetail";
+import { extractUuidFromSlug } from "@/utils/urlHelpers";
 import axios from "axios";
 import axiosInstance from "@/utils/axiosConfig";
 import { Button } from "@/components/ui/button";
@@ -50,7 +51,16 @@ const submitRSVP = async (
 const EventDetailPage: React.FC = () => {
   const router = useRouter();
   const { uuid } = router.query;
-  const { eventData, loading, error } = useEventDetail(uuid as string);
+
+  const actualUuid = useMemo(() => {
+    if (typeof uuid !== "string") return undefined;
+    
+    const extractedUuid = extractUuidFromSlug(uuid);
+    
+    return extractedUuid || uuid;
+  }, [uuid]);
+
+  const { eventData, loading, error } = useEventDetail(actualUuid);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [rsvpError, setRsvpError] = useState<string | null>(null);
   const [toast, setToast] = useState<{
@@ -62,9 +72,8 @@ const EventDetailPage: React.FC = () => {
     setToast({ type, message });
     setTimeout(() => setToast(null), 3000);
   };
-
   const handleSubmit = async (data: RSVPFormData) => {
-    if (!eventData || !uuid) return;
+    if (!eventData || !actualUuid) return;
     setRsvpError(null);
     const success = await submitRSVP(
       data,

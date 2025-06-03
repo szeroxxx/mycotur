@@ -57,6 +57,16 @@ const EventDetails: React.FC<EventDetailsProps> = ({
   location,
 }) => {
   const [isDirectionsOpen, setIsDirectionsOpen] = useState(false);
+  
+  // Function to open Google Maps directly
+  const openInGoogleMaps = () => {
+    if (!location.coordinates) return;
+    
+    const destination = `${location.coordinates.lat},${location.coordinates.lng}`;
+    const url = `https://www.google.com/maps/search/?api=1&query=${destination}`;
+    window.open(url, '_blank');
+  };
+  
   useEffect(() => {
     if (location.coordinates) {
       googleMapsLoader.load().catch((error) => {
@@ -203,23 +213,21 @@ const EventDetails: React.FC<EventDetailsProps> = ({
       <div>
         <h3 className="text-lg font-semibold text-[rgba(68,63,63)] mb-4">
           Event Address
-        </h3>
-        <div
+        </h3>        <div
           className={`w-full h-48 bg-gray-100 rounded-lg relative overflow-hidden transition-colors ${
             location.coordinates
               ? "cursor-pointer hover:bg-gray-50"
               : "cursor-not-allowed"
           }`}
-          onClick={() => location.coordinates && setIsDirectionsOpen(true)}
+          onClick={() => location.coordinates && openInGoogleMaps()}
         >
           <div className="w-full h-full bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
             <div className="text-center">
               <div className="w-12 h-12 bg-[rgba(229,114,0)] rounded-full flex items-center justify-center mx-auto mb-2">
                 <MapPin className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-[rgba(68,63,63)] font-medium">
+              </div>              <span className="text-[rgba(68,63,63)] font-medium">
                 {location.coordinates
-                  ? "Click to view on map"
+                  ? "Click to get directions"
                   : "Location not available"}
               </span>
             </div>

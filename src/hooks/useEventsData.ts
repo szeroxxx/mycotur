@@ -22,6 +22,7 @@ export const useEventsData = () => {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<CalendarEvent[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [isDateFilterActive, setIsDateFilterActive] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState({
@@ -67,8 +68,7 @@ export const useEventsData = () => {
     };
 
     fetchEvents();
-  }, []);
-  const filterEvents = (date?: Date, location?: string, category?: string) => {
+  }, []);  const filterEvents = (date?: Date, location?: string, category?: string) => {
     const newLocation = location || filters.location;
     const newCategory = category || filters.category;
 
@@ -81,6 +81,7 @@ export const useEventsData = () => {
 
     if (date) {
       setSelectedDate(date);
+      setIsDateFilterActive(true);
       filtered = filtered.filter((event) => {
         const eventDate = new Date(event.date);
         return (
@@ -89,6 +90,10 @@ export const useEventsData = () => {
           eventDate.getDate() === date.getDate()
         );
       });
+    } else {
+      // If date is undefined, clear the date filter (show events from all dates)
+      setIsDateFilterActive(false);
+      // Keep the selected date for calendar display but don't filter by it
     }
 
     if (newLocation !== "Location") {
@@ -115,11 +120,11 @@ export const useEventsData = () => {
       );
     });
   };
-
   return {
     events,
     filteredEvents,
     selectedDate,
+    isDateFilterActive,
     loading,
     error,
     filterEvents,

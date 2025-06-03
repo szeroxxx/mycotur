@@ -47,8 +47,8 @@ const EventsPage: React.FC = () => {
     needsUpdate: boolean;
     fields: string[];
     message: string;
-  } | null>(null);
-  const [categories, setCategories] = useState<Category[]>([]);
+  } | null>(null);  const [categories, setCategories] = useState<Category[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { fetchAllActivities } = useActivities();
   const {
     events,
@@ -147,11 +147,11 @@ const EventsPage: React.FC = () => {
     setEventToDelete(event);
     setIsDeleteModalOpen(true);
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedEvent) return;
 
+    setIsSubmitting(true);
     try {
       if (selectedEvent.id) {
         await updateEvent(selectedEvent);
@@ -165,6 +165,8 @@ const EventsPage: React.FC = () => {
         "error",
         err instanceof Error ? err.message : "Failed to save event"
       );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -321,8 +323,7 @@ const EventsPage: React.FC = () => {
               >
                 ✕
               </button>
-            </div>
-            <EventForm
+            </div>            <EventForm
               event={selectedEvent!}
               categories={categories}
               onSubmit={handleSubmit}
@@ -333,6 +334,7 @@ const EventsPage: React.FC = () => {
               }}
               activities={dropdownActivities}
               onActivitySelect={handleActivitySelect}
+              isLoading={isSubmitting}
             />
           </div>
         </div>

@@ -1,28 +1,20 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { googleMapsLoader } from "@/utils/googleMapsLoader";
-
-interface Location {
-  id: number;
-  lat: number;
-  lon: number;
-  title: string;
-  location: string;
-}
+import { ActivityData } from "@/hooks/useActivitiesData";
 
 interface GoogleMapComponentProps {
-  locations: Location[];
-  selectedLocation: Location | null;
-  onMarkerClick: (location: Location) => void;
+  locations: ActivityData[];
+  selectedLocation: ActivityData | null;
+  onMarkerClick: (location: ActivityData) => void;
 }
 
 const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
   locations,
   selectedLocation,
   onMarkerClick,
-}) => {
-  const mapRef = useRef<HTMLDivElement>(null);
+}) => {  const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
-  const markersRef = useRef<{ [key: number]: google.maps.Marker }>({});
+  const markersRef = useRef<{ [key: string]: google.maps.Marker }>({});
   const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 

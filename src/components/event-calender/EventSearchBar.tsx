@@ -1,6 +1,5 @@
 import React, { useMemo } from "react";
-import { Search, X } from "lucide-react";
-import { motion } from "framer-motion";
+import { X } from "lucide-react";
 import { useData } from "@/contexts/DataContext";
 import { useEventLocations } from "@/hooks/useEventLocations";
 
@@ -30,7 +29,7 @@ interface EventSearchBarProps {
   locationFilter: string;
   categoryFilter: string;
   onFilterChange: (type: "location" | "category", value: string) => void;
-  onSearch: () => void;
+  onSearch?: () => void;
   className?: string;
   variant?: "compact" | "full";
 }
@@ -39,7 +38,7 @@ const EventSearchBar: React.FC<EventSearchBarProps> = ({
   locationFilter,
   categoryFilter,
   onFilterChange,
-  onSearch,
+  // onSearch,
   className = "",
   variant = "full",
 }) => {
@@ -93,22 +92,10 @@ const EventSearchBar: React.FC<EventSearchBarProps> = ({
   }
 
   return (
-    <motion.div
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className={`bg-white rounded-[20px] shadow-md p-4 ${className}`}
-    >
-      <motion.div
-        className="flex gap-2"
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.2, duration: 0.3 }}
-      >
-        <motion.div
-          className={variant === "compact" ? "flex-1 min-w-0" : "w-32"}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <motion.select
+    <div className={`bg-white rounded-[20px] shadow-md p-4 ${className}`}>
+      <div className="flex gap-2">
+        <div className={variant === "compact" ? "flex-1 min-w-0" : "w-32"}>
+          <select
             value={locationFilter}
             onChange={(e) => handleFilterChange("location", e.target.value)}
             className="w-full text-[12px] px-4 py-2 text-[rgba(68,63,63)] rounded-lg cursor-pointer hover:border-[rgba(194,91,52)] border-2 border-transparent transition-all duration-200"
@@ -118,14 +105,10 @@ const EventSearchBar: React.FC<EventSearchBarProps> = ({
                 {location.location}
               </option>
             ))}
-          </motion.select>
-        </motion.div>
-        <motion.div
-          className={variant === "compact" ? "flex-1 min-w-0" : "w-36"}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <motion.select
+          </select>
+        </div>
+        <div className={variant === "compact" ? "flex-1 min-w-0" : "w-36"}>
+          <select
             value={categoryFilter}
             onChange={(e) => handleFilterChange("category", e.target.value)}
             className="w-full text-[12px] px-4 py-2 text-[rgba(68,63,63)] rounded-lg cursor-pointer hover:border-[rgba(194,91,52)] border-2 border-transparent transition-all duration-200"
@@ -134,60 +117,23 @@ const EventSearchBar: React.FC<EventSearchBarProps> = ({
               <option key={category.uuid} value={category.title}>
                 {category.title}
               </option>
-            ))}
-          </motion.select>
-        </motion.div>
+            ))}          </select>
+        </div>
         
-        {hasActiveFilters && (
-          <motion.button
-            onClick={handleClearFilters}
-            className=" text-[rgba(194,91,52)] px-4 py-2 rounded-lg flex-shrink-0"
-            whileHover={{
-              scale: 1.05,
-            }}
-            whileTap={{ scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1, x: 0 }}
-            exit={{ opacity: 0, scale: 0.5, x: 20 }}
-            transition={{
-              duration: 0.3,
-              type: "spring",
-              stiffness: 500,
-            }}
-            title="Clear filters"
-          >
-            <motion.div
-              whileHover={{ rotate: [0, 90, 180, 270, 360] }}
-              transition={{ duration: 0.5 }}
-            >
-              <X className="w-5 h-5" />
-            </motion.div>
-          </motion.button>
-        )}
-
-        <motion.button
-          onClick={onSearch}
-          className="bg-[rgba(194,91,52)] text-white px-4 py-2 rounded-lg flex-shrink-0"
-          whileHover={{
-            scale: 1.05,
-            backgroundColor: "#cc6600",
-          }}
-          whileTap={{ scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{
-            duration: 0.3,
-            type: "spring",
-            stiffness: 500,
-          }}
+        <button
+          onClick={handleClearFilters}
+          disabled={!hasActiveFilters}
+          className={`px-4 py-2 rounded-lg flex-shrink-0 transition-all duration-200 ${
+            hasActiveFilters
+              ? "text-[rgba(194,91,52)] hover:bg-gray-100 cursor-pointer"
+              : "text-gray-400 cursor-not-allowed opacity-50"
+          }`}
+          title={hasActiveFilters ? "Clear filters" : "No filters to clear"}
         >
-          <motion.div
-            whileHover={{ rotate: [0, -10, 10, -10, 0] }}
-            transition={{ duration: 0.5 }}
-          >
-            <Search className="w-5 h-5" />
-          </motion.div>
-        </motion.button>
-      </motion.div>
-    </motion.div>
+          <X className="w-5 h-5" />
+        </button>
+      </div>
+    </div>
   );
 };
 

@@ -1,9 +1,10 @@
 import React from "react";
 import { User, MapPin, Clock, CalendarDays } from "lucide-react";
 import { format } from "date-fns";
-import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 import Image from "next/image";
+import { createEventUrl } from "../../utils/urlHelpers";
+
 interface EventCardProps {
   id: string;
   title: string;
@@ -28,18 +29,14 @@ const EventCard: React.FC<EventCardProps> = ({
   category,
   isSelected,
   onClick,
-}) => {
-  const router = useRouter();
+}) => {  const router = useRouter();
   const handleCardClick = () => {
     onClick();
-    router.push(`/event-detail/${id}`);
+    router.push(createEventUrl(title, id));
   };
+
   return (
-    <motion.div
-      // initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -5 }}
-      transition={{ duration: 0.3 }}
+    <div
       className={`bg-[rgba(255,255,255)] rounded-[16px] shadow-sm cursor-pointer transition-all border ${
         isSelected
           ? "border-[rgba(194,91,52)] shadow-md"
@@ -60,60 +57,36 @@ const EventCard: React.FC<EventCardProps> = ({
             target.src = "/default-activity-image.png";
           }}
         />
-        <motion.div
-          initial={{ x: 20, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          whileHover={{ scale: 1.1 }}
-          className="absolute top-2 right-2 bg-[rgba(238,242,255)] text-[rgba(79,70,229)] text-xs px-2 py-1 rounded-[20px]"
-        >
+        <div className="absolute top-2 right-2 bg-[rgba(238,242,255)] text-[rgba(79,70,229)] text-xs px-2 py-1 rounded-[20px]">
           {category}
-        </motion.div>
+        </div>
       </div>
 
-      <motion.div
-        className="p-4"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
-      >
-        <motion.h3
-          whileHover={{ color: "#f97316" }}
-          className="font-medium text-[rgba(22,21,37)] mb-2"
-        >
+      <div className="p-4">
+        <h3 className="font-medium text-[rgba(22,21,37)] mb-2">
           {title}
-        </motion.h3>
+        </h3>
 
-        <motion.div className="space-y-2 text-sm">
-          <motion.div
-            className="flex items-center gap-2 text-[rgba(68,63,63)]"
-            whileHover={{ x: 5 }}
-          >
-            <motion.div>
-              <CalendarDays className="w-4 h-4 text-gray-500" />
-            </motion.div>
+        <div className="space-y-2 text-sm">
+          <div className="flex items-center gap-2 text-[rgba(68,63,63)]">
+            <CalendarDays className="w-4 h-4 text-gray-500" />
             <span>{format(new Date(date), "MMM dd, yyyy")}</span>
-            <motion.div>
-              <Clock className="w-4 h-4 text-gray-500 ml-1" />
-            </motion.div>
-            <span> {time}</span>
-          </motion.div>
+            <Clock className="w-4 h-4 text-gray-500 ml-1" />
+            <span>{time}</span>
+          </div>
 
-          <motion.div className="flex items-center gap-2" whileHover={{ x: 5 }}>
-            <motion.div>
-              <User className="w-4 h-4 text-[rgba(68,63,63)]" />
-            </motion.div>
+          <div className="flex items-center gap-2">
+            <User className="w-4 h-4 text-[rgba(68,63,63)]" />
             <span className="text-[rgba(68,63,63)] truncate">{owner}</span>
-          </motion.div>
+          </div>
 
-          <motion.div className="flex items-center gap-2" whileHover={{ x: 5 }}>
-            <motion.div>
-              <MapPin className="w-4 h-4 text-[rgba(68,63,63)]" />
-            </motion.div>
+          <div className="flex items-center gap-2">
+            <MapPin className="w-4 h-4 text-[rgba(68,63,63)]" />
             <span className="text-gray-600 truncate">{location}</span>
-          </motion.div>
-        </motion.div>
-      </motion.div>
-    </motion.div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

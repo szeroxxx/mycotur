@@ -27,7 +27,6 @@ const ActivitiesPage: React.FC = () => {
   } | null>(null);
 
   const [categories, setCategories] = useState<Category[]>([]);
-
   const {
     activities,
     pagination,
@@ -40,6 +39,7 @@ const ActivitiesPage: React.FC = () => {
     deleteActivity,
     showToast,
   } = useActivities();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [activityToDelete, setActivityToDelete] = useState<Activity | null>(
     null
   );
@@ -179,11 +179,11 @@ const ActivitiesPage: React.FC = () => {
     setSelectedActivity(duplicatedActivity);
     setIsModalOpen(true);
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedActivity) return;
 
+    setIsSubmitting(true);
     try {
       if (selectedActivity.id) {
         const updateData = {
@@ -216,6 +216,8 @@ const ActivitiesPage: React.FC = () => {
         "error",
         err instanceof Error ? err.message : "Failed to save activity"
       );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -355,14 +357,13 @@ const ActivitiesPage: React.FC = () => {
               >
                 ✕
               </button>
-            </div>
-            {selectedActivity && (
+            </div>            {selectedActivity && (
               <ActivityForm
                 activity={selectedActivity}
                 categories={categories}
                 onSubmit={handleSubmit}
                 onChange={handleInputChange}
-                // onImageUpload={handleImageUpload}
+                isLoading={isSubmitting}
                 onCancel={() => {
                   setIsModalOpen(false);
                   setSelectedActivity(null);

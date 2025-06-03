@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
 import {
   format,
   addMonths,
@@ -33,7 +32,7 @@ interface EventCalendarProps {
 const EventCalendar: React.FC<EventCalendarProps> = ({
   events,
   onDateSelect,
-  selectedDate = new Date(),
+  selectedDate,
   checkDateHasEvent,
 }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -107,10 +106,10 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
         const isCurrentMonth = isSameMonth(day, monthStart);
 
         days.push(
-          <motion.div
+          <div
             key={day.toString()}
             className={cn(
-              "relative h-30 flex items-center justify-center cursor-pointer transition-all",
+              "relative h-30 flex items-center justify-center cursor-pointer",
               !isCurrentMonth ? "" : "",
               isSelected
                 ? "bg-[rgba(168,193,135)] text-[rgba(255,255,255)]"
@@ -125,20 +124,9 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
               isCurrentDay && !isSelected ? "font-bold" : ""
             )}
             onClick={() => isCurrentMonth && onDateSelect(cloneDay)}
-            whileHover={{
-              scale: 1.1,
-              rotate: [0, 2, -2, 0],
-              transition: {
-                duration: 0.3,
-                rotate: {
-                  repeat: Infinity,
-                  duration: 0.5,
-                },
-              },
-            }}
           >
             <span className="text-base">{dateFormatted}</span>
-          </motion.div>
+          </div>
         );
 
         day = addDays(day, 1);
