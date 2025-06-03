@@ -115,18 +115,14 @@ const Index = () => {  const {
         </div>
       </div>
 
-      {/* Mobile and Tablet Layout */}
-      <div className="lg:hidden h-[calc(100vh-4rem)] flex flex-col">
-        {/* Mobile Header */}
+      <div className="lg:hidden h-[calc(100vh-4rem)] flex flex-col mb-5">
         <div className="flex justify-between items-center p-4 bg-gradient-to-r from-white to-gray-50 border-b border-[rgba(226,225,223,0.4)] sticky top-0 z-20">
           <h1 className="text-lg font-semibold text-[rgba(68,63,63)]">
             Event Calendar
           </h1>
         </div>
 
-        {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto scrollbar-hide touch-scroll bg-gradient-to-b from-white to-gray-50">
-          {/* Calendar Section */}
           <div className="h-[45vh] bg-white shadow-lg mx-4 mt-4 rounded-2xl overflow-hidden">
             <EventCalendar
               events={calendarEvents}
@@ -136,7 +132,6 @@ const Index = () => {  const {
             />
           </div>
 
-          {/* Search Filters Section */}
           <div className="p-4 pb-2">
             <EventSearchBar
               locationFilter={locationFilter}
@@ -147,7 +142,6 @@ const Index = () => {  const {
             />
           </div>
 
-          {/* Event Cards Section */}
           <div className="px-4 pb-6 space-y-4">
             {loading ? (
               <div className="text-center py-12">

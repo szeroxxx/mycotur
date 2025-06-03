@@ -165,7 +165,7 @@ const ActivityMapPage = () => {
             )}
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto scrollbar-hide touch-scroll bg-gradient-to-b from-white to-gray-50">
+          <div className="flex-1 overflow-y-auto scrollbar-hide touch-scroll bg-gradient-to-b from-white to-gray-50 mb-5">
             <div className="h-[25vh] relative bg-gray-100 overflow-hidden shadow-lg mx-4 mt-4 rounded-2xl">
               {!loading && (
                 <DynamicMapView
