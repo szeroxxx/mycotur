@@ -5,6 +5,9 @@ module.exports = {
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
   ],  theme: {
     extend: {
+      screens: {
+        'xs': '375px',
+      },
       fontFamily: {
         sans: ['var(--font-manrope)'],
       },
@@ -34,8 +37,7 @@ module.exports = {
         },
       },
     },
-  },
-  plugins: [
+  },  plugins: [
     function({ addUtilities }) {
       addUtilities({
         '.scrollbar-hide': {
@@ -47,6 +49,27 @@ module.exports = {
           '&::-webkit-scrollbar': {
             display: 'none'
           }
+        },
+        '.line-clamp-1': {
+          display: '-webkit-box',
+          '-webkit-line-clamp': '1',
+          'line-clamp': '1',
+          '-webkit-box-orient': 'vertical',
+          overflow: 'hidden',
+        },
+        '.line-clamp-2': {
+          display: '-webkit-box',
+          '-webkit-line-clamp': '2',
+          'line-clamp': '2',
+          '-webkit-box-orient': 'vertical',
+          overflow: 'hidden',
+        },
+        '.line-clamp-3': {
+          display: '-webkit-box',
+          '-webkit-line-clamp': '3',
+          'line-clamp': '3',
+          '-webkit-box-orient': 'vertical',
+          overflow: 'hidden',
         }
       })
     }

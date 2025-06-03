@@ -50,15 +50,9 @@ const submitRSVP = async (
 const ActivityDetailPage: React.FC = () => {
   const router = useRouter();
   const { uuid } = router.query;
-
-  // Extract actual UUID from slug-based URL or use direct UUID
   const actualUuid = useMemo(() => {
     if (typeof uuid !== "string") return undefined;
-    
-    // Try to extract UUID from slug-based URL first
     const extractedUuid = extractUuidFromSlug(uuid);
-    
-    // If extraction successful, use it; otherwise assume it's a direct UUID (backward compatibility)
     return extractedUuid || uuid;
   }, [uuid]);
 
@@ -170,26 +164,48 @@ const ActivityDetailPage: React.FC = () => {
       <div className="">
         <EventHeader title={activityData.title} />
 
-        <div className="px-4 py-2">
-          <div className="mb-8">
+        <div className="px-4 py-2">          <div className="mb-8">
             <PhotoGallery
               photos={activityData.photos}
               category={activityData.category}
               totalPhotos={activityData.totalPhotos}
             />
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">            <div className="lg:col-span-2">
-              <EventDetails
-                activityTitle={activityData.title}
-                eventDates={activityData.eventDates}
-                seasons={activityData.seasons}
-                description={activityData.description}
-                organizer={activityData.organizer}
-                location={activityData.location}
-              />
-            </div>
+          
+          <div className="hidden lg:block">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2">
+                <EventDetails
+                  activityTitle={activityData.title}
+                  eventDates={activityData.eventDates}
+                  seasons={activityData.seasons}
+                  description={activityData.description}
+                  organizer={activityData.organizer}
+                  location={activityData.location}
+                />
+              </div>
 
-            <div className="lg:col-span-1">
+              <div className="lg:col-span-1">
+                <RSVPForm
+                  onSubmit={handleSubmit}
+                  onGetContactInfo={handleGetContactInfo}
+                  error={rsvpError}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:hidden space-y-8">
+            <EventDetails
+              activityTitle={activityData.title}
+              eventDates={activityData.eventDates}
+              seasons={activityData.seasons}
+              description={activityData.description}
+              organizer={activityData.organizer}
+              location={activityData.location}
+            />
+            
+            <div className="w-full">
               <RSVPForm
                 onSubmit={handleSubmit}
                 onGetContactInfo={handleGetContactInfo}

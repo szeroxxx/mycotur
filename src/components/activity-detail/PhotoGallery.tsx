@@ -102,7 +102,6 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
           className="relative overflow-hidden rounded-lg cursor-pointer transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl group"
           onClick={() => openModal(0)}
         >
-          {" "}
           {displayPhotos[0] && (
             <>
               {renderMedia(
@@ -140,7 +139,6 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
               className="relative overflow-hidden rounded-lg cursor-pointer transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl group"
               onClick={() => openModal(index + 1)}
             >
-              {" "}
               {renderMedia(
                 photo,
                 "w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -168,89 +166,101 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
               )}
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 rounded-lg"></div>
             </div>
-          ))}{" "}
+          ))}
         </div>
-      </div>      {isModalOpen && selectedImageIndex !== null && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 lg:p-8">
+      </div>
+
+      {isModalOpen && selectedImageIndex !== null && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={closeModal}
           ></div>
 
-          <div className="relative z-10 w-full max-w-xs sm:max-w-2xl md:max-w-4xl lg:max-w-5xl xl:max-w-6xl h-full max-h-[90vh] sm:max-h-[85vh] md:max-h-[80vh] lg:max-h-[75vh]">            {/* Close button - positioned outside the modal for better visibility */}
+          <div className="relative z-10 w-full h-full max-w-6xl max-h-[90vh] flex items-center justify-center">
             <button
               onClick={closeModal}
-              className="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 z-50 bg-white hover:bg-gray-100 rounded-full p-2 sm:p-3 text-gray-700 hover:text-gray-900 transition-all duration-300 shadow-xl border border-gray-300 group"
+              className="absolute -top-4 -right-4 z-50 bg-white hover:bg-gray-100 rounded-full p-3 text-gray-700 hover:text-gray-900 transition-all duration-300 shadow-xl border border-gray-300 group"
             >
               <X
-                size={20}
-                className="sm:w-6 sm:h-6 group-hover:rotate-90 transition-transform duration-300"
+                size={24}
+                className="group-hover:rotate-90 transition-transform duration-300"
               />
             </button>
 
-            {/* Navigation buttons */}
             <button
               onClick={goToPrevious}
               disabled={selectedImageIndex === 0}
-              className={`absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white rounded-full p-2 sm:p-3 text-gray-700 transition-all duration-300 shadow-lg group ${
+              className={`absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white rounded-full p-3 text-gray-700 transition-all duration-300 shadow-lg group ${
                 selectedImageIndex === 0
                   ? "opacity-30 cursor-not-allowed"
                   : "hover:scale-110 hover:-translate-x-1"
               }`}
             >
               <ArrowLeft
-                size={18}
-                className="sm:w-5 sm:h-5 group-hover:-translate-x-1 transition-transform duration-300"
+                size={20}
+                className="group-hover:-translate-x-1 transition-transform duration-300"
               />
             </button>
             <button
               onClick={goToNext}
               disabled={selectedImageIndex === photos.length - 1}
-              className={`absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white rounded-full p-2 sm:p-3 text-gray-700 transition-all duration-300 shadow-lg group ${
+              className={`absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white rounded-full p-3 text-gray-700 transition-all duration-300 shadow-lg group ${
                 selectedImageIndex === photos.length - 1
                   ? "opacity-30 cursor-not-allowed"
                   : "hover:scale-110 hover:translate-x-1"
               }`}
             >
               <ArrowRight
-                size={18}
-                className="sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform duration-300"
+                size={20}
+                className="group-hover:translate-x-1 transition-transform duration-300"
               />
             </button>
 
-            {/* Modal content container */}
-            <div className="bg-white rounded-lg sm:rounded-xl shadow-2xl w-full h-full flex flex-col overflow-hidden">              {/* Media container */}
-              <div className="flex-1 flex items-center justify-center bg-gray-50 p-4 sm:p-6">
-                {isVideo(photos[selectedImageIndex].type) ? (
-                  <video
-                    src={photos[selectedImageIndex].url}
-                    className="max-w-full max-h-full object-contain rounded-lg shadow-md"
-                    style={{ maxHeight: 'calc(100vh - 180px)' }}
-                    controls
-                    autoPlay={false}
-                    muted={false}
-                    preload="metadata"
-                  >
-                    <source src={photos[selectedImageIndex].url} type="video/mp4" />
-                    Your browser does not support the video tag.
-                  </video>
-                ) : (
-                  <img
-                    src={photos[selectedImageIndex].url}
-                    alt={photos[selectedImageIndex].alt}
-                    className="max-w-full max-h-full object-contain rounded-lg shadow-md"
-                    style={{ maxHeight: 'calc(100vh - 180px)' }}
-                  />
-                )}
+            <div className="bg-white rounded-xl shadow-2xl w-full h-full max-w-5xl max-h-[85vh] flex flex-col overflow-hidden">
+              <div className="flex-1 flex items-center justify-center bg-gray-50 p-6 overflow-hidden">
+                <div className="w-full h-full flex items-center justify-center">
+                  {isVideo(photos[selectedImageIndex].type) ? (
+                    <video
+                      src={photos[selectedImageIndex].url}
+                      className="max-w-full max-h-full w-auto h-auto object-contain rounded-lg shadow-md"
+                      style={{
+                        maxWidth: "100%",
+                        maxHeight: "calc(85vh - 120px)",
+                        width: "auto",
+                        height: "auto",
+                      }}
+                      controls
+                      autoPlay={false}
+                      muted={false}
+                      preload="metadata"
+                    >
+                      <source
+                        src={photos[selectedImageIndex].url}
+                        type="video/mp4"
+                      />
+                      Your browser does not support the video tag.
+                    </video>
+                  ) : (
+                    <img
+                      src={photos[selectedImageIndex].url}
+                      alt={photos[selectedImageIndex].alt}
+                      className="max-w-full max-h-full w-auto h-auto object-contain rounded-lg shadow-md"
+                      style={{
+                        maxWidth: "100%",
+                        maxHeight: "calc(85vh - 120px)",
+                        width: "auto",
+                        height: "auto",
+                      }}
+                    />
+                  )}
+                </div>
               </div>
 
-              {/* Footer with counter */}
-              <div className="flex-shrink-0 bg-white px-4 py-3 sm:px-6 sm:py-4 border-t border-gray-200">
-                <div className="text-center">
-                  <span className="bg-orange-100 text-orange-600 px-3 py-1 sm:px-4 sm:py-2 rounded-full text-sm font-medium">
-                    {selectedImageIndex + 1} of {photos.length}
-                  </span>
-                </div>
+              <div className="flex-shrink-0 bg-white px-6 py-4 border-t border-gray-200 h-20 flex items-center justify-center">
+                <span className="bg-orange-100 text-orange-600 px-4 py-2 rounded-full text-sm font-medium">
+                  {selectedImageIndex + 1} of {photos.length}
+                </span>
               </div>
             </div>
           </div>

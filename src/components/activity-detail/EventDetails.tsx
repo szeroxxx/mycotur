@@ -64,16 +64,14 @@ const EventDetails: React.FC<EventDetailsProps> = ({
   };
 
   const handleEventClick = (id: string) => {
-    // Create a title from the activity title and event date for the slug
     const eventTitle = `${activityTitle} Event`;
     const eventUrl = createEventUrl(eventTitle, id);
     window.open(eventUrl, "_blank");
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <div className="grid grid-cols-2 gap-8">
+    <div className="space-y-6">      <div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="space-y-3">
             <h3 className="text-lg font-semibold text-[rgba(68,63,63)]">
               View Upcoming Event Dates

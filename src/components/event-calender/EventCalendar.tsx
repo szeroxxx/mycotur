@@ -44,37 +44,35 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
   const nextMonth = () => {
     setCurrentMonth(addMonths(currentMonth, 1));
   };
-
   const renderHeader = () => {
     return (
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between p-4 lg:p-6  bg-gradient-to-r from-white to-gray-50">
         <button
           onClick={prevMonth}
-          className="p-1 hover:bg-gray-100 rounded-full"
+          className="p-2 lg:p-3 hover:bg-gray-100 rounded-full transition-colors duration-200 shadow-sm hover:shadow-md"
         >
-          <ChevronLeft className="h-5 w-5 text-[rgba(68,63,63)]" />
+          <ChevronLeft className="h-5 w-5 lg:h-6 lg:w-6 text-[rgba(68,63,63)]" />
         </button>
-        <h2 className="text-lg font-medium text-[rgba(68,63,63)]">
+        <h2 className="text-lg lg:text-xl font-semibold text-[rgba(68,63,63)]">
           {format(currentMonth, "MMMM yyyy")}
         </h2>
         <button
           onClick={nextMonth}
-          className="p-1 hover:bg-gray-100 rounded-full"
+          className="p-2 lg:p-3 hover:bg-gray-100 rounded-full transition-colors duration-200 shadow-sm hover:shadow-md"
         >
-          <ChevronRight className="h-5 w-5 text-[rgba(68,63,63)]" />
+          <ChevronRight className="h-5 w-5 lg:h-6 lg:w-6 text-[rgba(68,63,63)]" />
         </button>
       </div>
     );
   };
-
   const renderDays = () => {
-    const days = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+    const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
     return (
-      <div className="grid grid-cols-7 mb-2">
+      <div className="flex w-full">
         {days.map((day, i) => (
           <div
             key={i}
-            className="text-center py-2 text-gray-500 text-xs font-medium"
+            className="flex-1 text-center py-3 lg:py-4 text-gray-600 text-xs lg:text-sm font-semibold uppercase tracking-wider bg-gray-50"
           >
             {day}
           </div>
@@ -82,7 +80,6 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
       </div>
     );
   };
-
   const renderCells = () => {
     const monthStart = startOfMonth(currentMonth);
     const monthEnd = endOfMonth(monthStart);
@@ -109,23 +106,27 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
           <div
             key={day.toString()}
             className={cn(
-              "relative h-30 flex items-center justify-center cursor-pointer",
-              !isCurrentMonth ? "" : "",
+              "m-[0.1px] relative flex-1 min-h-[60px] lg:min-h-[80px] flex items-center justify-center cursor-pointer  hover:bg-gray-50 transition-colors duration-200",
+              !isCurrentMonth ? "text-gray-300" : "",
               isSelected
-                ? "bg-[rgba(168,193,135)] text-[rgba(255,255,255)]"
+                ? "bg-[rgba(168,193,135)] text-white hover:bg-[rgba(148,173,115)]"
                 : "",
-              hasEvents && !isSelected ? "bg-[rgba(229,114,0)]" : "",
+              hasEvents && !isSelected
+                ? "bg-[rgba(229,114,0)] text-white hover:bg-[rgba(209,94,0)]"
+                : "",
               !isSelected && isCurrentMonth && !hasEvents
-                ? "text-[rgba(100,92,90)]"
+                ? "text-[rgba(100,92,90)] hover:bg-gray-50"
                 : "",
               hasEvents && isSelected
-                ? "bg-[rgba(168,193,135)] text-[rgba(255,255,255)]"
+                ? "bg-[rgba(168,193,135)] text-white"
                 : "",
               isCurrentDay && !isSelected ? "font-bold" : ""
             )}
             onClick={() => isCurrentMonth && onDateSelect(cloneDay)}
           >
-            <span className="text-base">{dateFormatted}</span>
+            <span className="text-sm lg:text-base font-medium">
+              {dateFormatted}
+            </span>
           </div>
         );
 
@@ -133,7 +134,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
       }
 
       rows.push(
-        <div key={day.toString()} className="grid grid-cols-7">
+        <div key={day.toString()} className="flex w-full">
           {days}
         </div>
       );
@@ -141,11 +142,10 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
       days = [];
     }
 
-    return <div className="space-y-px">{rows}</div>;
+    return <div className="flex-1 flex flex-col">{rows}</div>;
   };
-
   return (
-    <div className="bg-white p-6 rounded-xl">
+    <div className="h-full flex flex-col bg-white rounded-lg lg:rounded-none overflow-hidden shadow-sm">
       {renderHeader()}
       {renderDays()}
       {renderCells()}

@@ -94,9 +94,8 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
       onGetContactInfo();
     }
   };
-
   return (
-    <div className="max-w-sm mx-auto  overflow-hidden">
+    <div className="w-full max-w-none lg:max-w-sm lg:mx-auto overflow-hidden">
       <div className="p-6 space-y-4 bg-[rgba(255,255,255)] rounded-xl shadow-lg border border-[rgba(244,242,242)]">
         <h2 className="text-xl font-semibold text-[rgba(68,63,63)] text-center mb-6">
           RSVP Now

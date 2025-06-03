@@ -52,10 +52,7 @@ const ProfilePage: React.FC = () => {
     toast,
   } = useProfile();
   const { categories } = useData();
-  const [isEditing, setIsEditing] = useState(() => {
-    // Check if we were in editing mode before
-    return sessionStorage.getItem("isEditingProfile") === "true";
-  });
+  const [isEditing, setIsEditing] = useState(false);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
   const [profileData, setProfileData] = useState({
@@ -91,7 +88,6 @@ const ProfilePage: React.FC = () => {
         categories: profileData.categories,
       };
 
-      // If we're in editing mode and have saved form data, use that instead
       if (isEditing) {
         const savedFormData = localStorage.getItem("profileFormData");
         if (savedFormData) {
@@ -111,23 +107,28 @@ const ProfilePage: React.FC = () => {
       console.error("Error loading profile:", error);
     }
   };
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const wasEditing = sessionStorage.getItem("isEditingProfile");
+      if (wasEditing === "true") {
+        setIsEditing(true);
+      }
+    }
+  }, []);
 
-  // Load initial profile data and check for saved form data
   useEffect(() => {
     if (session?.user) {
       loadProfile();
     }
   }, [session?.user, isEditing]);
 
-  // Save form data whenever it changes and we're in edit mode
   useEffect(() => {
-    if (isEditing && profileData.name) { // Only save if we have actual data
+    if (isEditing && profileData.name) {
       localStorage.setItem("profileFormData", JSON.stringify(profileData));
       sessionStorage.setItem("isEditingProfile", "true");
     }
   }, [profileData, isEditing]);
 
-  // Save form data when user navigates away
   useEffect(() => {
     const handleBeforeUnload = () => {
       if (isEditing) {
@@ -143,7 +144,7 @@ const ProfilePage: React.FC = () => {
 
     window.addEventListener("beforeunload", handleBeforeUnload);
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    
+
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
@@ -179,7 +180,7 @@ const ProfilePage: React.FC = () => {
     localStorage.removeItem("profileFormData");
     sessionStorage.removeItem("isEditingProfile");
     if (session?.user) {
-      fetchProfile().then(profileData => {
+      fetchProfile().then((profileData) => {
         setProfileData({
           profilePicture: profileData.profilePicture || "",
           name: profileData.name,
@@ -334,7 +335,8 @@ const ProfilePage: React.FC = () => {
           <h1 className="text-xl sm:text-2xl font-semibold text-[rgb(68,63,63)]">
             My Profile
           </h1>{" "}
-          {!isEditing ? (            <button
+          {!isEditing ? (
+            <button
               onClick={handleEditToggle}
               className="self-start sm:self-auto text-[rgba(68,63,63)] hover:text-[#D45B20] transition-colors"
             >
@@ -359,8 +361,6 @@ const ProfilePage: React.FC = () => {
         </div>{" "}
         <div className="bg-white rounded-lg shadow-md">
           <div className="p-4 sm:p-6 space-y-6">
-            {" "}
-            {/* Profile Image Section */}
             <div className="flex flex-col items-center space-y-4 pb-6 border-b border-[rgba(226,225,223)]">
               <div className="relative group">
                 <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-[rgba(226,225,223)] bg-[rgba(253,250,246)] shadow-lg">

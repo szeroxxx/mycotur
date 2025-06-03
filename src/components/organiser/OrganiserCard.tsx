@@ -64,7 +64,7 @@ const OrganiserCard: React.FC<OrganiserCardProps> = ({
 
   return (
     <div className="block h-full">
-      <div className="rounded-xl shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow duration-200 h-full flex flex-col">
+      <div className="rounded-xl   bg-white shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow duration-200 h-full flex flex-col">
         {" "}
         <div className="p-4 flex flex-col h-full">
           <div className="flex items-start gap-4 mb-4">
@@ -125,16 +125,18 @@ const OrganiserCard: React.FC<OrganiserCardProps> = ({
           </div>
 
           <div className="grid grid-cols-2 gap-x-2 gap-y-1 mb-4 min-h-[3rem]">
-            {(isExpanded ? categories : categories.slice(0, 4)).map((category) => (
-              <div
-                key={category.id}
-                className="text-xs text-[rgba(68,63,63)] line-clamp-1 border-[0.5px] border-[rgba(218,218,218)] rounded-lg px-2 py-1  hover:bg-[rgba(229,229,229)] transition-colors duration-200"
-              >
-                {category.title}
-              </div>
-            ))}
+            {(isExpanded ? categories : categories.slice(0, 4)).map(
+              (category) => (
+                <div
+                  key={category.id}
+                  className="text-xs text-[rgba(68,63,63)] line-clamp-1 border-[0.5px] border-[rgba(218,218,218)] rounded-lg px-2 py-1  hover:bg-[rgba(229,229,229)] transition-colors duration-200"
+                >
+                  {category.title}
+                </div>
+              )
+            )}
             {categories.length > 4 && !isExpanded && (
-              <div 
+              <div
                 className="text-xs text-[rgba(100,92,90)] col-span-2 cursor-pointer hover:text-[rgba(229,114,0)] transition-colors duration-200"
                 onClick={() => setIsExpanded(true)}
               >
@@ -142,7 +144,7 @@ const OrganiserCard: React.FC<OrganiserCardProps> = ({
               </div>
             )}
             {isExpanded && (
-              <div 
+              <div
                 className="text-xs text-[rgba(100,92,90)] col-span-2 cursor-pointer hover:text-[rgba(229,114,0)] transition-colors duration-200"
                 onClick={() => setIsExpanded(false)}
               >

@@ -34,8 +34,6 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<{[key: string]: string | null}>({});
-
-  // Validation functions
   const validateFirstName = (name: string): string | null => {
     if (!name.trim()) {
       return "First name is required";
@@ -56,7 +54,6 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
     if (!phone.trim()) {
       return "Phone number is required";
     }
-    // Remove all non-digit characters for validation
     const cleanPhone = phone.replace(/\D/g, '');
     if (cleanPhone.length < 10) {
       return "Phone number should be at least 10 digits";
@@ -64,7 +61,6 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
     if (cleanPhone.length > 15) {
       return "Phone number should not exceed 15 digits";
     }
-    // Allow common phone number formats
     if (!/^[\d\s\-\(\)\+]+$/.test(phone)) {
       return "Phone number contains invalid characters";
     }
@@ -142,18 +138,13 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    
-    // Special handling for different field types
     let processedValue = value;
     
     if (name === 'firstName') {
-      // Only allow letters and spaces, remove other characters
       processedValue = value.replace(/[^a-zA-Z\s]/g, '');
     } else if (name === 'phoneNumber') {
-      // Allow digits, spaces, hyphens, parentheses, and plus sign
       processedValue = value.replace(/[^\d\s\-\(\)\+]/g, '');
     } else if (name === 'numberOfPeople') {
-      // Only allow digits
       processedValue = value.replace(/[^\d]/g, '');
     }
 
@@ -162,10 +153,7 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
       [name]: processedValue,
     }));
 
-    // Validate field on change
     validateField(name, processedValue);
-    
-    // Clear any previous submit error when user starts typing
     setSubmitError(null);
     setSubmitSuccess(false);
   };
@@ -174,7 +162,6 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
     const errors: {[key: string]: string | null} = {};
     let isValid = true;
 
-    // Validate all fields
     const firstNameError = validateFirstName(formData.firstName);
     if (firstNameError) {
       errors.firstName = firstNameError;
@@ -220,7 +207,6 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
       if (onSubmit) {
         await onSubmit(formData);
         setSubmitSuccess(true);
-        // Reset form after successful submission
         setFormData({
           firstName: "",
           phoneNumber: "",
@@ -245,10 +231,8 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
       onGetContactInfo();
     }
   };
-
   return (
-    <div className="max-w-sm mx-auto overflow-hidden">
-      {/* Main Form Section */}
+    <div className="w-full max-w-none lg:max-w-sm lg:mx-auto overflow-hidden">
       <div className="p-6 space-y-4 bg-white rounded-xl shadow-lg border border-gray-200">
         <h2 className="text-xl font-semibold text-gray-700 text-center mb-6">
           RSVP Now

@@ -54,9 +54,9 @@ const EventDetailPage: React.FC = () => {
 
   const actualUuid = useMemo(() => {
     if (typeof uuid !== "string") return undefined;
-    
+
     const extractedUuid = extractUuidFromSlug(uuid);
-    
+
     return extractedUuid || uuid;
   }, [uuid]);
 
@@ -114,7 +114,7 @@ const EventDetailPage: React.FC = () => {
     today.setHours(0, 0, 0, 0);
     return eventDate < today;
   };
-  console.log('eventData::: ', eventData);
+  console.log("eventData::: ", eventData);
 
   if (loading) {
     return (
@@ -149,12 +149,11 @@ const EventDetailPage: React.FC = () => {
     );
   }
 
-  console.log('eventData::: ', eventData);
+  console.log("eventData::: ", eventData);
   return (
     <PublicLayout>
       <Head>
         <title>{eventData.title} | Mycotur</title>
-
       </Head>
 
       <EventsContactModal
@@ -180,6 +179,7 @@ const EventDetailPage: React.FC = () => {
         <EventHeader title={eventData.title} />
 
         <div className="px-4 py-2">
+          {" "}
           <div className="mb-8">
             <PhotoGallery
               photos={eventData.photos}
@@ -187,17 +187,61 @@ const EventDetailPage: React.FC = () => {
               totalPhotos={eventData.totalPhotos}
             />
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2">
-              <EventDetails
-                date={eventData.eventDate.date}
-                time={eventData.eventDate.time}
-                description={{ main: eventData.description }}
-                organizer={eventData.organizer}
-                location={eventData.location}
-              />
+          {/* Desktop Layout */}
+          <div className="hidden lg:block">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2">
+                <EventDetails
+                  date={eventData.eventDate.date}
+                  time={eventData.eventDate.time}
+                  description={{ main: eventData.description }}
+                  organizer={eventData.organizer}
+                  location={eventData.location}
+                />
+              </div>
+              <div className="lg:col-span-1">
+                {isEventInPast() ? (
+                  <div className="mt-2 px-6 py-6 bg-[rgba(255,255,255)] rounded-xl shadow-lg border border-[rgba(244,242,242)]">
+                    <h3
+                      className="text-lg font-semibold mb-4 leading-tight"
+                      style={{ color: "rgba(68, 63, 63, 1)" }}
+                    >
+                      This event is{" "}
+                      <span style={{ color: "rgba(22, 163, 74, 1)" }}>
+                        Completed
+                      </span>{" "}
+                      you can View organiser details and contact them for more
+                      information
+                    </h3>
+                    <Button
+                      variant="outline"
+                      className="w-full bg-[rgba(68,63,63)] text-[rgba(255,255,255)] hover:bg-gray-900 border-gray-800 py-3 font-medium rounded-md transition-colors"
+                      onClick={handleGetContactInfo}
+                    >
+                      Get Contact Information
+                    </Button>
+                  </div>
+                ) : (
+                  <RSVPForm
+                    onSubmit={handleSubmit}
+                    onGetContactInfo={handleGetContactInfo}
+                    error={rsvpError}
+                  />
+                )}
+              </div>
             </div>
-            <div className="lg:col-span-1">
+          </div>
+          {/* Mobile Layout */}
+          <div className="lg:hidden space-y-8">
+            <EventDetails
+              date={eventData.eventDate.date}
+              time={eventData.eventDate.time}
+              description={{ main: eventData.description }}
+              organizer={eventData.organizer}
+              location={eventData.location}
+            />
+
+            <div className="w-full">
               {isEventInPast() ? (
                 <div className="mt-2 px-6 py-6 bg-[rgba(255,255,255)] rounded-xl shadow-lg border border-[rgba(244,242,242)]">
                   <h3
