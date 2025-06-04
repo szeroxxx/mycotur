@@ -29,7 +29,10 @@ const submitRSVP = async (
     });
 
     if (response.status === 200 || response.status === 201) {
-      showToast("success", "RSVP submitted successfully!");
+      showToast(
+        "success",
+        "Your information is sent to organiser, they will \nconnect you soon via submitted details"
+      );
       return true;
     } else {
       showToast("error", response.data.message || "Failed to submit RSVP");
@@ -70,7 +73,6 @@ const EventDetailPage: React.FC = () => {
 
   const showToast = (type: "success" | "error", message: string) => {
     setToast({ type, message });
-    setTimeout(() => setToast(null), 3000);
   };
   const handleSubmit = async (data: RSVPFormData) => {
     if (!eventData || !actualUuid) return;
@@ -114,7 +116,6 @@ const EventDetailPage: React.FC = () => {
     today.setHours(0, 0, 0, 0);
     return eventDate < today;
   };
-  console.log("eventData::: ", eventData);
 
   if (loading) {
     return (
@@ -148,8 +149,6 @@ const EventDetailPage: React.FC = () => {
       </div>
     );
   }
-
-  console.log("eventData::: ", eventData);
   return (
     <PublicLayout>
       <Head>
@@ -164,14 +163,25 @@ const EventDetailPage: React.FC = () => {
 
       {toast && (
         <div
-          className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-[12px] text-[rgba(255,255,255)] ${
-            toast.type === "success"
-              ? "bg-[rgba(22,163,74)]"
-              : "bg-[rgba(179,38,30)]"
-          } flex items-center`}
+          className={`fixed top-4 right-4 z-[9999] px-3 py-2 rounded-lg text-white shadow-lg ${
+            toast.type === "success" ? "bg-green-600" : "bg-red-600"
+          } flex items-center transition-all duration-300 text-xs`}
+          style={{
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+            fontSize: "12px",
+            lineHeight: "1.3",
+          }}
         >
-          <CircleCheck className="mr-2" />
-          <span>{toast.message}</span>
+          <CircleCheck className="mr-2 w-4 h-4 flex-shrink-0" />
+          <span className="text-xs leading-tight max-w-[280px] whitespace-pre-line">
+            {toast.message}
+          </span>
+          <button
+            className="ml-3 text-white hover:text-gray-200 text-sm leading-none"
+            onClick={() => setToast(null)}
+          >
+            ×
+          </button>
         </div>
       )}
 

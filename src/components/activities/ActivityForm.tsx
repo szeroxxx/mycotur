@@ -320,7 +320,6 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
 
     setIsUploading(true);
     try {
-      // Update images if any
       if (imageFiles.length > 0) {
         const updatedImages = [...existingImages, ...imageFiles];
         const imageEvent = {
@@ -575,35 +574,56 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
           <p className="text-[rgba(68,63,63)] text-sm mb-4 font-sm">
             Which season do you think is best for this activity?{" "}
             <RequiredIndicator />
-          </p>
-
+          </p>{" "}
           <div className="flex gap-4">
             <div className="w-full">
               <label className="block text-sm font-sm text-[rgba(142,133,129)] mb-2">
                 Start Month
               </label>
-              <input
-                type="month"
-                name="startMonth"
-                value={activity.startMonth || ""}
-                onChange={onChange}
-                required
-                className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
-              />
+              <div className="relative">
+                <input
+                  type="month"
+                  name="startMonth"
+                  value={activity.startMonth || ""}
+                  onChange={onChange}
+                  required
+                  className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20] cursor-pointer"
+                  style={{
+                    WebkitAppearance: "none",
+                    MozAppearance: "textfield",
+                    position: "relative",
+                    background: "transparent",
+                  }}
+                  onClick={(e) => {
+                    e.currentTarget.showPicker?.();
+                  }}
+                />
+              </div>
             </div>
 
             <div className="w-full">
               <label className="block text-sm font-sm text-[rgba(142,133,129)] mb-2">
                 End Month
               </label>
-              <input
-                type="month"
-                name="endMonth"
-                value={activity.endMonth || ""}
-                onChange={onChange}
-                required
-                className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
-              />
+              <div className="relative">
+                <input
+                  type="month"
+                  name="endMonth"
+                  value={activity.endMonth || ""}
+                  onChange={onChange}
+                  required
+                  className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20] cursor-pointer"
+                  style={{
+                    WebkitAppearance: "none",
+                    MozAppearance: "textfield",
+                    position: "relative",
+                    background: "transparent",
+                  }}
+                  onClick={(e) => {
+                    e.currentTarget.showPicker?.();
+                  }}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -725,7 +745,6 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
               </div>
             </div>
           )}
-
           {previewVideos.length > 0 && (
             <div className="mb-4">
               <h4 className="text-sm font-medium text-[rgba(68,63,63)] mb-2">
@@ -774,11 +793,19 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
                 ))}
               </div>
             </div>
-          )}
-
+          )}{" "}
           <div
-            className={`border-2 border-dashed border-[#E5E7EB] rounded-lg p-8 text-center transition-colors
-            ${isUploading ? "bg-gray-50" : "hover:border-[#D45B20]"}`}
+            className={`border-2 border-dashed border-[#E5E7EB] rounded-lg p-8 text-center transition-colors cursor-pointer
+            ${
+              isUploading
+                ? "bg-gray-50 cursor-not-allowed"
+                : "hover:border-[#D45B20]"
+            }`}
+            onClick={() => {
+              if (!isUploading) {
+                document.getElementById("activity-media")?.click();
+              }
+            }}
           >
             <input
               key={`${previewImages.length}-${previewVideos.length}`}
@@ -793,9 +820,8 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
               id="activity-media"
               disabled={isUploading}
             />
-            <label
-              htmlFor="activity-media"
-              className={`cursor-pointer text-sm ${
+            <div
+              className={`text-sm ${
                 isUploading
                   ? "text-gray-400"
                   : "text-[#6B7280] hover:text-[#D45B20]"
@@ -804,7 +830,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
               {isUploading
                 ? "Uploading..."
                 : "Click to upload images and videos"}
-            </label>
+            </div>
             <p className="text-xs text-[#6B7280] mt-2">
               {uploadError ? (
                 <span className="text-red-500">{uploadError}</span>
@@ -822,7 +848,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 text-sm font-medium text-[#6B7280] hover:text-[rgba(68,63,63)]"
+          className="cursor-pointer px-4 py-2 text-sm font-medium text-[#6B7280] hover:text-[rgba(68,63,63)]"
           disabled={isLoading}
         >
           Cancel
@@ -830,7 +856,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
         <button
           type="submit"
           disabled={isLoading || !isValidLocation}
-          className={`px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
+          className={`cursor-pointer px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
             isLoading || !isValidLocation
               ? "bg-[#D45B20]/70 cursor-not-allowed"
               : "bg-[#D45B20] hover:bg-[#C44D16]"

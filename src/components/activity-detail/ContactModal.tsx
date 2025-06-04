@@ -98,7 +98,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
         <div className="mt-3">
           <button
             onClick={onClose}
-            className="w-full px-4 py-2 text-[rgba(68,63,63)] rounded-lg text-sm border border-[rgba(199,195,193)] font-medium transition-colors"
+            className="cursor-pointer w-full px-4 py-2 text-[rgba(68,63,63)] rounded-lg text-sm border border-[rgba(199,195,193)] font-medium transition-colors"
           >
             Close
           </button>

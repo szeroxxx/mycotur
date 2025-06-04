@@ -73,7 +73,6 @@ export const EventForm: React.FC<EventFormProps> = ({
     }
   }, [event.location]);
 
-
   const handleAutoFillActivitySelect = (
     e: React.ChangeEvent<HTMLSelectElement>
   ) => {
@@ -243,20 +242,11 @@ export const EventForm: React.FC<EventFormProps> = ({
               media.name === imageToRemove.name &&
               media.type === imageToRemove.type
             );
-            if (!shouldKeep) {
-              console.log("Removing from mediaUrls:", media);
-            }
             return shouldKeep;
           }
           return true;
         });
 
-        console.log(
-          "Updated mediaUrls count:",
-          updatedMediaUrls.length,
-          "vs original:",
-          currentMediaUrls.length
-        );
 
         const mediaEvent = {
           target: {
@@ -698,44 +688,69 @@ export const EventForm: React.FC<EventFormProps> = ({
           className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
           required
         />
-      </div>
+      </div>{" "}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
             Event Date <RequiredIndicator />
-          </label>{" "}
-          <input
-            type="date"
-            name="eventDate"
-            value={
-              event.eventDate
-                ? new Date(event.eventDate).toISOString().split("T")[0]
-                : ""
-            }
-            onChange={onChange}
-            className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
-            required
-          />
+          </label>
+          <div className="relative">
+            <input
+              type="date"
+              name="eventDate"
+              value={
+                event.eventDate
+                  ? new Date(event.eventDate).toISOString().split("T")[0]
+                  : ""
+              }
+              onChange={onChange}
+              className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20] cursor-pointer"
+              style={{
+                WebkitAppearance: "none",
+                MozAppearance: "textfield",
+                position: "relative",
+                background: "transparent",
+              }}
+              onClick={(e) => {
+                e.currentTarget.showPicker?.();
+              }}
+              required
+            />
+          </div>
         </div>
         <div>
           <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
             Event Time <RequiredIndicator />
-          </label>{" "}
-          <input
-            type="time"
-            name="eventTime"
-            value={
-              event.eventTime
-                ? new Date(`2000-01-01 ${event.eventTime}`).toLocaleTimeString(
-                    "en-US",
-                    { hour12: false, hour: "2-digit", minute: "2-digit" }
-                  )
-                : ""
-            }
-            onChange={onChange}
-            className="w-full px-4 py-2 border text-[rgba(142,133,129)] border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
-            required
-          />
+          </label>
+          <div className="relative">
+            <input
+              type="time"
+              name="eventTime"
+              value={
+                event.eventTime
+                  ? new Date(
+                      `2000-01-01 ${event.eventTime}`
+                    ).toLocaleTimeString("en-US", {
+                      hour12: false,
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
+                  : ""
+              }
+              onChange={onChange}
+              className="w-full px-4 py-2 border text-[rgba(142,133,129)] border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20] cursor-pointer"
+              style={{
+                WebkitAppearance: "none",
+                MozAppearance: "textfield",
+                position: "relative",
+                background: "transparent",
+              }}
+              onClick={(e) => {
+                e.currentTarget.showPicker?.();
+              }}
+              required
+            />
+          </div>
         </div>
       </div>
       <div>
@@ -778,7 +793,6 @@ export const EventForm: React.FC<EventFormProps> = ({
             required
           />
 
-          {/* Success indicator */}
           {isValidLocation && event.location && (
             <div className="mt-2 text-sm text-green-600 flex items-center gap-1">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -792,12 +806,10 @@ export const EventForm: React.FC<EventFormProps> = ({
             </div>
           )}
 
-          {/* Error message */}
           {locationError && (
             <div className="mt-2 text-sm text-red-600">{locationError}</div>
           )}
 
-          {/* Instructional text */}
           {!isValidLocation && !locationError && (
             <div className="mt-2 text-sm text-gray-500">
               Type to search and select a location from Google Maps suggestions
@@ -995,10 +1007,19 @@ export const EventForm: React.FC<EventFormProps> = ({
                 ))}
               </div>
             </div>
-          )}
+          )}{" "}
           <div
-            className={`border-2 border-dashed border-[#E5E7EB] rounded-lg p-8 text-center transition-colors
-            ${isUploading ? "bg-gray-50" : "hover:border-[#D45B20]"}`}
+            className={`border-2 border-dashed border-[#E5E7EB] rounded-lg p-8 text-center transition-colors cursor-pointer
+            ${
+              isUploading
+                ? "bg-gray-50 cursor-not-allowed"
+                : "hover:border-[#D45B20]"
+            }`}
+            onClick={() => {
+              if (!isUploading) {
+                document.getElementById("event-media")?.click();
+              }
+            }}
           >
             <input
               key={`${previewImages.length}-${previewVideos.length}`}
@@ -1010,12 +1031,11 @@ export const EventForm: React.FC<EventFormProps> = ({
                 ","
               )}
               className="hidden"
-              id="activity-media"
+              id="event-media"
               disabled={isUploading}
             />
-            <label
-              htmlFor="activity-media"
-              className={`cursor-pointer text-sm ${
+            <div
+              className={`text-sm ${
                 isUploading
                   ? "text-gray-400"
                   : "text-[#6B7280] hover:text-[#D45B20]"
@@ -1024,7 +1044,7 @@ export const EventForm: React.FC<EventFormProps> = ({
               {isUploading
                 ? "Uploading..."
                 : "Click to upload images and videos"}
-            </label>{" "}
+            </div>
             <p className="text-xs text-[#6B7280] mt-2">
               {uploadError ? (
                 <span className="text-red-500">{uploadError}</span>
@@ -1042,7 +1062,7 @@ export const EventForm: React.FC<EventFormProps> = ({
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 text-sm font-medium text-[#6B7280] hover:text-[rgba(68,63,63)]"
+          className="cursor-pointer px-4 py-2 text-sm font-medium text-[#6B7280] hover:text-[rgba(68,63,63)]"
           disabled={isLoading}
         >
           Cancel
@@ -1050,7 +1070,7 @@ export const EventForm: React.FC<EventFormProps> = ({
         <button
           type="submit"
           disabled={isLoading || !isValidLocation || !event.location}
-          className={`px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
+          className={`cursor-pointer px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
             isLoading || !isValidLocation || !event.location
               ? "bg-[#D45B20]/70 cursor-not-allowed"
               : "bg-[#D45B20] hover:bg-[#C44D16]"

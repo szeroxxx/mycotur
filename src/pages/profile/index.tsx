@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Head from "next/head";
 import { useSession } from "next-auth/react";
 import { FiUser, FiMail, FiMapPin, FiEdit2, FiX } from "react-icons/fi";
@@ -7,6 +7,10 @@ import { useProfile } from "@/hooks/useProfile";
 import { useData } from "@/contexts/DataContext";
 import { getMediaUrl } from "@/utils/mediaHelpers";
 import { CircleCheck } from "lucide-react";
+import {
+  googlePlacesService,
+  LocationSuggestion,
+} from "@/utils/googlePlacesService";
 interface Category {
   uuid: string;
   title: string;
@@ -55,6 +59,26 @@ const ProfilePage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+
+  // Address suggestion states
+  const [addressInput, setAddressInput] = useState("");
+  const [addressSuggestions, setAddressSuggestions] = useState<
+    LocationSuggestion[]
+  >([]);
+  const [showAddressSuggestions, setShowAddressSuggestions] = useState(false);
+  const [isValidAddress, setIsValidAddress] = useState(true);
+  const [addressError, setAddressError] = useState<string | null>(null);
+  const addressRef = useRef<HTMLDivElement>(null);
+
+  // Other states
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [socialErrors, setSocialErrors] = useState<SocialErrors>({});
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
   const [profileData, setProfileData] = useState({
     profilePicture: "",
     name: session?.user?.name || "",
@@ -72,7 +96,6 @@ const ProfilePage: React.FC = () => {
   const loadProfile = async () => {
     try {
       const profileData = await fetchProfile();
-      console.log("profileData::: ", profileData);
       const loadedData = {
         profilePicture: profileData.profilePicture || "",
         name: profileData.name,
@@ -116,6 +139,15 @@ const ProfilePage: React.FC = () => {
     }
   }, []);
 
+  // Initialize address input when profile data changes
+  useEffect(() => {
+    if (profileData.address && profileData.address !== addressInput) {
+      setAddressInput(profileData.address);
+      setIsValidAddress(true);
+      setAddressError(null);
+    }
+  }, [profileData.address]);
+
   useEffect(() => {
     if (session?.user) {
       loadProfile();
@@ -144,12 +176,31 @@ const ProfilePage: React.FC = () => {
 
     window.addEventListener("beforeunload", handleBeforeUnload);
     document.addEventListener("visibilitychange", handleVisibilityChange);
-
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [isEditing, profileData]);
+
+  // Close address suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        addressRef.current &&
+        !addressRef.current.contains(event.target as Node)
+      ) {
+        setShowAddressSuggestions(false);
+      }
+    };
+
+    if (showAddressSuggestions) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showAddressSuggestions]);
   // Clear saved form data after successful save
   const handleSave = async () => {
     try {
@@ -198,19 +249,9 @@ const ProfilePage: React.FC = () => {
       });
     }
   };
-
   const handleEditToggle = () => {
     setIsEditing(true);
   };
-
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-
-  const [socialErrors, setSocialErrors] = useState<SocialErrors>({});
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const validatePassword = () => {
     if (newPassword.length < 8) {
@@ -236,9 +277,72 @@ const ProfilePage: React.FC = () => {
         isValid = false;
       }
     });
-
     setSocialErrors(errors);
     return isValid;
+  };
+
+  const handleAddressChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = e.target.value;
+
+    if (isValidAddress && value !== addressInput) {
+      setIsValidAddress(false);
+      setAddressError("Please select an address from the suggestions below");
+      setProfileData((prev) => ({
+        ...prev,
+        address: "",
+      }));
+    }
+
+    setAddressInput(value);
+
+    if (value.length > 2) {
+      try {
+        const suggestions = await googlePlacesService.searchPlaces(value);
+        setAddressSuggestions(suggestions);
+        setShowAddressSuggestions(suggestions.length > 0);
+
+        if (suggestions.length === 0) {
+          setAddressError(
+            "No valid locations found. Please search for places in Valle del Tiétar, La Moraña, Valle de Amblés, Sierra de Gredos, or Alberche Pinares."
+          );
+        } else {
+          setAddressError(
+            "Please select an address from the suggestions below"
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching addresses:", error);
+        setAddressSuggestions([]);
+        setShowAddressSuggestions(false);
+        setAddressError("Error fetching addresses. Please try again.");
+      }
+    } else {
+      setAddressSuggestions([]);
+      setShowAddressSuggestions(false);
+      if (value.length > 0 && !isValidAddress) {
+        setAddressError(
+          "Please enter at least 3 characters to search for addresses"
+        );
+      } else {
+        setAddressError(null);
+      }
+    }
+  };
+
+  const handleAddressSuggestionClick = (suggestion: LocationSuggestion) => {
+    const addressValue = `${suggestion.display_place}, ${suggestion.display_address}`;
+
+    setProfileData((prev) => ({
+      ...prev,
+      address: addressValue,
+    }));
+    setAddressInput(addressValue);
+    setAddressSuggestions([]);
+    setShowAddressSuggestions(false);
+    setIsValidAddress(true);
+    setAddressError(null);
   };
 
   const handleChangePassword = async (e: React.FormEvent) => {
@@ -256,7 +360,7 @@ const ProfilePage: React.FC = () => {
       setNewPassword("");
       setConfirmPassword("");
     } catch (err) {
-      console.log("err::: ", err);
+      console.log('err::: ', err);
       setPasswordError(
         "Failed to change password. Please check your current password."
       );
@@ -331,34 +435,34 @@ const ProfilePage: React.FC = () => {
         </div>
       )}{" "}
       <div className="max-w-3xl mx-auto p-4 sm:p-6">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
+        <div className="flex justify-between items-center mb-6">
           <h1 className="text-xl sm:text-2xl font-semibold text-[rgb(68,63,63)]">
             My Profile
-          </h1>{" "}
+          </h1>
           {!isEditing ? (
             <button
               onClick={handleEditToggle}
-              className="self-start sm:self-auto text-[rgba(68,63,63)] hover:text-[#D45B20] transition-colors"
+              className="text-[rgba(68,63,63)] hover:text-[#D45B20] transition-colors flex-shrink-0 cursor-pointer"
             >
               <FiEdit2 size={20} />
             </button>
           ) : (
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
+            <div className="flex gap-2 sm:gap-4 flex-shrink-0">
               <button
                 onClick={handleCancelEdit}
-                className="px-4 py-2 text-[rgba(68,63,63)] hover:text-[#111827] font-medium text-center"
+                className="cursor-pointer px-3 sm:px-4 py-2 text-[rgba(68,63,63)] hover:text-[#111827] font-medium text-sm"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
-                className="px-4 py-2 bg-[#D45B20] hover:bg-[#C44D16] text-white rounded-lg text-sm font-medium transition-colors"
+                className="cursor-pointer px-3 sm:px-4 py-2 bg-[#D45B20] hover:bg-[#C44D16] text-white rounded-lg text-sm font-medium transition-colors"
               >
                 Save
               </button>
             </div>
           )}
-        </div>{" "}
+        </div>
         <div className="bg-white rounded-lg shadow-md">
           <div className="p-4 sm:p-6 space-y-6">
             <div className="flex flex-col items-center space-y-4 pb-6 border-b border-[rgba(226,225,223)]">
@@ -378,13 +482,13 @@ const ProfilePage: React.FC = () => {
                       />
                     </div>
                   )}
-                </div>
+                </div>  
                 <button
                   onClick={() =>
                     document.getElementById("profile-image-input")?.click()
                   }
                   disabled={isUploadingImage}
-                  className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 w-8 h-8 sm:w-10 sm:h-10 bg-[#D45B20] hover:bg-[#C44D16] text-white rounded-full flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
+                  className="cursor-pointer absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 w-8 h-8 sm:w-10 sm:h-10 bg-[#D45B20] hover:bg-[#C44D16] text-white rounded-full flex items-center justify-center transition-all duration-200 shadow-lg  disabled:opacity-50 disabled:cursor-not-allowed"
                   title="Change profile picture"
                 >
                   {isUploadingImage ? (
@@ -450,7 +554,6 @@ const ProfilePage: React.FC = () => {
                   )}
                 </div>
               </div>
-
               <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 p-3 sm:p-4 bg-[rgba(253,250,246)] rounded-lg">
                 <div className="p-3 bg-[rgba(255,255,255)] rounded-full border border-[rgba(226,225,223)] self-center sm:self-auto">
                   <FiMail
@@ -465,7 +568,6 @@ const ProfilePage: React.FC = () => {
                   </p>
                 </div>
               </div>
-
               <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 p-3 sm:p-4 bg-[rgba(253,250,246)] rounded-lg">
                 <div className="p-3 bg-[rgba(255,255,255)] rounded-full border border-[rgba(226,225,223)] self-center sm:self-auto">
                   <FiMail
@@ -494,8 +596,7 @@ const ProfilePage: React.FC = () => {
                     </p>
                   )}
                 </div>
-              </div>
-
+              </div>{" "}
               <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 p-3 sm:p-4 bg-[rgba(253,250,246)] rounded-lg">
                 <div className="p-3 bg-[rgba(255,255,255)] rounded-full border border-[rgba(226,225,223)] self-center sm:self-auto">
                   <FiMapPin
@@ -506,18 +607,84 @@ const ProfilePage: React.FC = () => {
                 <div className="flex-grow text-center sm:text-left">
                   <p className="text-sm text-[rgba(100,92,90)]">Address</p>
                   {isEditing ? (
-                    <input
-                      type="text"
-                      value={profileData.address}
-                      onChange={(e) =>
-                        setProfileData((prev) => ({
-                          ...prev,
-                          address: e.target.value,
-                        }))
-                      }
-                      placeholder="Enter your address"
-                      className="w-full p-2 text-[rgb(68,63,63)] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#D45B20] text-sm"
-                    />
+                    <div className="relative" ref={addressRef}>
+                      <input
+                        type="text"
+                        value={addressInput}
+                        onChange={handleAddressChange}
+                        placeholder="Start typing to search for addresses (e.g., Valle del Tiétar, Sierra de Gredos...)"
+                        className={`w-full p-2 text-[rgb(68,63,63)] border rounded text-sm focus:outline-none focus:ring-1 ${
+                          addressError && !isValidAddress
+                            ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                            : isValidAddress
+                            ? "border-green-500 focus:ring-green-500 focus:border-green-500"
+                            : "border-gray-300 focus:ring-[#D45B20] focus:border-[#D45B20]"
+                        }`}
+                      />
+                      {addressError && (
+                        <p className="mt-1 text-sm text-red-600">
+                          {addressError}
+                        </p>
+                      )}
+                      {!addressError &&
+                        !isValidAddress &&
+                        addressInput.length === 0 && (
+                          <p className="mt-1 text-sm text-gray-500">
+                            You must select an address from the suggestions that
+                            appear as you type. Manual address entry is not
+                            allowed.
+                          </p>
+                        )}
+                      {isValidAddress && profileData.address && (
+                        <p className="mt-1 text-sm text-green-600 flex items-center">
+                          <svg
+                            className="w-4 h-4 mr-1"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          Valid address selected
+                        </p>
+                      )}
+                      {showAddressSuggestions &&
+                        addressSuggestions.length > 0 && (
+                          <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                            {addressSuggestions.map((suggestion) => (
+                              <div
+                                key={suggestion.place_id}
+                                className="px-4 py-2 hover:bg-[#FFF5F1] cursor-pointer border-b border-gray-100 last:border-b-0"
+                                onClick={() =>
+                                  handleAddressSuggestionClick(suggestion)
+                                }
+                              >
+                                <div className="font-medium text-[rgba(142,133,129)]">
+                                  {suggestion.display_place}
+                                </div>
+                                <div className="text-xs text-[rgba(142,133,129)]">
+                                  {suggestion.display_address}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      {showAddressSuggestions &&
+                        addressSuggestions.length === 0 &&
+                        addressInput.length > 2 && (
+                          <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4">
+                            <div className="text-sm text-gray-500 text-center">
+                              No addresses found in target regions. Try
+                              searching for places in Valle del Tiétar, La
+                              Moraña, Valle de Amblés, Sierra de Gredos, or
+                              Alberche Pinares.
+                            </div>
+                          </div>
+                        )}
+                    </div>
                   ) : (
                     <p className="text-[rgb(68,63,63)] font-medium">
                       {profileData.address || "Not provided"}
@@ -700,9 +867,7 @@ const ProfilePage: React.FC = () => {
                     <div
                       key={category.uuid}
                       className={`p-4 bg-[rgba(253,250,246)] rounded-lg cursor-pointer transition-colors ${
-                        isSelected
-                          ? "border border-[#D45B20]"
-                          : "hover:border hover:border-[#D45B20]"
+                        isSelected ? "border border-[#D45B20]" : ""
                       }`}
                       onClick={() => isEditing && toggleCategory(category)}
                     >

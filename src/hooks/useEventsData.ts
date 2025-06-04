@@ -61,7 +61,7 @@ export const useEventsData = () => {
         }
         setLoading(false);
       } catch (err) {
-        console.log("err::: ", err);
+        console.log('err::: ', err);
         setError("Failed to load events");
         setLoading(false);
       }

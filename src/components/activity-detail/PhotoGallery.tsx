@@ -180,7 +180,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
           <div className="relative z-10 w-full h-full max-w-6xl max-h-[90vh] flex items-center justify-center">
             <button
               onClick={closeModal}
-              className="absolute -top-4 -right-4 z-50 bg-white hover:bg-gray-100 rounded-full p-3 text-gray-700 hover:text-gray-900 transition-all duration-300 shadow-xl border border-gray-300 group"
+              className="cursor-pointer absolute -top-4 -right-4 z-50 bg-white hover:bg-gray-100 rounded-full p-3 text-gray-700 hover:text-gray-900 transition-all duration-300 shadow-xl border border-gray-300 group"
             >
               <X
                 size={24}
@@ -191,7 +191,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
             <button
               onClick={goToPrevious}
               disabled={selectedImageIndex === 0}
-              className={`absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white rounded-full p-3 text-gray-700 transition-all duration-300 shadow-lg group ${
+              className={`cursor-pointer absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white rounded-full p-3 text-gray-700 transition-all duration-300 shadow-lg group ${
                 selectedImageIndex === 0
                   ? "opacity-30 cursor-not-allowed"
                   : "hover:scale-110 hover:-translate-x-1"
@@ -205,7 +205,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
             <button
               onClick={goToNext}
               disabled={selectedImageIndex === photos.length - 1}
-              className={`absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white rounded-full p-3 text-gray-700 transition-all duration-300 shadow-lg group ${
+              className={`cursor-pointer absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white rounded-full p-3 text-gray-700 transition-all duration-300 shadow-lg group ${
                 selectedImageIndex === photos.length - 1
                   ? "opacity-30 cursor-not-allowed"
                   : "hover:scale-110 hover:translate-x-1"

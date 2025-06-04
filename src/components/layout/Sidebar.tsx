@@ -75,10 +75,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onWidthChange }) => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
       if (mobile) {
-        setIsExpanded(true); // Always show text on mobile when menu is open
-        onWidthChange?.(0); // No margin needed for mobile
+        setIsExpanded(true);
+        onWidthChange?.(0);
       } else {
-        onWidthChange?.(isExpanded ? 256 : 80); // 256px for w-64, 80px for w-20
+        onWidthChange?.(isExpanded ? 256 : 80);
       }
     };
 
@@ -88,7 +88,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onWidthChange }) => {
   }, [onWidthChange, isExpanded]);
 
   useEffect(() => {
-    // Notify parent when expanded state changes on desktop
     if (!isMobile) {
       onWidthChange?.(isExpanded ? 256 : 80);
     }
@@ -99,7 +98,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onWidthChange }) => {
     localStorage.removeItem("token");
     localStorage.clear();
     await signOut({ redirect: false });
-    console.log("isAdmin::: ", isAdmin);
     const loginPath = isAdmin ? "/admin/login" : "/login";
     router.push(loginPath);
   };
@@ -116,7 +114,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onWidthChange }) => {
         {!isMobileMenuOpen && (
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="fixed top-4 left-4 z-[60] md:hidden bg-[rgba(253,250,246)] p-2 rounded-lg shadow-lg border border-[#F3F4F6]"
+            className="fixed top-4 left-4 md:hidden bg-[rgba(253,250,246)] p-2 rounded-lg shadow-lg border border-[#F3F4F6]"
           >
             <FiMenu size={24} />
           </button>
@@ -143,7 +141,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onWidthChange }) => {
               <FiX className="text-[rgba(127,118,115)]" size={20} />
             </button>
           </div>
-
           <div className="flex-1 px-4">
             <SidebarItem
               href="/dashboard"
@@ -189,20 +186,19 @@ const Sidebar: React.FC<SidebarProps> = ({ onWidthChange }) => {
                 onClick={closeMobileMenu}
               />
             )}
-          </div>
-
+          </div>{" "}
           <div className="p-4 rounded-[15px] m-2 mt-auto border-t border-[#F3F4F6] bg-[rgba(255,255,255)]">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-[12px] font-medium themeTextColor">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex-1 min-w-0">
+                <p className="text-[12px] font-medium themeTextColor truncate">
                   {session?.user?.name || "User"}
                 </p>
-                <p className="text-[14px] text-[rgba(100,92,90)]">
+                <p className="text-[14px] text-[rgba(100,92,90)] truncate">
                   {session?.user?.email || "user@example.com"}
                 </p>
               </div>
               <button
-                className="text-[#6B7280] hover:text-[#D45B20] transition-colors"
+                className="text-[#6B7280] hover:text-[#D45B20] transition-colors flex-shrink-0"
                 onClick={handleSignOut}
               >
                 <FiLogOut size={20} />
@@ -212,7 +208,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onWidthChange }) => {
         </div>
       </>
     );
-  }  return (
+  }
+  return (
     <div
       className={`hidden md:flex h-screen fixed top-0 left-0 z-30 ${
         isExpanded ? "w-64" : "w-20"
@@ -243,7 +240,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onWidthChange }) => {
           />
         </button>
       </div>
-
       <div className="flex-1 px-4">
         <SidebarItem
           href="/dashboard"
@@ -284,22 +280,21 @@ const Sidebar: React.FC<SidebarProps> = ({ onWidthChange }) => {
             isExpanded={isExpanded}
           />
         )}
-      </div>
-
+      </div>{" "}
       <div className="p-4 rounded-[15px] m-2 mt-auto border-t border-[#F3F4F6] bg-[rgba(255,255,255)]">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
           {isExpanded ? (
             <>
-              <div>
-                <p className="text-[12px] font-medium themeTextColor">
+              <div className="flex-1 min-w-0">
+                <p className="text-[12px] font-medium themeTextColor truncate">
                   {session?.user?.name || "User"}
                 </p>
-                <p className="text-[14px] text-[rgba(100,92,90)]">
+                <p className="text-[14px] text-[rgba(100,92,90)] truncate">
                   {session?.user?.email || "user@example.com"}
                 </p>
               </div>
               <button
-                className="text-[#6B7280] hover:text-[#D45B20] transition-colors"
+                className="text-[#6B7280] hover:text-[#D45B20] transition-colors flex-shrink-0"
                 onClick={handleSignOut}
               >
                 <FiLogOut size={20} />

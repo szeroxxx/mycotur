@@ -74,7 +74,6 @@ export default NextAuth({
             }
           );
 
-          console.log("response::: ", response);
           if (response.status !== 200) {
             throw new Error("Authentication failed");
           }
@@ -84,7 +83,6 @@ export default NextAuth({
           if (!userData || !token) {
             throw new Error("Invalid response from authentication server");
           }
-          console.log("userData::: ", userData);
           return {
             id: userData.uuid || userData.id.toString(),
             name: userData.name,

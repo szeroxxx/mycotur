@@ -32,7 +32,6 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
 
   const [submitError, setSubmitError] = useState<string | null>(error);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -42,7 +41,6 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
       [name]: value,
     }));
     setSubmitError(null);
-    setSubmitSuccess(false);
   };
 
   const validateForm = (): boolean => {
@@ -70,7 +68,6 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
     try {
       if (onSubmit) {
         await onSubmit(formData);
-        setSubmitSuccess(true);
         setFormData({
           firstName: "",
           phoneNumber: "",
@@ -89,7 +86,6 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
   };
 
   const handleGetContactInfo = () => {
-    console.log("Get contact info clicked");
     if (onGetContactInfo) {
       onGetContactInfo();
     }
@@ -196,13 +192,6 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
           {submitError && (
             <div className="text-red-500 text-sm mt-2">{submitError}</div>
           )}
-
-          {submitSuccess && (
-            <div className="text-green-500 text-sm mt-2">
-              RSVP submitted successfully!
-            </div>
-          )}
-
           <Button
             type="submit"
             disabled={isSubmitting}

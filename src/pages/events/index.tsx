@@ -225,7 +225,7 @@ const EventsPage: React.FC = () => {
       </Head>
       {toast && (
         <div
-          className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-[12px] text-[rgba(255,255,255)] ${
+          className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-[12px] text-[rgba(255,255,255)] ${
             toast.type === "success"
               ? "bg-[rgba(22,163,74)]"
               : "bg-[rgba(179,38,30)]"
@@ -235,7 +235,7 @@ const EventsPage: React.FC = () => {
           <span>{toast.message}</span>
         </div>
       )}{" "}
-      <div className="px-2 sm:px-4">
+      <div className="px-2 sm:px-4 lg:px-8 py-4 sm:py-6">
         <div className="mb-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
             <div className="relative w-full sm:w-auto">
@@ -245,9 +245,9 @@ const EventsPage: React.FC = () => {
                 placeholder="Search"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                disabled={(isAgent && profileStatus?.needsUpdate) || events.length === 0}
+                disabled={(isAgent && profileStatus?.needsUpdate)}
                 className={`w-full sm:w-64 pl-10 pr-4 py-2 border border-[rgba(199,195,193)] shadow-sm shadow-[rgba(24,27,37,0.04)] text-[rgba(142,133,129)] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[rgba(194,91,52)] focus:border-[rgba(194,91,52)] ${
-                  (isAgent && profileStatus?.needsUpdate) || events.length === 0
+                  (isAgent && profileStatus?.needsUpdate)
                     ? "bg-gray-100 cursor-not-allowed"
                     : ""
                 }`}
@@ -256,9 +256,9 @@ const EventsPage: React.FC = () => {
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              disabled={(isAgent && profileStatus?.needsUpdate) || events.length === 0}
+              disabled={(isAgent && profileStatus?.needsUpdate)}
               className={` w-full sm:w-48 px-4 py-2 text-[rgba(142,133,129)] border border-[rgba(199,195,193)] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20] ${
-                (isAgent && profileStatus?.needsUpdate) || events.length === 0
+                (isAgent && profileStatus?.needsUpdate)
                   ? "bg-gray-100 cursor-not-allowed"
                   : "cursor-pointer"
               }`}

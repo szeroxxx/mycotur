@@ -7,14 +7,8 @@ interface Category {
   description: string;
 }
 
-interface Location {
-  uuid: string;
-  location: string;
-}
-
 interface DataContextType {
   categories: Category[];
-  locations: Location[];
   isLoading: boolean;
   error: string | null;
   refetch: () => Promise<void>;
@@ -28,7 +22,6 @@ interface DataProviderProps {
 
 export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [locations, setLocations] = useState<Location[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,17 +31,10 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       setError(null);
       
       const URL = process.env.NEXTAUTH_BACKEND_URL;
-        const [categoriesResponse, locationsResponse] = await Promise.all([
-        axiosInstance.get(`${URL}/api/category`),
-        axiosInstance.get(`${URL}/api/getLocation`)
-      ]);
+      const categoriesResponse = await axiosInstance.get(`${URL}/api/category`);
 
       if (categoriesResponse.data?.data) {
         setCategories(categoriesResponse.data.data);
-      }
-
-      if (locationsResponse.data?.data) {
-        setLocations(locationsResponse.data.data);
       }
     } catch (err) {
       console.error('Error fetching data:', err);
@@ -68,7 +54,6 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 
   const value: DataContextType = {
     categories,
-    locations,
     isLoading,
     error,
     refetch

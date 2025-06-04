@@ -4,6 +4,7 @@ import PublicLayout from "@/components/layout/PublicLayout";
 import SearchBar from "@/components/ui/SearchBar";
 import OrganiserCard from "@/components/organiser/OrganiserCard";
 import Head from "next/head";
+import { useOrganizerLocations } from "@/hooks/useOrganizerLocations";
 
 interface Organizer {
   id: number;
@@ -33,6 +34,11 @@ const DiscoverOrganiserPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [locationFilter, setLocationFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
+  
+  const { 
+    locations: organizerLocations, 
+    // isLoading: locationsLoading 
+  } = useOrganizerLocations();
 
   useEffect(() => {
     const fetchOrganisers = async () => {
@@ -41,7 +47,6 @@ const DiscoverOrganiserPage = () => {
         const response = await axiosInstance.get(
           `${URL}/api/visitor/organization`
         );
-        console.log("response::: ", response);
         setOrganisers(response.data);
         setFilteredOrganisers(response.data);
       } catch (error) {
@@ -128,14 +133,15 @@ const DiscoverOrganiserPage = () => {
           <div className="mb-8">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
               <div>
-              </div>
-              <div className="lg:w-96">
+              </div>              <div className="lg:w-96">
                 <SearchBar
                   locationFilter={locationFilter || "Location"}
                   categoryFilter={categoryFilter || "Event Category"}
                   onFilterChange={handleFilterChange}
                   onSearch={handleSearch}
                   variant="compact"
+                  customLocations={organizerLocations}
+                  useCustomLocations={true}
                 />
               </div>
             </div>
@@ -174,14 +180,15 @@ const DiscoverOrganiserPage = () => {
         </div>
       </div>
 
-      <div className="lg:hidden min-h-screen bg-gradient-to-br from-[rgba(244,242,242)] to-[rgba(248,250,252)]">
-        <div className="sticky top-0 z-20  border-b border-[rgba(226,225,223,0.4)] p-4">
+      <div className="lg:hidden min-h-screen bg-gradient-to-br from-[rgba(244,242,242)] to-[rgba(248,250,252)]">        <div className="sticky top-0 z-20  border-b border-[rgba(226,225,223,0.4)] p-4">
           <SearchBar
             locationFilter={locationFilter || "Location"}
             categoryFilter={categoryFilter || "Event Category"}
             onFilterChange={handleFilterChange}
             onSearch={handleSearch}
             variant="mobile"
+            customLocations={organizerLocations}
+            useCustomLocations={true}
           />
         </div>
 

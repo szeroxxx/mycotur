@@ -42,6 +42,12 @@ const OrganiserCard: React.FC<OrganiserCardProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isAboutExpanded, setIsAboutExpanded] = useState(false);
+
+  const shouldShowReadMore = (text: string | null) => {
+    if (!text) return false;
+    return text.length > 150;
+  };
 
   const recordClick = async (organizerId: string) => {
     try {
@@ -64,7 +70,7 @@ const OrganiserCard: React.FC<OrganiserCardProps> = ({
 
   return (
     <div className="block h-full">
-      <div className="rounded-xl   bg-white shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow duration-200 h-full flex flex-col">
+      <div className="rounded-xl bg-white shadow-sm overflow-hidden  hover:shadow-md transition-shadow duration-200 h-full flex flex-col">
         {" "}
         <div className="p-4 flex flex-col h-full">
           <div className="flex items-start gap-4 mb-4">
@@ -123,7 +129,6 @@ const OrganiserCard: React.FC<OrganiserCardProps> = ({
               </div>
             </div>
           </div>
-
           <div className="grid grid-cols-2 gap-x-2 gap-y-1 mb-4 min-h-[3rem]">
             {(isExpanded ? categories : categories.slice(0, 4)).map(
               (category) => (
@@ -151,19 +156,29 @@ const OrganiserCard: React.FC<OrganiserCardProps> = ({
                 Show less
               </div>
             )}
-          </div>
-
+          </div>{" "}
           <div className="flex-1 mb-4">
-            <p className="text-xs text-gray-600 leading-relaxed line-clamp-3">
+            <p
+              className={`text-xs text-gray-600 leading-relaxed ${
+                !isAboutExpanded ? "line-clamp-3" : ""
+              }`}
+            >
               {about || "No description available."}
             </p>
+            {about && shouldShowReadMore(about) && (
+              <button
+                onClick={() => setIsAboutExpanded(!isAboutExpanded)}
+                className="text-xs text-[rgba(100,92,90)] mt-1 cursor-pointer hover:text-[rgba(229,114,0)] transition-colors duration-200"
+              >
+                {isAboutExpanded ? "Show less" : "Read more"}
+              </button>
+            )}
           </div>
-
           <div className="mt-auto">
             <div className="block">
               <button
                 onClick={handleOpen}
-                className="w-full py-3 bg-[rgba(68,63,63)] text-[rgba(255,255,255)]s text-sm rounded-md hover:bg-gray-700 transition-colors"
+                className="cursor-pointer w-full py-3 bg-[rgba(68,63,63)] text-[rgba(255,255,255)]s text-sm rounded-md hover:bg-gray-700 transition-colors"
               >
                 Get Contact Information
               </button>

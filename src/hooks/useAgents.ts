@@ -108,10 +108,6 @@ export const useAgents = () => {
       } catch (error: unknown) {
         if (axios.isAxiosError(error)) {
           if (error.response?.status === 400) {
-            console.log(
-              "error.response?.data.error::: ",
-              error.response?.data.error
-            );
             showToast("error", error.response?.data.error);
           } else if (error.response?.status === 500) {
             showToast("error", "Internal server error. Please try again later");

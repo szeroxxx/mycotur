@@ -28,7 +28,10 @@ const submitRSVP = async (
     });
 
     if (response.status === 200 || response.status === 201) {
-      showToast("success", "RSVP submitted successfully!");
+      showToast(
+        "success",
+        "Your information is sent to organiser, they will \nconnect you soon via submitted details"
+      );
       return true;
     } else {
       showToast("error", response.data.message || "Failed to submit RSVP");
@@ -66,13 +69,12 @@ const ActivityDetailPage: React.FC = () => {
 
   const showToast = (type: "success" | "error", message: string) => {
     setToast({ type, message });
-    setTimeout(() => setToast(null), 3000);
   };
   const handleSubmit = async (data: RSVPFormData) => {
-    if (!activityData || !actualUuid) return;
-
+    if (!activityData || !actualUuid) {
+      return;
+    }
     setRsvpError(null);
-
     const success = await submitRSVP(
       data,
       {
@@ -81,7 +83,6 @@ const ActivityDetailPage: React.FC = () => {
       },
       showToast
     );
-
     if (!success) {
       setRsvpError("Failed to submit RSVP");
     }
@@ -141,37 +142,46 @@ const ActivityDetailPage: React.FC = () => {
       <Head>
         <title>Activity Details | Mycotur</title>
       </Head>
-
       <ActivityContactModal
         isOpen={isContactModalOpen}
         onClose={() => setIsContactModalOpen(false)}
         contactInfo={activityData.contact}
-      />
-
+      />{" "}
       {toast && (
         <div
-          className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-[12px] text-[rgba(255,255,255)] ${
-            toast.type === "success"
-              ? "bg-[rgba(22,163,74)]"
-              : "bg-[rgba(179,38,30)]"
-          } flex items-center`}
+          className={`fixed top-4 right-4 z-[9999] px-3 py-2 rounded-lg text-white shadow-lg ${
+            toast.type === "success" ? "bg-green-600" : "bg-red-600"
+          } flex items-center transition-all duration-300 text-xs`}
+          style={{
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+            fontSize: "12px",
+            lineHeight: "1.3",
+          }}
         >
-          <CircleCheck className="mr-2" />
-          <span>{toast.message}</span>
+          <CircleCheck className="mr-2 w-4 h-4 flex-shrink-0" />
+          <span className="text-xs leading-tight max-w-[280px] whitespace-pre-line">
+            {toast.message}
+          </span>
+          <button
+            className="ml-3 text-white hover:text-gray-200 text-sm leading-none"
+            onClick={() => setToast(null)}
+          >
+            ×
+          </button>
         </div>
       )}
-
       <div className="">
         <EventHeader title={activityData.title} />
 
-        <div className="px-4 py-2">          <div className="mb-8">
+        <div className="px-4 py-2">
+          {" "}
+          <div className="mb-8">
             <PhotoGallery
               photos={activityData.photos}
               category={activityData.category}
               totalPhotos={activityData.totalPhotos}
             />
           </div>
-          
           <div className="hidden lg:block">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2">
@@ -194,7 +204,6 @@ const ActivityDetailPage: React.FC = () => {
               </div>
             </div>
           </div>
-
           <div className="lg:hidden space-y-8">
             <EventDetails
               activityTitle={activityData.title}
@@ -204,7 +213,7 @@ const ActivityDetailPage: React.FC = () => {
               organizer={activityData.organizer}
               location={activityData.location}
             />
-            
+
             <div className="w-full">
               <RSVPForm
                 onSubmit={handleSubmit}

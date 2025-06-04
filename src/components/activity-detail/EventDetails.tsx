@@ -1,9 +1,10 @@
 import React from "react";
-import { Calendar, MapPin } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { RiInstagramFill } from "react-icons/ri";
 import { IoLogoFacebook } from "react-icons/io5";
 import { IoLogoYoutube } from "react-icons/io";
 import { createEventUrl } from "../../utils/urlHelpers";
+import StaticMapView from "../maps/StaticMapView";
 
 interface EventDate {
   id: string;
@@ -174,45 +175,15 @@ const EventDetails: React.FC<EventDetailsProps> = ({
             )}
           </div>
         </div>
-      </div>{" "}
-      <div>
+      </div>{" "}      <div>
         <h3 className="text-lg font-semibold text-[rgba(68,63,63)] mb-4">
           Event Address
-        </h3>        <div
-          className={`w-full h-48 bg-gray-100 rounded-lg relative overflow-hidden transition-colors ${
-            location.coordinates
-              ? "cursor-pointer hover:bg-gray-50"
-              : "cursor-not-allowed"
-          }`}
-          onClick={openInGoogleMaps}
-        >
-          <div className="w-full h-full bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-[rgba(229,114,0)] rounded-full flex items-center justify-center mx-auto mb-2">
-                <MapPin className="w-6 h-6 text-white" />
-              </div>              <span className="text-[rgba(68,63,63)] font-medium">
-                {location.coordinates
-                  ? "Click to get directions"
-                  : "Location not available"}
-              </span>
-            </div>
-          </div>
-
-          <div
-            className={`absolute bottom-4 left-4 bg-white rounded-lg px-3 py-2 shadow-sm border border-gray-200 ${
-              !location.coordinates ? "opacity-50" : ""
-            }`}
-          >
-            <div className="flex items-center gap-2 text-sm">
-              <MapPin className="w-4 h-4 text-[rgba(229,114,0)]" />
-              <span className="text-[rgba(68,63,63)] font-medium">
-                {location.coordinates
-                  ? "Get Directions"
-                  : "Directions unavailable"}
-              </span>
-            </div>
-          </div>
-        </div>        <p className="text-sm text-[rgba(100,92,90)] mt-2">
+        </h3>
+        <StaticMapView
+          location={location}
+          onGetDirections={openInGoogleMaps}
+        />
+        <p className="text-sm text-[rgba(100,92,90)] mt-2">
           {location.address}
         </p>
       </div>

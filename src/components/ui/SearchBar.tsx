@@ -31,6 +31,8 @@ interface SearchBarProps {
   onSearch?: () => void;
   className?: string;
   variant?: "compact" | "full" | "mobile";
+  customLocations?: string[]; 
+  useCustomLocations?: boolean;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -40,17 +42,27 @@ const SearchBar: React.FC<SearchBarProps> = ({
   // onSearch,
   className = "",
   variant = "full",
+  customLocations = [],
+  useCustomLocations = false,
 }) => {
-  const { categories, locations, isLoading, error } = useData();
+  const { categories, isLoading, error } = useData();
 
   const categoryOptions = useMemo(
     () => [defaultCategory, ...categories],
     [categories]
   );
-  const locationOptions = useMemo(
-    () => [defaultLocation, ...locations],
-    [locations]
-  );
+  
+  const locationOptions = useMemo(() => {
+    if (useCustomLocations) {
+      const customLocationObjects = customLocations.map((location, index) => ({
+        uuid: `custom-${index}`,
+        location: location,
+      }));
+      return [defaultLocation, ...customLocationObjects];
+    } else {
+      return [defaultLocation];
+    }
+  }, [useCustomLocations, customLocations]);
 
   const hasActiveFilters = useMemo(() => {
     return locationFilter !== "Location" || categoryFilter !== "Event Category";

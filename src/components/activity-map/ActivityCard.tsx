@@ -32,7 +32,8 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
   const handleCardClick = () => {
     onClick();
     router.push(createActivityUrl(title, uuid));
-  };  return (
+  };
+  return (
     <div
       className={`activity-card-mobile p-3 sm:p-4 mb-3 rounded-2xl border cursor-pointer transition-all duration-300 hover:shadow-xl active:scale-[0.98] ${
         isSelected
@@ -70,11 +71,17 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
         </h3>
         <div className="space-y-1.5">
           <div className="flex items-center text-[rgba(100,92,90)] text-xs sm:text-sm">
-            <User size={14} className="mr-2 flex-shrink-0 text-[rgba(194,91,52)]" />
+            <User
+              size={14}
+              className="mr-2 flex-shrink-0 text-[rgba(194,91,52)]"
+            />
             <span className="truncate font-medium">{user}</span>
           </div>
           <div className="flex items-center text-[rgba(100,92,90)] text-xs sm:text-sm">
-            <MapPin size={14} className="mr-2 flex-shrink-0 text-[rgba(194,91,52)]" />
+            <MapPin
+              size={14}
+              className="mr-2 flex-shrink-0 text-[rgba(194,91,52)]"
+            />
             <span className="truncate">{location}</span>
           </div>
         </div>

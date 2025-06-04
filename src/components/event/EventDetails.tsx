@@ -1,24 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Calendar, MapPin } from "lucide-react";
 import { RiInstagramFill } from "react-icons/ri";
 import { IoLogoFacebook } from "react-icons/io5";
 import { IoLogoYoutube } from "react-icons/io";
-import dynamic from "next/dynamic";
 import { googleMapsLoader } from "@/utils/googleMapsLoader";
-
-const DirectionsMap = dynamic(() => import("../maps/GoogleDirectionsMap"), {
-  ssr: false,
-  loading: () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-8 m-4">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[rgba(229,114,0)] mx-auto"></div>
-          <p className="mt-2 text-sm text-gray-600">Loading map...</p>
-        </div>
-      </div>
-    </div>
-  ),
-});
+import StaticMapView from "../maps/StaticMapView";
 
 interface EventDetailsProps {
   date: string;
@@ -56,8 +42,6 @@ const EventDetails: React.FC<EventDetailsProps> = ({
   organizer,
   location,
 }) => {
-  const [isDirectionsOpen, setIsDirectionsOpen] = useState(false);
-  
   // Function to open Google Maps directly
   const openInGoogleMaps = () => {
     if (!location.coordinates) return;
@@ -172,97 +156,41 @@ const EventDetails: React.FC<EventDetailsProps> = ({
             <p className="text-xs text-[rgba(100,92,90)]">
               {organizer.eventsHosted} Events Hosted
             </p>
-          </div>
-          <div className="flex gap-2 ">
+          </div>          <div className="flex gap-2 ">
             {organizer.socialLinks.youtube && (
-              <a
-                href={organizer.socialLinks.youtube}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <div className="w-10 h-10 text-[rgba(229,114,0)] border border-[rgba(199,195,193)] rounded flex items-center justify-center">
-                  <IoLogoYoutube className="w-6 h-6" />
-                </div>
-              </a>
+              <div 
+                onClick={() => window.open(organizer.socialLinks.youtube, '_blank')}
+                className="cursor-pointer w-10 h-10 text-[rgba(229,114,0)] border border-[rgba(199,195,193)] rounded flex items-center justify-center">
+                <IoLogoYoutube className="w-6 h-6" />
+              </div>
             )}
             {organizer.socialLinks.facebook && (
-              <a
-                href={organizer.socialLinks.facebook}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <div className="w-10 h-10 text-[rgba(229,114,0)] border border-[rgba(199,195,193)] rounded flex items-center justify-center">
-                  <IoLogoFacebook className="w-6 h-6" />
-                </div>
-              </a>
+              <div
+                onClick={() => window.open(organizer.socialLinks.facebook, '_blank')}
+                className="cursor-pointer w-10 h-10 text-[rgba(229,114,0)] border border-[rgba(199,195,193)] rounded flex items-center justify-center">
+                <IoLogoFacebook className="w-6 h-6" />
+              </div>
             )}
             {organizer.socialLinks.instagram && (
-              <a
-                href={organizer.socialLinks.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <div className="w-10 h-10 text-[rgba(229,114,0)] border border-[rgba(199,195,193)] rounded flex items-center justify-center">
-                  <RiInstagramFill className="w-6 h-6" />
-                </div>
-              </a>
+              <div
+                onClick={() => window.open(organizer.socialLinks.instagram, '_blank')}
+                className="cursor-pointer w-10 h-10 text-[rgba(229,114,0)] border border-[rgba(199,195,193)] rounded flex items-center justify-center">
+                <RiInstagramFill className="w-6 h-6" />
+              </div>
             )}
           </div>
         </div>
-      </div>{" "}
-      <div>
+      </div>{" "}      <div>
         <h3 className="text-lg font-semibold text-[rgba(68,63,63)] mb-4">
           Event Address
-        </h3>        <div
-          className={`w-full h-48 bg-gray-100 rounded-lg relative overflow-hidden transition-colors ${
-            location.coordinates
-              ? "cursor-pointer hover:bg-gray-50"
-              : "cursor-not-allowed"
-          }`}
-          onClick={() => location.coordinates && openInGoogleMaps()}
-        >
-          <div className="w-full h-full bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-[rgba(229,114,0)] rounded-full flex items-center justify-center mx-auto mb-2">
-                <MapPin className="w-6 h-6 text-white" />
-              </div>              <span className="text-[rgba(68,63,63)] font-medium">
-                {location.coordinates
-                  ? "Click to get directions"
-                  : "Location not available"}
-              </span>
-            </div>
-          </div>{" "}
-          <div
-            className={`absolute bottom-4 left-4 bg-white rounded-lg px-3 py-2 shadow-sm border border-gray-200 ${
-              !location.coordinates ? "opacity-50" : ""
-            }`}
-          >
-            <div className="flex items-center gap-2 text-sm">
-              <MapPin className="w-4 h-4 text-[rgba(229,114,0)]" />
-              <span className="text-[rgba(68,63,63)] font-medium">
-                {location.coordinates
-                  ? "Get Directions"
-                  : "Directions unavailable"}
-              </span>
-            </div>
-          </div>
-        </div>
+        </h3>
+        <StaticMapView
+          location={location}
+          onGetDirections={openInGoogleMaps}
+        />
         <p className="text-sm text-[rgba(100,92,90)] mt-2">
           {location.address}
         </p>
-        {isDirectionsOpen && location.coordinates && (
-          <DirectionsMap
-            eventLocation={{
-              address: location.address,
-              coordinates: {
-                lat: location.coordinates.lat,
-                lng: location.coordinates.lng,
-              },
-            }}
-            isOpen={isDirectionsOpen}
-            onClose={() => setIsDirectionsOpen(false)}
-          />
-        )}
       </div>
     </div>
   );

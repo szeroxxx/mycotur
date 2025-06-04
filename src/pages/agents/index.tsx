@@ -128,14 +128,12 @@ const AgentsPage: React.FC = () => {
                   placeholder="Search"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  disabled={agents.length > 0}
                   className="w-full sm:w-64 pl-10 pr-4 py-2 border border-[rgba(199,195,193)] shadow-sm shadow-[rgba(24,27,37,0.04)] text-[rgba(142,133,129)] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[rgba(194,91,52)] focus:border-[rgba(194,91,52)] disabled:opacity-50 disabled:cursor-not-allowed"
                 />
               </div>{" "}
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                disabled={agents.length > 0}
                 className="cursor-pointer w-full sm:w-48 px-4 py-2 text-[rgba(142,133,129)] border border-[rgba(199,195,193)] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <option value="">All Status</option>

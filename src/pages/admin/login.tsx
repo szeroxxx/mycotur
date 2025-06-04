@@ -13,14 +13,9 @@ const AdminLogin: React.FC = () => {
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
-    console.log("handleSubmit::: ");
     e.preventDefault();
-    console.log("xx::: ");
     setIsLoading(true);
-    console.log("xx::: ");
-
     setError("");
-    console.log("xx::: ");
     try {
       const result = await signIn("credentials", {
         email,
@@ -29,7 +24,7 @@ const AdminLogin: React.FC = () => {
         role: "admin",
       });
 
-      console.log("result::: ", result);
+
       if (result?.error) {
         setError(result.error);
         return;
@@ -39,7 +34,6 @@ const AdminLogin: React.FC = () => {
         const sessionData = await session.json();
 
         if (sessionData?.user?.uuid) {
-          console.log("Storing UUID in localStorage:", sessionData.user.uuid);
           localStorage.setItem("userUuid", sessionData.user.uuid);
         } else {
           console.warn("UUID not found in session data");

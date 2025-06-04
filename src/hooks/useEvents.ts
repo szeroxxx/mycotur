@@ -122,7 +122,6 @@ export const useEvents = () => {
             },
           }
         );
-        console.log("response::: ", response);
 
         if (response.data && Array.isArray(response.data.data)) {
           const fetchedEvents: Event[] = response.data.data.map(

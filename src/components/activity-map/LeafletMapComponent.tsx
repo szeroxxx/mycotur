@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
+import { useRouter } from "next/router";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import { ActivityData } from "@/hooks/useActivitiesData";
+import { createActivityUrl } from "@/utils/urlHelpers";
 
 const DefaultIcon = L.icon({
   iconUrl: icon.src,
@@ -22,7 +24,9 @@ const LeafletMapComponent: React.FC<LeafletMapComponentProps> = ({
   locations,
   selectedLocation,
   onMarkerClick,
-}) => {  const mapRef = useRef<L.Map | null>(null);
+}) => {
+  const router = useRouter();
+  const mapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<{ [key: string]: L.Marker }>({});
   const [map, setMap] = useState<L.Map | null>(null);
   const defaultCenter = useMemo<[number, number]>(() => [40.4168, -3.7038], []);
@@ -83,11 +87,11 @@ const LeafletMapComponent: React.FC<LeafletMapComponentProps> = ({
         );
         return;
       }
-
       const position = [loc.lat, loc.lon] as [number, number];
+      const popupId = `leaflet-popup-${loc.id}`;
       const marker = L.marker(position, { icon: DefaultIcon }).addTo(map)
         .bindPopup(`
-          <div>
+          <div id="${popupId}" style="cursor: pointer; padding: 4px;">
             <h3 class="font-medium">${loc.title}</h3>
             <p class="text-sm">${loc.location}</p>
           </div>
@@ -95,6 +99,23 @@ const LeafletMapComponent: React.FC<LeafletMapComponentProps> = ({
 
       marker.on("click", () => {
         onMarkerClick(loc);
+      });
+
+      marker.on("popupopen", () => {
+        const popupElement = document.getElementById(popupId);
+        if (popupElement) {
+          popupElement.addEventListener("click", () => {
+            const activityUrl = createActivityUrl(loc.title, loc.uuid);
+            router.push(activityUrl);
+          });
+
+          popupElement.addEventListener("mouseenter", () => {
+            popupElement.style.backgroundColor = "#f9f9f9";
+          });
+          popupElement.addEventListener("mouseleave", () => {
+            popupElement.style.backgroundColor = "transparent";
+          });
+        }
       });
 
       markersRef.current[loc.id] = marker;
@@ -117,7 +138,7 @@ const LeafletMapComponent: React.FC<LeafletMapComponentProps> = ({
     } else {
       map.setView(defaultCenter, 12);
     }
-  }, [locations, map, defaultCenter, onMarkerClick]);
+  }, [locations, map, defaultCenter, onMarkerClick, router]);
 
   useEffect(() => {
     if (!map || !selectedLocation) return;

@@ -106,7 +106,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
           <div
             key={day.toString()}
             className={cn(
-              "m-[0.1px] relative flex-1 min-h-[60px] lg:min-h-[80px] flex items-center justify-center cursor-pointer  hover:bg-gray-50 transition-colors duration-200",
+              "m-[0.5px] relative flex-1 min-h-[60px] lg:min-h-[80px] flex items-center justify-center cursor-pointer  hover:bg-gray-50 transition-colors duration-200",
               !isCurrentMonth ? "text-gray-300" : "",
               isSelected
                 ? "bg-[rgba(168,193,135)] text-white hover:bg-[rgba(148,173,115)]"

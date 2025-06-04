@@ -31,13 +31,13 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
           <div className="flex justify-center space-x-4 w-full">
             <button
               onClick={onClose}
-              className="flex-1 basis-[120px] px-4 py-2 text-sm font-medium text-[rgba(68,63,63)] hover:text-[#111827] border border-[rgba(199,195,193)] rounded-lg transition-colors"
+              className="cursor-pointer flex-1 basis-[120px] px-4 py-2 text-sm font-medium text-[rgba(68,63,63)] hover:text-[#111827] border border-[rgba(199,195,193)] rounded-lg transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={onConfirm}
-              className="flex-1 basis-[120px] px-4 py-2 text-sm font-medium bg-[rgba(220,38,38)] hover:bg-red-600 text-[rgba(255,255,255)] border border-[rgba(199,195,193)] rounded-lg transition-colors"
+              className="cursor-pointer flex-1 basis-[120px] px-4 py-2 text-sm font-medium bg-[rgba(220,38,38)] hover:bg-red-600 text-[rgba(255,255,255)] border border-[rgba(199,195,193)] rounded-lg transition-colors"
             >
               Yes, Remove
             </button>

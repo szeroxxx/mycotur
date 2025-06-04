@@ -28,17 +28,13 @@ interface ApiActivityResponse {
   media: ApiActivityMedia[];
 }
 
-// interface ApiResponse {
-//   data: ApiActivityResponse[];
-//   pagination: PaginationInfo;
-// }
-
 export const useActivities = () => {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
-  const [toast, setToast] = useState<Toast | null>(null);  const [pagination, setPagination] = useState<PaginationInfo>({
+  const [toast, setToast] = useState<Toast | null>(null);
+  const [pagination, setPagination] = useState<PaginationInfo>({
     currentPage: 1,
     totalPages: 1,
     pageSize: 12,
@@ -52,12 +48,13 @@ export const useActivities = () => {
       setTimeout(() => setToast(null), 3000);
     },
     []
-  );  const fetchActivities = useCallback(
+  );
+  const fetchActivities = useCallback(
     async (page: number = 1) => {
       try {
         setIsLoading(true);
         const uuid = localStorage.getItem("userUuid");
-        
+
         const queryParams = new URLSearchParams({
           page: page.toString(),
           limit: "12", // Use fixed page size to avoid dependency issues
@@ -82,7 +79,7 @@ export const useActivities = () => {
               userid: uuid,
             },
           }
-        );console.log("response.data.data::: ", response.data.data);
+        );
         const mappedActivities: Activity[] = response.data.data.map(
           (item: ApiActivityResponse) => ({
             id: item.id.toString(),
@@ -112,7 +109,8 @@ export const useActivities = () => {
         showToast(
           "error",
           error instanceof Error ? error.message : "Failed to fetch activities"
-        );      } finally {
+        );
+      } finally {
         setIsLoading(false);
       }
     },
@@ -173,11 +171,14 @@ export const useActivities = () => {
         }
         if (activity.lon) {
           formData.append("lon", activity.lon.toString());
-        }
-
-        // Add originalActivityId if this is a duplicate
+        } // Add originalActivityId if this is a duplicate
         if (activity.originalActivityId) {
           formData.append("originalActivityId", activity.originalActivityId);
+        }
+
+        // Add mediaUrls if provided (for duplication with selective media)
+        if (activity.mediaUrls && activity.mediaUrls.length > 0) {
+          formData.append("mediaUrls", JSON.stringify(activity.mediaUrls));
         }
 
         if (activity.images && activity.images.length > 0) {
@@ -191,7 +192,6 @@ export const useActivities = () => {
             formData.append("videos", video);
           });
         }
-        console.log("formData::: ", formData);
         const uuid = localStorage.getItem("userUuid");
 
         const response = await axiosInstance.post(

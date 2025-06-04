@@ -32,8 +32,9 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
 
   const [submitError, setSubmitError] = useState<string | null>(error);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [fieldErrors, setFieldErrors] = useState<{[key: string]: string | null}>({});
+  const [fieldErrors, setFieldErrors] = useState<{
+    [key: string]: string | null;
+  }>({});
   const validateFirstName = (name: string): string | null => {
     if (!name.trim()) {
       return "First name is required";
@@ -54,7 +55,7 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
     if (!phone.trim()) {
       return "Phone number is required";
     }
-    const cleanPhone = phone.replace(/\D/g, '');
+    const cleanPhone = phone.replace(/\D/g, "");
     if (cleanPhone.length < 10) {
       return "Phone number should be at least 10 digits";
     }
@@ -107,28 +108,28 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
 
   const validateField = (name: string, value: string) => {
     let error: string | null = null;
-    
+
     switch (name) {
-      case 'firstName':
+      case "firstName":
         error = validateFirstName(value);
         break;
-      case 'phoneNumber':
+      case "phoneNumber":
         error = validatePhoneNumber(value);
         break;
-      case 'email':
+      case "email":
         error = validateEmail(value);
         break;
-      case 'numberOfPeople':
+      case "numberOfPeople":
         error = validateNumberOfPeople(value);
         break;
-      case 'message':
+      case "message":
         error = validateMessage(value);
         break;
     }
 
-    setFieldErrors(prev => ({
+    setFieldErrors((prev) => ({
       ...prev,
-      [name]: error
+      [name]: error,
     }));
 
     return error === null;
@@ -139,13 +140,13 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
   ) => {
     const { name, value } = e.target;
     let processedValue = value;
-    
-    if (name === 'firstName') {
-      processedValue = value.replace(/[^a-zA-Z\s]/g, '');
-    } else if (name === 'phoneNumber') {
-      processedValue = value.replace(/[^\d\s\-\(\)\+]/g, '');
-    } else if (name === 'numberOfPeople') {
-      processedValue = value.replace(/[^\d]/g, '');
+
+    if (name === "firstName") {
+      processedValue = value.replace(/[^a-zA-Z\s]/g, "");
+    } else if (name === "phoneNumber") {
+      processedValue = value.replace(/[^\d\s\-\(\)\+]/g, "");
+    } else if (name === "numberOfPeople") {
+      processedValue = value.replace(/[^\d]/g, "");
     }
 
     setFormData((prev) => ({
@@ -155,11 +156,10 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
 
     validateField(name, processedValue);
     setSubmitError(null);
-    setSubmitSuccess(false);
   };
 
   const validateForm = (): boolean => {
-    const errors: {[key: string]: string | null} = {};
+    const errors: { [key: string]: string | null } = {};
     let isValid = true;
 
     const firstNameError = validateFirstName(formData.firstName);
@@ -195,10 +195,12 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
     setFieldErrors(errors);
     return isValid;
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      console.log("Form validation failed");
+      return;
+    }
 
     setIsSubmitting(true);
     setSubmitError(null);
@@ -206,7 +208,6 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
     try {
       if (onSubmit) {
         await onSubmit(formData);
-        setSubmitSuccess(true);
         setFormData({
           firstName: "",
           phoneNumber: "",
@@ -215,8 +216,11 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
           message: "",
         });
         setFieldErrors({});
+      } else {
+        console.log("No onSubmit prop provided");
       }
     } catch (error) {
+      console.error("RSVPForm submission error:", error);
       setSubmitError(
         error instanceof Error ? error.message : "Failed to submit RSVP"
       );
@@ -226,7 +230,6 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
   };
 
   const handleGetContactInfo = () => {
-    console.log("Get contact info clicked");
     if (onGetContactInfo) {
       onGetContactInfo();
     }
@@ -238,7 +241,7 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
           RSVP Now
         </h2>
 
-        <div className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label
               htmlFor="firstName"
@@ -251,17 +254,18 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
               name="firstName"
               placeholder="John"
               className={`text-gray-600 w-full h-11 px-3 border rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
-                fieldErrors.firstName ? 'border-red-500' : 'border-gray-300'
+                fieldErrors.firstName ? "border-red-500" : "border-gray-300"
               }`}
               value={formData.firstName}
               onChange={handleInputChange}
               required
             />
             {fieldErrors.firstName && (
-              <div className="text-red-500 text-xs mt-1">{fieldErrors.firstName}</div>
+              <div className="text-red-500 text-xs mt-1">
+                {fieldErrors.firstName}
+              </div>
             )}
           </div>
-
           <div>
             <Label
               htmlFor="phoneNumber"
@@ -274,17 +278,18 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
               name="phoneNumber"
               placeholder="enter your primary phone number"
               className={`text-gray-600 w-full h-11 px-3 border rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
-                fieldErrors.phoneNumber ? 'border-red-500' : 'border-gray-300'
+                fieldErrors.phoneNumber ? "border-red-500" : "border-gray-300"
               }`}
               value={formData.phoneNumber}
               onChange={handleInputChange}
               required
             />
             {fieldErrors.phoneNumber && (
-              <div className="text-red-500 text-xs mt-1">{fieldErrors.phoneNumber}</div>
+              <div className="text-red-500 text-xs mt-1">
+                {fieldErrors.phoneNumber}
+              </div>
             )}
           </div>
-
           <div>
             <Label
               htmlFor="email"
@@ -298,17 +303,18 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
               type="email"
               placeholder="john@example.com"
               className={`text-gray-600 w-full h-11 px-3 border rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
-                fieldErrors.email ? 'border-red-500' : 'border-gray-300'
+                fieldErrors.email ? "border-red-500" : "border-gray-300"
               }`}
               value={formData.email}
               onChange={handleInputChange}
               required
             />
             {fieldErrors.email && (
-              <div className="text-red-500 text-xs mt-1">{fieldErrors.email}</div>
+              <div className="text-red-500 text-xs mt-1">
+                {fieldErrors.email}
+              </div>
             )}
           </div>
-
           <div>
             <Label
               htmlFor="numberOfPeople"
@@ -321,17 +327,20 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
               name="numberOfPeople"
               placeholder="1"
               className={`text-gray-600 w-full h-11 px-3 border rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-center ${
-                fieldErrors.numberOfPeople ? 'border-red-500' : 'border-gray-300'
+                fieldErrors.numberOfPeople
+                  ? "border-red-500"
+                  : "border-gray-300"
               }`}
               value={formData.numberOfPeople}
               onChange={handleInputChange}
               required
             />
             {fieldErrors.numberOfPeople && (
-              <div className="text-red-500 text-xs mt-1">{fieldErrors.numberOfPeople}</div>
+              <div className="text-red-500 text-xs mt-1">
+                {fieldErrors.numberOfPeople}
+              </div>
             )}
           </div>
-
           <div>
             <Label
               htmlFor="message"
@@ -348,34 +357,28 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
               placeholder="this message will directly shows to organiser"
               rows={3}
               className={`text-gray-600 w-full px-3 py-3 border rounded-md text-sm placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
-                fieldErrors.message ? 'border-red-500' : 'border-gray-300'
+                fieldErrors.message ? "border-red-500" : "border-gray-300"
               }`}
               value={formData.message}
               onChange={handleInputChange}
             />
             {fieldErrors.message && (
-              <div className="text-red-500 text-xs mt-1">{fieldErrors.message}</div>
+              <div className="text-red-500 text-xs mt-1">
+                {fieldErrors.message}
+              </div>
             )}
           </div>
-
           {submitError && (
             <div className="text-red-500 text-sm mt-2">{submitError}</div>
-          )}
-
-          {submitSuccess && (
-            <div className="text-green-500 text-sm mt-2">
-              RSVP submitted successfully!
-            </div>
-          )}
-
+          )}{" "}
           <Button
-            onClick={handleSubmit}
+            type="submit"
             disabled={isSubmitting}
             className="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-2 px-4 rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? "Submitting..." : "Submit RSVP"}
           </Button>
-        </div>
+        </form>
       </div>
 
       <div className="mt-2 px-6 py-6 bg-white rounded-xl shadow-lg border border-gray-200">

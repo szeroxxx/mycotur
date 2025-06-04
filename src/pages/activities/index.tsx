@@ -7,7 +7,7 @@ import { DeleteModal } from "../../components/activities/DeleteModal";
 import { Pagination } from "../../components/pagination/Pagination";
 import { useActivities } from "../../hooks/useActivities";
 import { useProfile } from "../../hooks/useProfile";
-import { CircleCheck, Plus, Search} from "lucide-react";
+import { CircleCheck, Plus, Search } from "lucide-react";
 interface Category {
   uuid: string;
   title: string;
@@ -110,13 +110,11 @@ const ActivitiesPage: React.FC = () => {
           mediaUrls: typeof value === "string" ? JSON.parse(value) : value,
         }));
       } else if (name === "images" && Array.isArray(value)) {
-        // Handle direct array updates for images
         setSelectedActivity((prev: Activity | null) => ({
           ...prev!,
           images: value,
         }));
       } else if (name === "videos" && Array.isArray(value)) {
-        // Handle direct array updates for videos
         setSelectedActivity((prev: Activity | null) => ({
           ...prev!,
           videos: value,
@@ -129,29 +127,14 @@ const ActivitiesPage: React.FC = () => {
       }
     }
   };
-  // const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   if (!e.target.files || !selectedActivity) return;
-
-  //   const existingImages = selectedActivity.images || [];
-  //   const newImages = Array.from(e.target.files);
-
-  //   setSelectedActivity((prev) => ({
-  //     ...prev!,
-  //     images: [...existingImages, ...newImages],
-  //   }));
-  // };
 
   const handleEdit = (activity: Activity) => {
-    console.log("Editing activity:", activity);
-
     const activityCopy = {
       ...activity,
       images: activity.images || [],
       videos: activity.videos || [],
       mediaUrls: activity.mediaUrls ? [...activity.mediaUrls] : [],
     };
-
-    console.log("Activity copy for editing:", activityCopy);
     setSelectedActivity(activityCopy);
     setIsModalOpen(true);
   };
@@ -161,21 +144,18 @@ const ActivitiesPage: React.FC = () => {
     setIsDeleteModalOpen(true);
   };
   const handleDuplicate = async (activity: Activity) => {
+
     const duplicatedActivity = {
       ...activity,
       id: "",
       title: `${activity.title} (Copy)`,
       images: [],
       videos: [],
-      mediaUrls:
-        activity.mediaUrls?.map((media) => ({
-          name: media.name,
-          type: media.type,
-        })) || [],
+      mediaUrls: activity.mediaUrls ? [...activity.mediaUrls] : [], // Copy mediaUrls so user can modify them
       originalActivityId: activity.uuid,
     };
 
-    console.log("Duplicated activity ready:", duplicatedActivity);
+
     setSelectedActivity(duplicatedActivity);
     setIsModalOpen(true);
   };
@@ -195,16 +175,15 @@ const ActivitiesPage: React.FC = () => {
           mediaUrls: selectedActivity.mediaUrls || [],
         };
 
-        console.log("Update data:", updateData);
         await updateActivity(updateData);
       } else {
         const createData = {
           ...selectedActivity,
           images: selectedActivity.images || [],
           videos: selectedActivity.videos || [],
+          mediaUrls: selectedActivity.mediaUrls || [], // Include mediaUrls for duplication
         };
 
-        console.log("Create data:", createData);
         await createActivity(createData);
       }
 
@@ -256,7 +235,6 @@ const ActivitiesPage: React.FC = () => {
       mediaUrls: [],
     };
 
-    console.log("Opening add modal with new activity:", newActivity);
     setSelectedActivity(newActivity);
     setIsModalOpen(true);
   };
@@ -290,13 +268,9 @@ const ActivitiesPage: React.FC = () => {
               placeholder="Search activities..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              disabled={
-                (isAgent && profileStatus?.needsUpdate) ||
-                activities.length === 0
-              }
+              disabled={isAgent && profileStatus?.needsUpdate}
               className={`w-full pl-10 pr-4 py-2.5 sm:py-3 border border-[rgba(199,195,193)] shadow-sm shadow-[rgba(24,27,37,0.04)] text-[rgba(142,133,129)] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[rgba(194,91,52)] focus:border-[rgba(194,91,52)] transition-colors ${
-                (isAgent && profileStatus?.needsUpdate) ||
-                activities.length === 0
+                isAgent && profileStatus?.needsUpdate
                   ? "bg-gray-100 cursor-not-allowed"
                   : ""
               }`}
@@ -357,7 +331,8 @@ const ActivitiesPage: React.FC = () => {
               >
                 ✕
               </button>
-            </div>            {selectedActivity && (
+            </div>{" "}
+            {selectedActivity && (
               <ActivityForm
                 activity={selectedActivity}
                 categories={categories}

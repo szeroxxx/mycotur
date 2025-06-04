@@ -104,20 +104,20 @@ const Dashboard: React.FC = () => {
     );
   }
 
-  console.log("isAgent::: ", isAgent);
 
   return (
     <>
       <Head>
         <title>Dashboard | Mycotur</title>
-      </Head>      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 max-w-7xl mx-auto px-2">
+      </Head>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6">
         {!isAgent && (
           <StatCard
             title="Total Agents"
             value={dashboardData.totalAgents}
             icon={<FiUsers size={20} />}
           />
-        )}{" "}
+        )}
         <StatCard
           title="Total Number of Form submission"
           value={dashboardData.totalForms}

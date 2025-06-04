@@ -121,7 +121,6 @@ export const useProfile = (): UseProfileReturn => {
       if (!session?.user?.accessToken) {
         throw new Error("User session not found");
       }
-      console.log("updateData::: ", updateData);
       const response = await axiosInstance.put(
         `${URL}/api/user/${uuid}`,
         updateData,
@@ -249,7 +248,6 @@ export const useProfile = (): UseProfileReturn => {
           userid: uuid,
         },
       });
-      console.log("responxxxxse::: ", response);
       if (response.data && response.data.data) {
         return response.data.data;
       }

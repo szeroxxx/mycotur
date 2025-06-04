@@ -5,7 +5,7 @@ import PublicLayout from "@/components/layout/PublicLayout";
 import ActivityCard from "@/components/activity-map/ActivityCard";
 import { useActivitiesData } from "@/hooks/useActivitiesData";
 import SearchBar from "@/components/ui/SearchBar";
-import EventSearchBar from "@/components/event-calender/EventSearchBar";
+import { useActivityLocations } from "@/hooks/useActivityLocations";
 import dynamic from "next/dynamic";
 
 const DynamicMapView = dynamic(
@@ -22,6 +22,12 @@ const ActivityMapPage = () => {
     setSelectedActivity,
     setSearchLocation,
   } = useActivitiesData();
+  
+  const { 
+    locations: activityLocations, 
+    // isLoading: locationsLoading 
+  } = useActivityLocations();
+  
   const [locationFilter, setLocationFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [showMobileMap, setShowMobileMap] = useState(false);
@@ -56,12 +62,10 @@ const ActivityMapPage = () => {
       <Head>
         <title>Activity Map | Mycotur</title>
       </Head>
-
       <div className="hidden lg:flex h-[calc(100vh-5rem)] overflow-hidden scrollbar-hide">
         <div className="w-1/3 flex flex-col border-r border-[rgba(226,225,223,0.6)]">
           <div className="p-6 flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide touch-scroll">
-            <div className="space-y-6">
-              <SearchBar
+            <div className="space-y-6">              <SearchBar
                 locationFilter={locationFilter || "Location"}
                 categoryFilter={categoryFilter || "Event Category"}
                 onFilterChange={handleFilterChange}
@@ -69,6 +73,8 @@ const ActivityMapPage = () => {
                   filterActivities("", locationFilter, categoryFilter)
                 }
                 variant="compact"
+                customLocations={activityLocations.map(loc => loc.location)}
+                useCustomLocations={true}
               />
               <div className="space-y-4">
                 {loading ? (
@@ -119,7 +125,8 @@ const ActivityMapPage = () => {
             />
           )}
         </div>
-      </div>      <div className="lg:hidden h-[calc(100vh-5rem)] flex flex-col">
+      </div>{" "}
+      <div className="lg:hidden h-[calc(100vh-5rem)] flex flex-col">
         <div className="flex justify-between items-center p-4 bg-gradient-to-r from-white to-gray-50 border-b border-[rgba(226,225,223,0.4)] sticky top-0 z-20">
           <h1 className="text-lg font-semibold text-[rgba(68,63,63)]">
             Activity Map
@@ -162,7 +169,8 @@ const ActivityMapPage = () => {
                 }}
               />
             )}
-          </div>        ) : (
+          </div>
+        ) : (
           <div className="flex-1 overflow-y-auto scrollbar-hide touch-scroll bg-gradient-to-b from-white to-gray-50">
             <div className="h-[25vh] relative bg-gray-100 overflow-hidden shadow-lg mx-4 mt-4 rounded-2xl">
               {!loading && (
@@ -177,13 +185,14 @@ const ActivityMapPage = () => {
                   }}
                 />
               )}
-            </div>
-            <div className="p-4 pb-2">
-              <EventSearchBar
+            </div>            <div className="p-4 pb-2">
+              <SearchBar
                 locationFilter={locationFilter || "Location"}
                 categoryFilter={categoryFilter || "Event Category"}
                 onFilterChange={handleFilterChange}
                 variant="compact"
+                customLocations={activityLocations.map(loc => loc.location)}
+                useCustomLocations={true}
               />
             </div>
 
