@@ -31,7 +31,7 @@ interface SearchBarProps {
   onSearch?: () => void;
   className?: string;
   variant?: "compact" | "full" | "mobile";
-  customLocations?: string[]; 
+  customLocations?: string[];
   useCustomLocations?: boolean;
 }
 
@@ -51,7 +51,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     () => [defaultCategory, ...categories],
     [categories]
   );
-  
+
   // const locationOptions = useMemo(() => {
   //   if (useCustomLocations) {
   //     const customLocationObjects = customLocations.map((location, index) => ({
@@ -63,10 +63,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
   //     return [defaultLocation];
   //   }
   // }, [useCustomLocations, customLocations]);
-
   const hasActiveFilters = useMemo(() => {
-    return locationFilter !== "Ubicación" || categoryFilter !== "Tipo de evento";
-  }, [locationFilter, categoryFilter]);
+    return categoryFilter !== "Tipo de evento";
+  }, [categoryFilter]); 
 
   const handleFilterChange = (
     type: "location" | "category",
@@ -79,7 +78,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     onFilterChange("location", "Ubicación");
     onFilterChange("category", "Tipo de evento");
   };
-  console.log('locationFilter::: ', locationFilter);
+  console.log("locationFilter::: ", locationFilter);
 
   if (isLoading) {
     return (

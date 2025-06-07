@@ -5,7 +5,7 @@ import PublicLayout from "@/components/layout/PublicLayout";
 import ActivityCard from "@/components/activity-map/ActivityCard";
 import { useActivitiesData } from "@/hooks/useActivitiesData";
 import SearchBar from "@/components/ui/SearchBar";
-import { useActivityLocations } from "@/hooks/useActivityLocations";
+// import { useActivityLocations } from "@/hooks/useActivityLocations";
 import dynamic from "next/dynamic";
 
 const DynamicMapView = dynamic(
@@ -23,38 +23,37 @@ const ActivityMapPage = () => {
     setSearchLocation,
   } = useActivitiesData();
 
-  const {
-    locations: activityLocations,
-    // isLoading: locationsLoading
-  } = useActivityLocations();
-
-  const [locationFilter, setLocationFilter] = useState("");
+  // const {
+  //   locations: activityLocations,
+  //   // isLoading: locationsLoading
+  // } = useActivityLocations();  // const [locationFilter, setLocationFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [showMobileMap, setShowMobileMap] = useState(false);
+  
   const handleFilterChange = useCallback(
     (type: "location" | "category", value: string) => {
-      if (type === "location") {
-        setLocationFilter(value === "Ubicación" ? "" : value);
-      } else {
+      // if (type === "location") {
+      //   setLocationFilter(value === "Ubicación" ? "" : value);
+      // } else {
         setCategoryFilter(value === "Tipo de evento" ? "" : value);
-      }
+      // }
     },
     []
   );
 
   useEffect(() => {
-    filterActivities("", locationFilter, categoryFilter);
-  }, [locationFilter, categoryFilter, filterActivities]);
+    filterActivities("", "", categoryFilter);
+  }, [categoryFilter, filterActivities]);
 
   useEffect(() => {
     setSearchLocation(null);
   }, [setSearchLocation]);
 
-  useEffect(() => {
-    if (locationFilter || categoryFilter) {
-      filterActivities("", locationFilter, categoryFilter);
-    }
-  }, [locationFilter, categoryFilter]);
+  // useEffect(() => {
+  //   if (locationFilter || categoryFilter) {
+  //     filterActivities("", locationFilter, categoryFilter);
+  //   }
+  // }, [locationFilter, categoryFilter]);
 
   return (
     <PublicLayout>
@@ -65,17 +64,16 @@ const ActivityMapPage = () => {
         <div className="w-1/3 flex flex-col border-r border-[rgba(226,225,223,0.6)]">
           <div className="p-6 flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide touch-scroll">
             <div className="space-y-6">
-              {" "}
-              <SearchBar
-                locationFilter={locationFilter || "Ubicación"}
+              {" "}              <SearchBar
+                locationFilter="Ubicación"
                 categoryFilter={categoryFilter || "Tipo de evento"}
                 onFilterChange={handleFilterChange}
                 onSearch={() =>
-                  filterActivities("", locationFilter, categoryFilter)
+                  filterActivities("", "", categoryFilter)
                 }
                 variant="compact"
-                customLocations={activityLocations.map((loc) => loc.location)}
-                useCustomLocations={true}
+                // customLocations={activityLocations.map((loc) => loc.location)}
+                // useCustomLocations={true}
               />
               <div className="space-y-4">
                 {loading ? (
@@ -188,14 +186,13 @@ const ActivityMapPage = () => {
                 />
               )}
             </div>{" "}
-            <div className="p-4 pb-2">
-              <SearchBar
-                locationFilter={locationFilter || "Ubicación"}
+            <div className="p-4 pb-2">              <SearchBar
+                locationFilter="Ubicación"
                 categoryFilter={categoryFilter || "Tipo de evento"}
                 onFilterChange={handleFilterChange}
                 variant="compact"
-                customLocations={activityLocations.map((loc) => loc.location)}
-                useCustomLocations={true}
+                // customLocations={activityLocations.map((loc) => loc.location)}
+                // useCustomLocations={true}
               />
             </div>
             <div className="px-4 pb-20 space-y-4">

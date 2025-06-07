@@ -4,7 +4,7 @@ import PublicLayout from "@/components/layout/PublicLayout";
 import SearchBar from "@/components/ui/SearchBar";
 import OrganiserCard from "@/components/organiser/OrganiserCard";
 import Head from "next/head";
-import { useOrganizerLocations } from "@/hooks/useOrganizerLocations";
+// import { useOrganizerLocations } from "@/hooks/useOrganizerLocations";
 
 interface Organizer {
   id: number;
@@ -28,17 +28,16 @@ interface Organizer {
 }
 
 const DiscoverOrganiserPage = () => {
-  const [organisers, setOrganisers] = useState<Organizer[]>([]);
-  const [filteredOrganisers, setFilteredOrganisers] = useState<Organizer[]>([]);
+  const [organisers, setOrganisers] = useState<Organizer[]>([]);  const [filteredOrganisers, setFilteredOrganisers] = useState<Organizer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [locationFilter, setLocationFilter] = useState("");
+  // const [locationFilter, setLocationFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
 
-  const {
-    locations: organizerLocations,
-    // isLoading: locationsLoading
-  } = useOrganizerLocations();
+  // const {
+  //   locations: organizerLocations,
+  //   // isLoading: locationsLoading
+  // } = useOrganizerLocations();
 
   useEffect(() => {
     const fetchOrganisers = async () => {
@@ -62,17 +61,16 @@ const DiscoverOrganiserPage = () => {
     };
 
     fetchOrganisers();
-  }, []);
-  const filterOrganisers = useCallback(() => {
+  }, []);  const filterOrganisers = useCallback(() => {
     let filtered = [...organisers];
 
-    if (locationFilter && locationFilter !== "Location") {
-      filtered = filtered.filter(
-        (organiser) =>
-          organiser.address &&
-          organiser.address.toLowerCase().includes(locationFilter.toLowerCase())
-      );
-    }
+    // if (locationFilter && locationFilter !== "Location") {
+    //   filtered = filtered.filter(
+    //     (organiser) =>
+    //       organiser.address &&
+    //       organiser.address.toLowerCase().includes(locationFilter.toLowerCase())
+    //   );
+    // }
     if (categoryFilter && categoryFilter !== "Tipo de evento") {
       filtered = filtered.filter((organiser) =>
         organiser.categories.some(
@@ -83,17 +81,16 @@ const DiscoverOrganiserPage = () => {
     }
 
     setFilteredOrganisers(filtered);
-  }, [organisers, locationFilter, categoryFilter]);
+  }, [organisers, categoryFilter]);
   useEffect(() => {
     filterOrganisers();
-  }, [filterOrganisers]);
-  const handleFilterChange = useCallback(
+  }, [filterOrganisers]);  const handleFilterChange = useCallback(
     (type: "location" | "category", value: string) => {
-      if (type === "location") {
-        setLocationFilter(value === "Ubicación" ? "" : value);
-      } else {
+      // if (type === "location") {
+      //   setLocationFilter(value === "Ubicación" ? "" : value);
+      // } else {
         setCategoryFilter(value === "Tipo de evento" ? "" : value);
-      }
+      // }
     },
     []
   );
@@ -131,16 +128,15 @@ const DiscoverOrganiserPage = () => {
         <div className="container mx-auto px-6 py-8">
           <div className="mb-8">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-              <div></div>{" "}
-              <div className="lg:w-96">
+              <div></div>{" "}              <div className="lg:w-96">
                 <SearchBar
-                  locationFilter={locationFilter || "Ubicación"}
+                  locationFilter="Ubicación"
                   categoryFilter={categoryFilter || "Tipo de evento"}
                   onFilterChange={handleFilterChange}
                   onSearch={handleSearch}
                   variant="compact"
-                  customLocations={organizerLocations}
-                  useCustomLocations={true}
+                  // customLocations={organizerLocations}
+                  // useCustomLocations={true}
                 />
               </div>
             </div>
@@ -182,16 +178,15 @@ const DiscoverOrganiserPage = () => {
       </div>
 
       <div className="lg:hidden min-h-screen bg-gradient-to-br from-[rgba(244,242,242)] to-[rgba(248,250,252)]">
-        {" "}
-        <div className="sticky top-0 z-20  border-b border-[rgba(226,225,223,0.4)] p-4">
+        {" "}        <div className="sticky top-0 z-20  border-b border-[rgba(226,225,223,0.4)] p-4">
           <SearchBar
-            locationFilter={locationFilter || "Ubicación"}
+            locationFilter="Ubicación"
             categoryFilter={categoryFilter || "Tipo de evento"}
             onFilterChange={handleFilterChange}
             onSearch={handleSearch}
             variant="mobile"
-            customLocations={organizerLocations}
-            useCustomLocations={true}
+            // customLocations={organizerLocations}
+            // useCustomLocations={true}
           />
         </div>
         <div className="p-4">

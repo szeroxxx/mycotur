@@ -79,9 +79,7 @@ export const useEventsData = () => {
       category: newCategory,
     });
 
-    let filtered = [...events];
-
-    if (date) {
+    let filtered = [...events];    if (date) {
       setSelectedDate(date);
       setIsDateFilterActive(true);
       filtered = filtered.filter((event) => {
@@ -96,28 +94,27 @@ export const useEventsData = () => {
       setIsDateFilterActive(false);
     }
 
-    if (newLocation !== "Ubicación") {
-      let locationFiltered = [...events];
-      if (date) {
-        locationFiltered = locationFiltered.filter((event) => {
-          const eventDate = new Date(event.date);
-          return (
-            eventDate.getFullYear() === date.getFullYear() &&
-            eventDate.getMonth() === date.getMonth() &&
-            eventDate.getDate() === date.getDate()
-          );
-        });
-      }
+    // if (newLocation !== "Ubicación") {
+    //   let locationFiltered = [...events];
+    //   if (date) {
+    //     locationFiltered = locationFiltered.filter((event) => {
+    //       const eventDate = new Date(event.date);
+    //       return (
+    //         eventDate.getFullYear() === date.getFullYear() &&
+    //         eventDate.getMonth() === date.getMonth() &&
+    //         eventDate.getDate() === date.getDate()
+    //       );
+    //     });
+    //   }
       
-      filtered = locationFiltered.filter((event) =>
-        event.location.toLowerCase().includes(newLocation.toLowerCase())
-      );
-    }
+    //   filtered = locationFiltered.filter((event) =>
+    //     event.location.toLowerCase().includes(newLocation.toLowerCase())
+    //   );
+    // }
 
     if (newCategory !== "Tipo de evento") {
       let categoryFiltered = [...events];
-      
-      if (date) {
+        if (date) {
         categoryFiltered = categoryFiltered.filter((event) => {
           const eventDate = new Date(event.date);
           return (
@@ -128,11 +125,11 @@ export const useEventsData = () => {
         });
       }
       
-      if (newLocation !== "Ubicación") {
-        categoryFiltered = categoryFiltered.filter((event) =>
-          event.location.toLowerCase().includes(newLocation.toLowerCase())
-        );
-      }
+      // if (newLocation !== "Ubicación") {
+      //   categoryFiltered = categoryFiltered.filter((event) =>
+      //     event.location.toLowerCase().includes(newLocation.toLowerCase())
+      //   );
+      // }
       
       
       filtered = categoryFiltered.filter((event) => {

@@ -19,17 +19,15 @@ const Index = () => {
     clearAllFilters,
     dateHasEvent,
     events,
-  } = useEventsData();
-  const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
-  const [locationFilter, setLocationFilter] = useState("Ubicación");
+  } = useEventsData();  const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
+  // const [locationFilter, setLocationFilter] = useState("Ubicación");
   const [categoryFilter, setCategoryFilter] = useState("Tipo de evento");
   const calendarEvents = events.map((event: CalendarEvent) => ({
     id: event.uuid,
     date: new Date(event.date),
     title: event.title,
     hasEvent: true,
-  }));
-  const handleDateSelect = (date: Date) => {
+  }));  const handleDateSelect = (date: Date) => {
     const isSameDate =
       selectedDate &&
       selectedDate.getFullYear() === date.getFullYear() &&
@@ -37,41 +35,41 @@ const Index = () => {
       selectedDate.getDate() === date.getDate();
 
     if (isSameDate) {
-      filterEvents(undefined, locationFilter, categoryFilter);
+      filterEvents(undefined, "Ubicación", categoryFilter);
     } else {
-      filterEvents(date, locationFilter, categoryFilter);
+      filterEvents(date, "Ubicación", categoryFilter);
     }
   };
 
   const handleSearch = () => {
-    filterEvents(selectedDate, locationFilter, categoryFilter);
+    filterEvents(selectedDate, "Ubicación", categoryFilter);
   };
   const handleFilterChange = (type: "location" | "category", value: string) => {
-    if (type === "location") {
-      setLocationFilter(value);
+    // if (type === "location") {
+    //   setLocationFilter(value);
 
-      if (value === "Ubicación" && categoryFilter === "Tipo de evento") {
-        clearAllFilters();
-      } else {
-        filterEvents(
-          isDateFilterActive ? selectedDate : undefined,
-          value,
-          categoryFilter
-        );
-      }
-    } else {
+    //   if (value === "Ubicación" && categoryFilter === "Tipo de evento") {
+    //     clearAllFilters();
+    //   } else {
+    //     filterEvents(
+    //       isDateFilterActive ? selectedDate : undefined,
+    //       value,
+    //       categoryFilter
+    //     );
+    //   }
+    // } else {
       setCategoryFilter(value);
 
-      if (value === "Tipo de evento" && locationFilter === "Ubicación") {
+      if (value === "Tipo de evento") {
         clearAllFilters();
       } else {
         filterEvents(
           isDateFilterActive ? selectedDate : undefined,
-          locationFilter,
+          "Ubicación",
           value
         );
       }
-    }
+    // }
   };
 
   return (
@@ -81,10 +79,9 @@ const Index = () => {
       </Head>
       <div className="hidden lg:flex h-[calc(100vh-5rem)] overflow-hidden scrollbar-hide">
         <div className="w-1/3 flex flex-col border-r border-[rgba(226,225,223,0.6)]  bg-gradient-to-br from-[rgba(244,242,242)] to-[rgba(248,250,252)]">
-          <div className="p-6 flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide touch-scroll">
-            <div className="space-y-6">
+          <div className="p-6 flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide touch-scroll">            <div className="space-y-6">
               <EventSearchBar
-                locationFilter={locationFilter}
+                // locationFilter="Ubicación"
                 categoryFilter={categoryFilter}
                 onFilterChange={handleFilterChange}
                 onSearch={handleSearch}
@@ -153,11 +150,9 @@ const Index = () => {
               selectedDate={isDateFilterActive ? selectedDate : undefined}
               checkDateHasEvent={dateHasEvent}
             />
-          </div>
-
-          <div className="p-4 pb-2">
+          </div>          <div className="p-4 pb-2">
             <EventSearchBar
-              locationFilter={locationFilter}
+              // locationFilter="Ubicación"
               categoryFilter={categoryFilter}
               onFilterChange={handleFilterChange}
               onSearch={handleSearch}
