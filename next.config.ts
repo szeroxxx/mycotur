@@ -4,13 +4,12 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   images: {
-    domains: ["localhost", "images.unsplash.com", "avilamycotour.es"],
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'localhost',
+        hostname: 'avilamycotour.es',
         port: '',
-        pathname: '/server/api/image/**',
+        pathname: '/server/api/files/**',
       },
     ],
   },
