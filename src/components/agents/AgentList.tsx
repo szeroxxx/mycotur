@@ -26,12 +26,12 @@ export const AgentList: React.FC<AgentListProps> = ({
           className="mx-auto mb-4 opacity-50"
         />
         <h3 className="text-lg font-medium text-[rgba(68,63,63)] mb-2">
-          No Agents Found
+          No se Encontraron Agentes
         </h3>
         <p className="text-sm text-[rgba(100,92,90)]">
           {" "}
-          There are no agents added yet. Click the &quot;Add Agent&quot; button
-          to create one.
+          No se han añadido agentes aún. Haz clic en el botón &quot;Añadir
+          Agente&quot; para crear uno.
         </p>
       </div>
     );
@@ -46,16 +46,16 @@ export const AgentList: React.FC<AgentListProps> = ({
               <thead className="bg-[rgba(244,242,242)] sticky top-0 z-10">
                 <tr>
                   <th className="py-3.5 px-6 text-left text-xs font-medium text-[rgba(100,92,90)] uppercase tracking-wider">
-                    Agent Name
+                    Nombre del Agente
                   </th>
                   <th className="py-3.5 px-6 text-left text-xs font-medium text-[rgba(100,92,90)] uppercase tracking-wider">
-                    Email
+                    Correo Electrónico
                   </th>
                   <th className="py-3.5 px-6 text-left text-xs font-medium text-[rgba(100,92,90)] uppercase tracking-wider">
-                    Status
+                    Estado
                   </th>
                   <th className="py-3.5 px-6 text-left text-xs font-medium text-[rgba(100,92,90)] uppercase tracking-wider">
-                    Action
+                    Acción
                   </th>
                 </tr>
               </thead>

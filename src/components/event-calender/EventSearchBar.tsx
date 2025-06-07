@@ -9,19 +9,19 @@ interface Category {
   description: string;
 }
 
-interface Location {
-  uuid: string;
-  location: string;
-}
+// interface Location {
+//   uuid: string;
+//   location: string;
+// }
 
-const defaultLocation: Location = {
-  uuid: "",
-  location: "Location",
-};
+// const defaultLocation: Location = {
+//   uuid: "",
+//   location: "Ubicación",
+// };
 
 const defaultCategory: Category = {
   uuid: "",
-  title: "Event Category",
+  title: "Tipo de evento",
   description: "",
 };
 
@@ -42,22 +42,32 @@ const EventSearchBar: React.FC<EventSearchBarProps> = ({
   className = "",
   variant = "full",
 }) => {
-  const { categories, isLoading: categoriesLoading, error: categoriesError } = useData();
-  
-  const { locations, isLoading: locationsLoading, error: locationsError } = useEventLocations();
+  const {
+    categories,
+    isLoading: categoriesLoading,
+    error: categoriesError,
+  } = useData();
+  console.log("categories::: ", categories);
+
+  const {
+    // locations,
+    isLoading: locationsLoading,
+    error: locationsError,
+  } = useEventLocations();
 
   const categoryOptions = useMemo(
     () => [defaultCategory, ...categories],
     [categories]
   );
-  
-  const locationOptions = useMemo(
-    () => [defaultLocation, ...locations],
-    [locations]
-  );
 
+  // const locationOptions = useMemo(
+  //   () => [defaultLocation, ...locations],
+  //   [locations]
+  // );
   const hasActiveFilters = useMemo(() => {
-    return locationFilter !== "Location" || categoryFilter !== "Event Category";
+    return (
+      locationFilter !== "Ubicación" || categoryFilter !== "Tipo de evento"
+    );
   }, [locationFilter, categoryFilter]);
 
   const handleFilterChange = (
@@ -66,10 +76,9 @@ const EventSearchBar: React.FC<EventSearchBarProps> = ({
   ): void => {
     onFilterChange(type, value);
   };
-
   const handleClearFilters = (): void => {
-    onFilterChange("location", "Location");
-    onFilterChange("category", "Event Category");
+    onFilterChange("location", "Ubicación");
+    onFilterChange("category", "Tipo de evento");
   };
 
   const isLoading = categoriesLoading || locationsLoading;
@@ -78,7 +87,7 @@ const EventSearchBar: React.FC<EventSearchBarProps> = ({
   if (isLoading) {
     return (
       <div className="bg-white rounded-[20px] shadow-md p-4 flex items-center justify-center">
-        <p>Loading...</p>
+        <p>Cargando...</p>
       </div>
     );
   }
@@ -86,7 +95,7 @@ const EventSearchBar: React.FC<EventSearchBarProps> = ({
   if (error) {
     return (
       <div className="bg-white rounded-[20px] shadow-md p-4 flex items-center justify-center">
-        <p className="text-red-500">Error loading data</p>
+        <p className="text-red-500">Error al cargar datos</p>
       </div>
     );
   }
@@ -94,7 +103,7 @@ const EventSearchBar: React.FC<EventSearchBarProps> = ({
   return (
     <div className={`bg-white rounded-[20px] shadow-md p-4 ${className}`}>
       <div className="flex gap-2">
-        <div className={variant === "compact" ? "flex-1 min-w-0" : "w-32"}>
+        {/* <div className={variant === "compact" ? "flex-1 min-w-0" : "w-32"}>
           <select
             value={locationFilter}
             onChange={(e) => handleFilterChange("location", e.target.value)}
@@ -106,7 +115,7 @@ const EventSearchBar: React.FC<EventSearchBarProps> = ({
               </option>
             ))}
           </select>
-        </div>
+        </div> */}
         <div className={variant === "compact" ? "flex-1 min-w-0" : "w-36"}>
           <select
             value={categoryFilter}
@@ -117,9 +126,10 @@ const EventSearchBar: React.FC<EventSearchBarProps> = ({
               <option key={category.uuid} value={category.title}>
                 {category.title}
               </option>
-            ))}          </select>
+            ))}{" "}
+          </select>
         </div>
-        
+
         <button
           onClick={handleClearFilters}
           disabled={!hasActiveFilters}

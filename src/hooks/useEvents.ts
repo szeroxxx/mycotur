@@ -23,6 +23,7 @@ interface ApiEventItem {
   activityId: number;
   activityTitle: string;
   category: string;
+  categories?: string[]; 
   location: string;
   date: string;
   time: string;
@@ -36,10 +37,10 @@ interface ApiEventItem {
   media?: Array<{ name: string; type: string }>;
 }
 
-
 export const useEvents = () => {
   const [events, setEvents] = useState<Event[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);  const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
   const [pagination, setPagination] = useState<PaginationInfo>({
@@ -106,7 +107,8 @@ export const useEvents = () => {
 
         if (searchTerm) {
           queryParams.append("search", searchTerm);
-        }        if (categoryFilter) {
+        }
+        if (categoryFilter) {
           queryParams.append("category", categoryFilter);
         }
 
@@ -134,6 +136,8 @@ export const useEvents = () => {
               eventDate: item.date,
               eventTime: item.time,
               category: item.category,
+              categories:
+                item.categories || (item.category ? [item.category] : []),
               description: item.description,
               email: item.email,
               phone: item.phone,
@@ -157,16 +161,17 @@ export const useEvents = () => {
         }
       } catch (error) {
         console.error("Error fetching events:", error);
-        let errorMessage = "Failed to fetch events";
+        let errorMessage = "No pudo buscar eventos";
 
         if (axios.isAxiosError(error)) {
           if (error.response?.status === 401) {
-            errorMessage = "Authentication failed. Please log in again.";
+            errorMessage =
+              "La autenticación falló. Por favor, inicia sesión de nuevo.";
           } else {
             errorMessage =
               error.response?.data?.message ||
               error.message ||
-              "Error connecting to server";
+              "Error al conectar con el servidor";
           }
         } else if (error instanceof Error) {
           errorMessage = error.message;
@@ -186,26 +191,31 @@ export const useEvents = () => {
   const createEvent = useCallback(
     async (event: Omit<Event, "id">) => {
       try {
-        const formData = new FormData();        if (
+        const formData = new FormData();
+        if (
           !event.event ||
-          !event.category ||
+          (!event.category &&
+            (!event.categories || event.categories.length === 0)) ||
           !event.email ||
           !event.activityId
         ) {
-          showToast("error", "Please fill in all required fields");
+          showToast(
+            "error",
+            "Por favor, completa todos los campos obligatorios"
+          );
           return null;
         }
 
         if (event.images && event.images.length > 0) {
           for (const image of event.images) {
             if (!ALLOWED_FILE_TYPES.includes(image.type)) {
-              showToast("error", "Only JPG, PNG and WebP images are allowed");
+              showToast("error", "Solo se permiten imágenes JPG, PNG y WebP");
               return null;
             }
             if (image.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
               showToast(
                 "error",
-                `Images must be less than ${MAX_FILE_SIZE_MB}MB`
+                `Las imágenes deben ser menores de ${MAX_FILE_SIZE_MB}MB`
               );
               return null;
             }
@@ -216,23 +226,28 @@ export const useEvents = () => {
         if (event.videos && event.videos.length > 0) {
           for (const video of event.videos) {
             if (!ALLOWED_VIDEO_TYPES.includes(video.type)) {
-              showToast("error", "Only MP4, WebM and MOV videos are allowed");
+              showToast("error", "Solo se permiten videos MP4, WebM y MOV");
               return null;
             }
             if (video.size > MAX_VIDEO_SIZE_MB * 1024 * 1024) {
               showToast(
                 "error",
-                `Videos must be less than ${MAX_VIDEO_SIZE_MB}MB`
+                `Los videos deben ser menores de ${MAX_VIDEO_SIZE_MB}MB`
               );
               return null;
             }
             formData.append("videos", video);
           }
         }
-
         formData.append("activityId", event.activityId.toString());
         formData.append("title", event.event);
-        formData.append("category", event.category);
+
+        if (event.categories && event.categories.length > 0) {
+          formData.append("categories", JSON.stringify(event.categories));
+        } else if (event.category) {
+          formData.append("category", event.category);
+        }
+
         formData.append("date", event.eventDate);
         formData.append("time", event.eventTime);
         formData.append("description", event.description);
@@ -263,36 +278,38 @@ export const useEvents = () => {
             ...event,
             id: response.data.id,
           };
-          showToast("success", "Event created successfully");
+          showToast("success", "Evento creado con éxito");
           fetchEvents(pagination.currentPage);
 
           return newEvent;
         } else {
           const errorMessage =
-            response.data?.message || "Failed to create event";
+            response.data?.message || "Fallo al crear el evento";
           showToast("error", errorMessage);
           return null;
         }
       } catch (error) {
         console.error("Error creating event:", error);
-        let errorMessage = "Failed to create event";
+        let errorMessage = "Fallo al crear el evento";
 
         if (axios.isAxiosError(error)) {
           if (error.response?.status === 401) {
-            errorMessage = "Authentication failed. Please log in again.";
+            errorMessage =
+              "La autenticación falló. Por favor, inicia sesión de nuevo.";
           } else if (error.response?.status === 400) {
             errorMessage =
               error.response.data?.message ||
-              "Invalid input data. Please check your form.";
+              "Los datos de entrada no son válidos. Por favor, revisa tu formulario.";
           } else if (error.response?.status === 403) {
-            errorMessage = "You don't have permission to create events.";
+            errorMessage = "No tienes permiso para crear eventos.";
           } else if (error.response?.status === 500) {
-            errorMessage = "Server error. Please try again later.";
+            errorMessage =
+              "Error del servidor. Por favor, inténtalo de nuevo más tarde.";
           } else {
             errorMessage =
               error.response?.data?.message ||
               error.message ||
-              "Error connecting to server";
+              "Error al conectar con el servidor";
           }
         } else if (error instanceof Error) {
           errorMessage = error.message;
@@ -310,22 +327,25 @@ export const useEvents = () => {
         const response = await axiosInstance.delete(`${URL}/api/event/${id}`);
 
         if (response.status === 200) {
-          showToast("success", "Event deleted successfully");
+          showToast("success", "Evento eliminado con éxito");
           fetchEvents(pagination.currentPage);
         } else {
-          throw new Error(response.data?.message || "Failed to delete event");
+          throw new Error(
+            response.data?.message || "Fallo al eliminar el evento"
+          );
         }
       } catch (error) {
         console.error("Error deleting event:", error);
-        let errorMessage = "Failed to delete event";
+        let errorMessage = "Fallo al eliminar el evento";
 
         if (axios.isAxiosError(error)) {
           if (error.response?.status === 404) {
-            errorMessage = "Event not found";
+            errorMessage = "Evento no encontrado";
           } else if (error.response?.status === 401) {
-            errorMessage = "Authentication failed. Please log in again.";
+            errorMessage =
+              "La autenticación falló. Por favor, inicie sesión de nuevo.";
           } else if (error.response?.status === 403) {
-            errorMessage = "You don't have permission to delete this event.";
+            errorMessage = "No tienes permiso para eliminar este evento.";
           } else {
             errorMessage = error.response?.data?.message || error.message;
           }
@@ -343,16 +363,17 @@ export const useEvents = () => {
   const updateEvent = useCallback(
     async (event: Event) => {
       try {
-        const formData = new FormData();        if (event.images && event.images.length > 0) {
+        const formData = new FormData();
+        if (event.images && event.images.length > 0) {
           for (const image of event.images) {
             if (!ALLOWED_FILE_TYPES.includes(image.type)) {
-              showToast("error", "Only JPG, PNG and WebP images are allowed");
+              showToast("error", "Solo se permiten imágenes JPG, PNG y WebP");
               return null;
             }
             if (image.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
               showToast(
                 "error",
-                `Images must be less than ${MAX_FILE_SIZE_MB}MB`
+                `Las imágenes deben ser menores de ${MAX_FILE_SIZE_MB}MB`
               );
               return null;
             }
@@ -363,23 +384,28 @@ export const useEvents = () => {
         if (event.videos && event.videos.length > 0) {
           for (const video of event.videos) {
             if (!ALLOWED_VIDEO_TYPES.includes(video.type)) {
-              showToast("error", "Only MP4, WebM and MOV videos are allowed");
+              showToast("error", "Solo se permiten videos MP4, WebM y MOV");
               return null;
             }
             if (video.size > MAX_VIDEO_SIZE_MB * 1024 * 1024) {
               showToast(
                 "error",
-                `Videos must be less than ${MAX_VIDEO_SIZE_MB}MB`
+                `Los videos deben ser menores de ${MAX_VIDEO_SIZE_MB}MB`
               );
               return null;
             }
             formData.append("videos", video);
           }
         }
-
         formData.append("activityId", event.activityId.toString());
         formData.append("title", event.event);
-        formData.append("category", event.category);
+
+        if (event.categories && event.categories.length > 0) {
+          formData.append("categories", JSON.stringify(event.categories));
+        } else if (event.category) {
+          formData.append("category", event.category);
+        }
+
         formData.append("date", event.eventDate);
         formData.append("time", event.eventTime);
         formData.append("description", event.description);
@@ -390,38 +416,39 @@ export const useEvents = () => {
         formData.append("location", event.location || "");
         if (event.lat) {
           formData.append("lat", event.lat.toString());
-        }        if (event.lon) {
+        }
+        if (event.lon) {
           formData.append("lon", event.lon.toString());
         }
         if (event.mediaUrls && event.mediaUrls.length > 0) {
           formData.append("mediaUrls", JSON.stringify(event.mediaUrls));
         }
-        
+
         const response = await axiosInstance.put(
           `${URL}/api/event/${event.id}`,
           formData
         );
 
         if (response.status === 200) {
-          showToast("success", "Event updated successfully");
+          showToast("success", "Evento actualizado con éxito");
           fetchEvents(pagination.currentPage);
 
           return event;
         } else {
           const errorMessage =
-            response.data?.message || "Failed to update event";
+            response.data?.message || "Fallo al actualizar el evento";
           showToast("error", errorMessage);
           return null;
         }
       } catch (error) {
         console.error("Error updating event:", error);
-        let errorMessage = "Failed to update event";
+        let errorMessage = "Fallo al actualizar el evento";
 
         if (axios.isAxiosError(error)) {
           errorMessage =
             error.response?.data?.message ||
             error.message ||
-            "Error connecting to server";
+            "Error al conectar con el servidor";
         } else if (error instanceof Error) {
           errorMessage = error.message;
         }

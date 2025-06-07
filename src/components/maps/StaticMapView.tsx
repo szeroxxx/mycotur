@@ -108,7 +108,7 @@ const StaticMapView: React.FC<StaticMapViewProps> = ({
             <div className="flex items-center gap-2 text-sm">
               <MapPin className="w-4 h-4 text-[rgba(229,114,0)]" />
               <span className="text-[rgba(68,63,63)] font-medium">
-                Directions unavailable
+                Direcciones no disponibles
               </span>
             </div>
           </div>
@@ -129,7 +129,7 @@ const StaticMapView: React.FC<StaticMapViewProps> = ({
         <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[rgba(229,114,0)] mx-auto mb-2"></div>
-            <p className="text-gray-600 text-sm">Loading map...</p>
+            <p className="text-gray-600 text-sm">Cargando mapa...</p>
           </div>
         </div>
       )}
@@ -142,7 +142,7 @@ const StaticMapView: React.FC<StaticMapViewProps> = ({
           <div className="flex items-center gap-2 text-sm">
             <MapPin className="w-4 h-4 text-[rgba(229,114,0)]" />
             <span className="text-[rgba(68,63,63)] font-medium">
-              Get Directions
+              Cómo llegar
             </span>
           </div>
         </div>

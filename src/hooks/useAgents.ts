@@ -30,23 +30,26 @@ export const useAgents = () => {
       setTimeout(() => setToast(null), 3000);
     },
     []
-  );  const fetchAgents = useCallback(async () => {
+  );
+  const fetchAgents = useCallback(async () => {
     try {
       setIsLoading(true);
-      
+
       const queryParams = new URLSearchParams();
-      
+
       if (searchTerm) {
         queryParams.append("search", searchTerm);
       }
-      
+
       if (statusFilter) {
         queryParams.append("status", statusFilter);
       }
-      
+
       const queryString = queryParams.toString();
-      const url = queryString ? `/api/user/agent?${queryString}` : "/api/user/agent";
-      
+      const url = queryString
+        ? `/api/user/agent?${queryString}`
+        : "/api/user/agent";
+
       const response = await axiosInstance.get(url);
 
       const fetchedAgents = response.data.map((agent: ApiAgentResponse) => ({
@@ -64,7 +67,7 @@ export const useAgents = () => {
       }));
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : "Failed to fetch agents";
+        error instanceof Error ? error.message : "No pudo buscar agentes";
       showToast("error", errorMessage);
       console.error("Error fetching agents:", error);
     } finally {
@@ -97,7 +100,7 @@ export const useAgents = () => {
 
         if (response.data && response.data.message === "User created") {
           await fetchAgents();
-          showToast("success", "Agent invited successfully");
+          showToast("success", "Agente invitado con éxito");
           return {
             ...agent,
             id: response.data.id || Date.now().toString(),
@@ -110,13 +113,13 @@ export const useAgents = () => {
           if (error.response?.status === 400) {
             showToast("error", error.response?.data.error);
           } else if (error.response?.status === 500) {
-            showToast("error", "Internal server error. Please try again later");
+            showToast("error", "Error interno del servidor. Por favor, inténtalo de nuevo más tarde");
           } else {
-            showToast("error", "Failed to invite agent. Please try again");
+            showToast("error", "No se pudo invitar al agente. Por favor, inténtalo de nuevo");
           }
         } else {
           console.error("Error creating agent:", error);
-          showToast("error", "An unexpected error occurred");
+          showToast("error", "Ocurrió un error inesperado");
         }
       }
     },
@@ -134,13 +137,13 @@ export const useAgents = () => {
           setAgents((prev) =>
             prev.map((item) => (item.id === agent.id ? agent : item))
           );
-          showToast("success", "Agent updated successfully");
+          showToast("success", "Agente actualizado con éxito");
           return agent;
         }
       } catch (error) {
         console.error("Error updating agent:", error);
         const errorMessage =
-          error instanceof Error ? error.message : "Failed to update agent";
+          error instanceof Error ? error.message : "No se pudo actualizar el agente";
         showToast("error", errorMessage);
         throw error;
       }
@@ -155,14 +158,14 @@ export const useAgents = () => {
 
         if (response.status === 200 || response.status === 204) {
           await fetchAgents();
-          showToast("success", "Agent deleted successfully");
+          showToast("success", "Agente eliminado con éxito");
         } else {
-          showToast("error", "Failed to delete agent");
+          showToast("error", "No se pudo eliminar el agente");
         }
       } catch (error) {
         console.error("Error deleting agent:", error);
         const errorMessage =
-          error instanceof Error ? error.message : "Failed to delete agent";
+          error instanceof Error ? error.message : "No se pudo eliminar el agente";
         showToast("error", errorMessage);
         throw error;
       }
@@ -189,11 +192,13 @@ export const useAgents = () => {
     const end = start + pagination.pageSize;
 
     return filtered.slice(start, end);
-  }, [getFilteredAgents, pagination.currentPage, pagination.pageSize]);  const setPage = useCallback((page: number) => {
+  }, [getFilteredAgents, pagination.currentPage, pagination.pageSize]);
+  const setPage = useCallback((page: number) => {
     setPagination((prev) => ({
       ...prev,
       currentPage: page,
-    }));  }, []);
+    }));
+  }, []);
 
   return {
     agents: getPaginatedAgents(),

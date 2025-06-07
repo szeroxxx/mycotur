@@ -9,6 +9,7 @@ interface RawEventDetailData {
   title: string;
   owner: string;
   category: string;
+  categories?: string[];
   location: string;
   lat: string;
   lon: string;
@@ -49,6 +50,7 @@ export interface EventDetailData {
   }[];
   totalPhotos: number;
   category: string;
+  categories?: string[];
   eventDate: {
     date: string;
     time: string;
@@ -94,10 +96,10 @@ export const useEventDetail = (uuid: string | undefined) => {
         id: (index + 1).toString(),
         url: getMediaUrl(media.name),
         alt: `${data.title} - Media ${index + 1}`,
-        type: media.type,
-      })),
+        type: media.type,      })),
       totalPhotos: data.photos.length,
       category: data.category,
+      categories: data.categories || (data.category ? [data.category] : []),
       eventDate: data.eventDates,
       description: data.description,
       organizer: {

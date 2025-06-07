@@ -39,10 +39,10 @@ export const EventList: React.FC<EventListProps> = ({
         className="bg-[rgba(255,255,255)] border border-red-400 text-red-700 p-4 rounded relative"
         role="alert"
       >
-        <strong className="font-bold">Profile Incomplete</strong>
+        <strong className="font-bold">Perfil Incompleto</strong>
         <span className="block sm:inline">
           {" "}
-          Please complete your profile before adding events.
+          Por favor completa tu perfil antes de añadir eventos.
         </span>
         <div>
           <span className="block sm:inline"> {profileStatus?.message}</span>
@@ -62,12 +62,11 @@ export const EventList: React.FC<EventListProps> = ({
           className="mx-auto mb-4 opacity-50"
         />
         <h3 className="text-lg font-medium text-[rgba(68,63,63)] mb-2">
-          No Event Found
+          No se encontraron eventos
         </h3>
         <p className="text-sm text-[rgba(100,92,90)]">
           {" "}
-          There are no Event added yet. Click the &quot;Add Event&quot; button
-          to create one.
+          No se han añadido eventos aún. Haz clic en el botón &quot;Añadir Evento&quot; para crear uno.
         </p>
       </div>
     );
@@ -81,22 +80,22 @@ export const EventList: React.FC<EventListProps> = ({
               <thead className="bg-[rgba(244,242,242)] sticky top-0 z-10">
                 <tr>
                   <th className="py-3.5 px-6 text-left text-xs font-medium text-[rgba(100,92,90)] uppercase tracking-wider bg-[rgba(244,242,242)]">
-                    Activity name
+                    Nombre de la Actividad
                   </th>
                   <th className="py-3.5 px-6 text-left text-xs font-medium text-[rgba(100,92,90)] uppercase tracking-wider bg-[rgba(244,242,242)]">
-                    Event
+                    Evento
                   </th>
                   <th className="py-3.5 px-6 text-left text-xs font-medium text-[rgba(100,92,90)] uppercase tracking-wider bg-[rgba(244,242,242)]">
-                    Event Date
+                    Fecha del Evento
                   </th>
                   <th className="py-3.5 px-6 text-left text-xs font-medium text-[rgba(100,92,90)] uppercase tracking-wider bg-[rgba(244,242,242)]">
-                    Event Time
+                    Hora del Evento
                   </th>
                   <th className="py-3.5 px-6 text-left text-xs font-medium text-[rgba(100,92,90)] uppercase tracking-wider bg-[rgba(244,242,242)]">
-                    Category
+                    Categoría
                   </th>
                   <th className="py-3.5 px-6 text-left text-xs font-medium text-[rgba(100,92,90)] uppercase tracking-wider bg-[rgba(244,242,242)]">
-                    Action
+                    Acción
                   </th>
                 </tr>
               </thead>

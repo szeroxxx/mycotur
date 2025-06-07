@@ -31,15 +31,15 @@ const submitRSVP = async (
     if (response.status === 200 || response.status === 201) {
       showToast(
         "success",
-        "Your information is sent to organiser, they will \nconnect you soon via submitted details"
+        "Hemos enviado tu información al organizador. Muy \npronto se pondrá en contacto contigo para \ncontarte más"
       );
       return true;
     } else {
-      showToast("error", response.data.message || "Failed to submit RSVP");
+      showToast("error", response.data.message || "Fallo al enviar RSVP");
       return false;
     }
   } catch (error) {
-    let errorMessage = "Failed to submit RSVP";
+    let errorMessage = "Fallo al enviar RSVP";
     if (axios.isAxiosError(error)) {
       errorMessage =
         error.response?.data?.message || error.message || errorMessage;
@@ -122,7 +122,7 @@ const EventDetailPage: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-orange-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading event details...</p>
+          <p className="mt-4 text-gray-600">Cargando detalles del evento...</p>
         </div>
       </div>
     );
@@ -134,7 +134,7 @@ const EventDetailPage: React.FC = () => {
         <div className="text-center">
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
           <h1 className="text-2xl font-bold text-gray-800 mb-2">
-            Event Not Found
+            Evento no encontrado
           </h1>
           <p className="text-gray-600 mb-4">
             {error || "The requested event could not be found."}
@@ -143,7 +143,7 @@ const EventDetailPage: React.FC = () => {
             onClick={() => router.back()}
             className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors"
           >
-            Go Back
+            Volver Volver
           </button>
         </div>
       </div>
@@ -193,11 +193,13 @@ const EventDetailPage: React.FC = () => {
           <div className="mb-8">
             <PhotoGallery
               photos={eventData.photos}
-              category={eventData.category}
+              category={
+                eventData.categories ||
+                (eventData.category ? [eventData.category] : [])
+              }
               totalPhotos={eventData.totalPhotos}
             />
           </div>
-          {/* Desktop Layout */}
           <div className="hidden lg:block">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2">
@@ -216,19 +218,19 @@ const EventDetailPage: React.FC = () => {
                       className="text-lg font-semibold mb-4 leading-tight"
                       style={{ color: "rgba(68, 63, 63, 1)" }}
                     >
-                      This event is{" "}
+                      Este evento está Completo,
                       <span style={{ color: "rgba(22, 163, 74, 1)" }}>
-                        Completed
+                        Completo
                       </span>{" "}
-                      you can View organiser details and contact them for more
-                      information
+                      puedes Ver los detalles del organizador y contactarlos
+                      para más información
                     </h3>
                     <Button
                       variant="outline"
                       className="w-full bg-[rgba(68,63,63)] text-[rgba(255,255,255)] hover:bg-gray-900 border-gray-800 py-3 font-medium rounded-md transition-colors"
                       onClick={handleGetContactInfo}
                     >
-                      Get Contact Information
+                      Obtener información de contacto
                     </Button>
                   </div>
                 ) : (
@@ -241,7 +243,6 @@ const EventDetailPage: React.FC = () => {
               </div>
             </div>
           </div>
-          {/* Mobile Layout */}
           <div className="lg:hidden space-y-8">
             <EventDetails
               date={eventData.eventDate.date}
@@ -258,19 +259,19 @@ const EventDetailPage: React.FC = () => {
                     className="text-lg font-semibold mb-4 leading-tight"
                     style={{ color: "rgba(68, 63, 63, 1)" }}
                   >
-                    This event is{" "}
+                    Este evento está Completo,
                     <span style={{ color: "rgba(22, 163, 74, 1)" }}>
-                      Completed
+                      Completo
                     </span>{" "}
-                    you can View organiser details and contact them for more
-                    information
+                    puedes Ver los detalles del organizador y contactarlos para
+                    más información
                   </h3>
                   <Button
                     variant="outline"
                     className="w-full bg-[rgba(68,63,63)] text-[rgba(255,255,255)] hover:bg-gray-900 border-gray-800 py-3 font-medium rounded-md transition-colors"
                     onClick={handleGetContactInfo}
                   >
-                    Get Contact Information
+                    Obtener información de contacto
                   </Button>
                 </div>
               ) : (

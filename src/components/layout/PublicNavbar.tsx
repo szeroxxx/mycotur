@@ -10,11 +10,11 @@ const PublicNavbar = () => {
   const isActive = (path: string) => router.pathname === path;
   
   const navItems = [
-    { path: "/home", label: "Home" },
-    { path: "/activity-map", label: "Activities via map" },
-    { path: "/event-calender", label: "Event via Calendar" },
-    { path: "/discover-organiser", label: "Discover Organiser" },
-    { path: "/about", label: "About us" },
+    { path: "/home", label: "Inicio", external: true, url: "https://mycotour.webflow.io/" },
+    { path: "/mapa", label: "Catálogo de Actividades", external: false, url: "" },
+    { path: "/calendario-eventos", label: "Eventos programados", external: false, url: "" },
+    { path: "/organizadores", label: "Organizadores de eventos", external: false, url: "" },
+    { path: "/about", label: "Sobre nosotros", external: true, url: "https://mycotour.webflow.io/about-us" },
   ];
 
   const toggleMobileMenu = () => {
@@ -23,6 +23,10 @@ const PublicNavbar = () => {
 
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
+  };
+
+  const handleExternalLink = (url: string) => {
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -41,7 +45,10 @@ const PublicNavbar = () => {
         <nav className="w-full">
           <div className="max-w-[1440px] mx-auto px-4 md:px-8">
             <div className="flex items-center justify-between h-20">
-              <Link href="/home" className="flex items-center">
+              <button 
+                onClick={() => handleExternalLink("https://mycotour.webflow.io/")}
+                className="flex items-center cursor-pointer"
+              >
                 <Image
                   src="/logo.jpg"
                   alt="Logo"
@@ -49,22 +56,40 @@ const PublicNavbar = () => {
                   height={70}
                   className="md:ml-[251px]"
                 />
-              </Link>
+              </button>
 
               <div className="hidden md:flex items-center justify-center flex-1 ml-16">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.path}
-                    href={item.path}
-                    className={`text-sm font-medium transition-colors duration-200 px-4 ${
-                      isActive(item.path)
-                        ? "text-[rgba(229,114,0)]"
-                        : "text-[rgba(22,21,37)] hover:text-[rgba(229,114,0)]"
-                    }`}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
+                {navItems.map((item) => {
+                  if (item.external) {
+                    return (
+                      <button
+                        key={item.path}
+                        onClick={() => handleExternalLink(item.url)}
+                        className={`text-sm font-medium transition-colors duration-200 px-4 cursor-pointer ${
+                          isActive(item.path)
+                            ? "text-[rgba(229,114,0)]"
+                            : "text-[rgba(22,21,37)] hover:text-[rgba(229,114,0)]"
+                        }`}
+                      >
+                        {item.label}
+                      </button>
+                    );
+                  } else {
+                    return (
+                      <Link
+                        key={item.path}
+                        href={item.path}
+                        className={`text-sm font-medium transition-colors duration-200 px-4 ${
+                          isActive(item.path)
+                            ? "text-[rgba(229,114,0)]"
+                            : "text-[rgba(22,21,37)] hover:text-[rgba(229,114,0)]"
+                        }`}
+                      >
+                        {item.label}
+                      </Link>
+                    );
+                  }
+                })}
               </div>
 
               <div className="hidden md:block w-[156px]"></div>
@@ -101,14 +126,20 @@ const PublicNavbar = () => {
           style={{ top: 0, left: 0, right: 0, bottom: 0 }}
         >
           <div className="flex items-center justify-between px-4 h-20 border-b border-gray-100">
-            <Link href="/home" className="flex items-center" onClick={closeMobileMenu}>
+            <button 
+              onClick={() => {
+                handleExternalLink("https://mycotour.webflow.io/");
+                closeMobileMenu();
+              }}
+              className="flex items-center cursor-pointer"
+            >
               <Image
                 src="/logo.jpg"
                 alt="Logo"
                 width={120}
                 height={54}
               />
-            </Link>
+            </button>
             <button
               onClick={closeMobileMenu}
               className="w-8 h-8 flex items-center justify-center"
@@ -131,20 +162,41 @@ const PublicNavbar = () => {
           </div>
 
           <div className="px-4 py-8">
-            {navItems.map((item) => (
-              <Link
-                key={item.path}
-                href={item.path}
-                onClick={closeMobileMenu}
-                className={`block py-4 text-lg font-medium transition-colors duration-200 ${
-                  isActive(item.path)
-                    ? "text-[rgba(229,114,0)]"
-                    : "text-[rgba(22,21,37)] hover:text-[rgba(229,114,0)]"
-                }`}
-              >
-                {item.label}
-              </Link>
-            ))}
+            {navItems.map((item) => {
+              if (item.external) {
+                return (
+                  <button
+                    key={item.path}
+                    onClick={() => {
+                      handleExternalLink(item.url);
+                      closeMobileMenu();
+                    }}
+                    className={`block py-4 text-lg font-medium transition-colors duration-200 w-full text-left cursor-pointer ${
+                      isActive(item.path)
+                        ? "text-[rgba(229,114,0)]"
+                        : "text-[rgba(22,21,37)] hover:text-[rgba(229,114,0)]"
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                );
+              } else {
+                return (
+                  <Link
+                    key={item.path}
+                    href={item.path}
+                    onClick={closeMobileMenu}
+                    className={`block py-4 text-lg font-medium transition-colors duration-200 ${
+                      isActive(item.path)
+                        ? "text-[rgba(229,114,0)]"
+                        : "text-[rgba(22,21,37)] hover:text-[rgba(229,114,0)]"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              }
+            })}
           </div>
         </div>
       )}

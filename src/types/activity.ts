@@ -1,9 +1,8 @@
-// types/activity.ts
 export interface Activity {
   id: string;
   uuid: string;
   title: string;
-  category: string;
+  categories: string[];
   location: string;
   lat: string;
   lon: string;

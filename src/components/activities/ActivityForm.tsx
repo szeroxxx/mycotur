@@ -74,7 +74,9 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
 
     if (isValidLocation && value !== locationInput) {
       setIsValidLocation(false);
-      setLocationError("Please select a location from the suggestions below");
+      setLocationError(
+        "Seleccione una ubicación de las sugerencias a continuación"
+      );
       const clearEvent = {
         target: {
           name: "location",
@@ -94,25 +96,27 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
 
         if (suggestions.length === 0) {
           setLocationError(
-            "No valid locations found. Please search for places in Valle del Tiétar, La Moraña, Valle de Amblés, Sierra de Gredos, or Alberche Pinares."
+            "No se encontraron ubicaciones válidas. Por favor, busca lugares en Valle del Tiétar, La Moraña, Valle de Amblés, Sierra de Gredos o Alberche Pinares."
           );
         } else {
           setLocationError(
-            "Please select a location from the suggestions below"
+            "Seleccione una ubicación de las sugerencias a continuación"
           );
         }
       } catch (error) {
         console.error("Error fetching locations:", error);
         setSuggestions([]);
         setShowSuggestions(false);
-        setLocationError("Error fetching locations. Please try again.");
+        setLocationError(
+          "Error al buscar ubicaciones. Por favor, inténtalo de nuevo."
+        );
       }
     } else {
       setSuggestions([]);
       setShowSuggestions(false);
       if (value.length > 0 && !isValidLocation) {
         setLocationError(
-          "Please enter at least 3 characters to search for locations"
+          "Por favor, ingresa al menos 3 caracteres para buscar ubicaciones"
         );
       } else {
         setLocationError(null);
@@ -196,7 +200,9 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
       onChange(mediaEvent);
     } catch (error) {
       console.error("Error in handleImageRemove:", error);
-      setUploadError("Failed to remove image. Please try again.");
+      setUploadError(
+        "Fallo al eliminar la imagen. Por favor, inténtalo de nuevo."
+      );
     }
   };
 
@@ -245,7 +251,9 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
       onChange(mediaEvent);
     } catch (error) {
       console.error("Error in handleVideoRemove:", error);
-      setUploadError("Failed to remove video. Please try again.");
+      setUploadError(
+        "Fallo al eliminar el video. Por favor, inténtalo de nuevo."
+      );
     }
   };
 
@@ -261,19 +269,19 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
     for (const file of newFiles) {
       if (ALLOWED_IMAGE_TYPES.includes(file.type)) {
         if (file.size > 10 * 1024 * 1024) {
-          setUploadError(`Image ${file.name} exceeds 10MB limit`);
+          setUploadError(`La imagen ${file.name} excede el límite de 10MB`);
           return;
         }
         imageFiles.push(file);
       } else if (ALLOWED_VIDEO_TYPES.includes(file.type)) {
         if (file.size > 15 * 1024 * 1024) {
-          setUploadError(`Video ${file.name} exceeds 15MB limit`);
+          setUploadError(`El video ${file.name} excede el límite de 15MB`);
           return;
         }
         videoFiles.push(file);
       } else {
         setUploadError(
-          `File ${file.name} is not allowed. Only JPG, PNG, WebP images and MP4, WebM, MOV videos are supported.`
+          `El archivo ${file.name} no está permitido. Solo se admiten imágenes JPG, PNG, WebP y videos MP4, WebM, MOV.`
         );
         return;
       }
@@ -294,9 +302,9 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
     if (totalImages + imageFiles.length > MAX_IMAGES) {
       const remaining = MAX_IMAGES - totalImages;
       setUploadError(
-        `Too many images. Maximum ${MAX_IMAGES} images allowed. You can upload ${
-          remaining > 0 ? remaining : "no"
-        } more image${remaining !== 1 ? "s" : ""}.`
+        `Demasiadas imágenes. Máximo ${MAX_IMAGES} imágenes permitidas. Puede subir ${
+          remaining > 0 ? remaining : "ninguna"
+        } imagen${remaining !== 1 ? "es" : ""} más.`
       );
       return;
     }
@@ -304,16 +312,18 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
     if (totalVideos + videoFiles.length > MAX_VIDEOS) {
       const remaining = MAX_VIDEOS - totalVideos;
       setUploadError(
-        `Too many videos. Maximum ${MAX_VIDEOS} videos allowed. You can upload ${
-          remaining > 0 ? remaining : "no"
-        } more video${remaining !== 1 ? "s" : ""}.`
+        `Demasiados videos. Máximo ${MAX_VIDEOS} videos permitidos. Puede subir ${
+          remaining > 0 ? remaining : "ningún"
+        } video${remaining !== 1 ? "s" : ""} más.`
       );
       return;
     }
 
     for (const file of newFiles) {
       if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-        setUploadError(`Files must be less than ${MAX_FILE_SIZE_MB}MB`);
+        setUploadError(
+          `Los archivos deben ser menores de ${MAX_FILE_SIZE_MB}MB`
+        );
         return;
       }
     }
@@ -441,7 +451,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
     e.preventDefault();
 
     if (!isValidLocation || !activity.location) {
-      setLocationError("Please select a valid location from the suggestions");
+      setLocationError("Por favor, seleccione una ubicación válida de las sugerencias");
       return;
     }
 
@@ -460,10 +470,10 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
     <form onSubmit={handleFormSubmit} className="space-y-6">
       <div>
         <label className="block text-sm font-sm text-[rgba(68,63,63)] mb-2">
-          Activity Title <RequiredIndicator />
+          Título de la Actividad <RequiredIndicator />
         </label>
         <input
-          placeholder="Activity Name"
+          placeholder="Nombre de la Actividad"
           type="text"
           name="title"
           value={activity.title || ""}
@@ -471,30 +481,94 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
           className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
           required
         />
-      </div>
-
+      </div>{" "}
       <div>
-        <label className="block text-sm font-sm text-[rgba(68,63,63)] mb-2">
-          Activity Category <RequiredIndicator />
+        {" "}
+        <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
+          Categoría de Actividad <RequiredIndicator />
         </label>
-        <select
-          name="category"
-          value={activity.category || ""}
-          onChange={onChange}
-          className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
-          required
-        >
-          <option value="">Select Category</option>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 border border-[#E5E7EB] rounded-lg bg-gray-50/50">
           {categories.map((category) => (
-            <option key={category.uuid} value={category.title}>
-              {category.title}
-            </option>
+            <label
+              key={category.uuid}
+              className="flex items-center space-x-2 text-sm cursor-pointer hover:bg-white/80 p-2 rounded-md transition-colors"
+            >
+              <input
+                type="checkbox"
+                name="categories"
+                value={category.title}
+                checked={(activity.categories || []).includes(category.title)}
+                onChange={(e) => {
+                  const currentCategories = activity.categories || [];
+                  let newCategories;
+
+                  if (e.target.checked) {
+                    newCategories = [...currentCategories, category.title];
+                  } else {
+                    newCategories = currentCategories.filter(
+                      (cat) => cat !== category.title
+                    );
+                  }
+
+                  const categoryEvent = {
+                    target: {
+                      name: "categories",
+                      value: newCategories,
+                    },
+                  } as unknown as React.ChangeEvent<HTMLInputElement>;
+
+                  onChange(categoryEvent);
+                }}
+                className="w-4 h-4 text-[#D45B20] bg-gray-100 border-gray-300 rounded focus:ring-[#D45B20] focus:ring-2"
+              />
+              <span className="text-[rgba(68,63,63)] select-none">
+                {category.title}
+              </span>
+            </label>
           ))}
-        </select>
+        </div>
+        {(!activity.categories || activity.categories.length === 0) && (
+          <p className="mt-1 text-sm text-red-600">
+            Seleccione al menos una categorías
+          </p>
+        )}
+        {activity.categories && activity.categories.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-1">
+            {activity.categories.map((categoryTitle) => (
+              <span
+                key={categoryTitle}
+                className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[#D45B20]/10 text-[#D45B20] border border-[#D45B20]/20"
+              >
+                {categoryTitle}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const currentCategories = activity.categories || [];
+                    const newCategories = currentCategories.filter(
+                      (cat) => cat !== categoryTitle
+                    );
+
+                    const categoryEvent = {
+                      target: {
+                        name: "categories",
+                        value: newCategories,
+                      },
+                    } as unknown as React.ChangeEvent<HTMLInputElement>;
+
+                    onChange(categoryEvent);
+                  }}
+                  className="ml-1 hover:bg-[#D45B20]/20 rounded-full p-0.5 transition-colors"
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
       </div>
       <div>
         <label className="block text-sm font-sm text-[rgba(68,63,63)] mb-2">
-          Location <RequiredIndicator />
+          Ubicación <RequiredIndicator />
         </label>
         <div className="relative" ref={locationRef}>
           <input
@@ -502,7 +576,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
             name="location"
             value={locationInput}
             onChange={handleLocationChange}
-            placeholder="Start typing to search for locations (e.g., Valle del Tiétar, Sierra de Gredos...)"
+            placeholder="Comienza a escribir para buscar ubicaciones (por ejemplo, Valle del Tiétar, Sierra de Gredos...)"
             className={`w-full px-4 py-2 text-[rgba(142,133,129)] border rounded-lg text-sm focus:outline-none focus:ring-1 ${
               locationError && !isValidLocation
                 ? "border-red-500 focus:ring-red-500 focus:border-red-500"
@@ -517,8 +591,9 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
           )}
           {!locationError && !isValidLocation && locationInput.length === 0 && (
             <p className="mt-1 text-sm text-gray-500">
-              You must select a location from the suggestions that appear as you
-              type. Manual location entry is not allowed.
+              Debe seleccionar una ubicación de las sugerencias que aparecen a
+              medida que escribe. La entrada manual de ubicaciones no está
+              permitida.
             </p>
           )}
           {isValidLocation && (
@@ -534,7 +609,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
                   clipRule="evenodd"
                 />
               </svg>
-              Valid location selected
+              Ubicación válida seleccionada
             </p>
           )}
           {showSuggestions && suggestions.length > 0 && (
@@ -560,25 +635,24 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
             locationInput.length > 2 && (
               <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4">
                 <div className="text-sm text-gray-500 text-center">
-                  No locations found in target regions. Try searching for places
-                  in Valle del Tiétar, La Moraña, Valle de Amblés, Sierra de
-                  Gredos, or Alberche Pinares.
+                  No se encontraron ubicaciones en las regiones objetivo.
+                  Intente buscar lugares en Valle del Tiétar, La Moraña, Valle
+                  de Amblés, Sierra de Gredos o Alberche Pinares.
                 </div>
               </div>
             )}
         </div>
       </div>
-
       <div className="w-full max-w-2xl">
         <div className="mb-4">
           <p className="text-[rgba(68,63,63)] text-sm mb-4 font-sm">
-            Which season do you think is best for this activity?{" "}
+            ¿Qué temporada crees que es la mejor para esta actividad?
             <RequiredIndicator />
           </p>{" "}
           <div className="flex gap-4">
             <div className="w-full">
               <label className="block text-sm font-sm text-[rgba(142,133,129)] mb-2">
-                Start Month
+                Mes de Inicio
               </label>
               <div className="relative">
                 <input
@@ -603,7 +677,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
 
             <div className="w-full">
               <label className="block text-sm font-sm text-[rgba(142,133,129)] mb-2">
-                End Month
+                Mes de finalización
               </label>
               <div className="relative">
                 <input
@@ -628,10 +702,9 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
           </div>
         </div>
       </div>
-
       <div>
         <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
-          Contact Information (People can view this detail)
+          Información de contacto (Las personas pueden ver estos detalles)
           <RequiredIndicator />
         </label>
         <div className="space-y-4">
@@ -640,7 +713,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
             name="phone"
             value={activity.phone || ""}
             onChange={onChange}
-            placeholder="Phone number"
+            placeholder="Número de teléfono"
             className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
             required
           />
@@ -649,12 +722,12 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
             name="email"
             value={activity.email || ""}
             onChange={onChange}
-            placeholder="Email address"
+            placeholder="Dirección de correo electrónico"
             className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
             required={!activity.phone && !activity.url}
           />
           <input
-            placeholder="Enter link"
+            placeholder="Ingrese el enlace"
             type="text"
             name="url"
             value={activity.url || ""}
@@ -664,48 +737,45 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
           />
         </div>
       </div>
-
       <div>
         <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
-          Fees
+          Tarifas
           <RequiredIndicator />
         </label>
         <textarea
           name="notes"
           value={activity.notes || ""}
           onChange={onChange}
-          placeholder="Mention if there are any fees involved, such as a $20 charge per person covering food and all activities"
+          placeholder="Menciona si hay tarifas involucradas, como un cargo de 0 por persona que cubre comida y todas las actividades"
           rows={3}
           required
           className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
         />
       </div>
-
       <div>
         <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
-          Description <RequiredIndicator />
+          Descripción <RequiredIndicator />
         </label>
         <textarea
           name="description"
           value={activity.description || ""}
           onChange={onChange}
-          placeholder="Write more details Activity and how people can connect you."
+          placeholder="Escribe más sobre la Actividad y cómo las personas pueden contactarte."
           rows={3}
           maxLength={1000}
           className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
           required
         />
       </div>
-
       <div>
         <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
-          Activity Images & Videos
+          Actividad Imágenes & Videos
         </label>
         <div>
           {previewImages.length > 0 && (
             <div className="mb-4">
               <h4 className="text-sm font-medium text-[rgba(68,63,63)] mb-2">
-                Images ({currentImageCount}/{MAX_IMAGES})
+                Imágenes ({currentImageCount}/{MAX_IMAGES})
               </h4>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {previewImages.map((url, index) => (
@@ -736,7 +806,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
                             ? "scale-100 opacity-100"
                             : "scale-75 opacity-0"
                         }`}
-                      aria-label="Remove image"
+                      aria-label="Eliminar imagen"
                     >
                       <MdDelete />
                     </button>
@@ -828,8 +898,8 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
               }`}
             >
               {isUploading
-                ? "Uploading..."
-                : "Click to upload images and videos"}
+                ? "Cargando..."
+                : "Haga clic para cargar imágenes y videos"}
             </div>
             <p className="text-xs text-[#6B7280] mt-2">
               {uploadError ? (
@@ -839,7 +909,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
               )}
             </p>
             <p className="text-xs text-[#6B7280] mt-1">
-              Supported: JPG, PNG, WebP, MP4, WebM, MOV
+              Formatos admitidos: JPG, PNG, WebP, MP4, WebM, MOV
             </p>
           </div>
         </div>
@@ -851,7 +921,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
           className="cursor-pointer px-4 py-2 text-sm font-medium text-[#6B7280] hover:text-[rgba(68,63,63)]"
           disabled={isLoading}
         >
-          Cancel
+          Cancelar
         </button>
         <button
           type="submit"
@@ -886,11 +956,11 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
           )}
           {isLoading
             ? activity.id
-              ? "Updating..."
-              : "Saving..."
+              ? "Actualización..."
+              : "Ahorro..."
             : activity.id
-            ? "Update"
-            : "Save"}
+            ? "Actualizar"
+            : "Guardar"}
         </button>
       </div>
     </form>

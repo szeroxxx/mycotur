@@ -13,6 +13,7 @@ interface RawEventData {
   location: string;
   owner?: string;
   category: string;
+  categories?: string[];
   description: string;
   lat: string;
   lon: string;
@@ -26,10 +27,9 @@ export const useEventsData = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState({
-    location: "Location",
-    category: "Event Category",
+    location: "Ubicación",
+    category: "Tipo de evento",
   });
-
   const mapEventsData = (data: RawEventData[]): CalendarEvent[] => {
     return data.map((item) => ({
       uuid: item.uuid,
@@ -42,6 +42,7 @@ export const useEventsData = () => {
       location: item.location,
       owner: item.owner || "Unknown",
       category: item.category,
+      categories: item.categories || (item.category ? [item.category] : []),
       description: item.description,
       lat: item.lat,
       lon: item.lon,
@@ -61,7 +62,7 @@ export const useEventsData = () => {
         }
         setLoading(false);
       } catch (err) {
-        console.log('err::: ', err);
+        console.log("err::: ", err);
         setError("Failed to load events");
         setLoading(false);
       }
@@ -71,6 +72,7 @@ export const useEventsData = () => {
   }, []);  const filterEvents = (date?: Date, location?: string, category?: string) => {
     const newLocation = location || filters.location;
     const newCategory = category || filters.category;
+
 
     setFilters({
       location: newLocation,
@@ -91,23 +93,68 @@ export const useEventsData = () => {
         );
       });
     } else {
-      // If date is undefined, clear the date filter (show events from all dates)
       setIsDateFilterActive(false);
-      // Keep the selected date for calendar display but don't filter by it
     }
 
-    if (newLocation !== "Location") {
-      filtered = filtered.filter((event) =>
+    if (newLocation !== "Ubicación") {
+      let locationFiltered = [...events];
+      if (date) {
+        locationFiltered = locationFiltered.filter((event) => {
+          const eventDate = new Date(event.date);
+          return (
+            eventDate.getFullYear() === date.getFullYear() &&
+            eventDate.getMonth() === date.getMonth() &&
+            eventDate.getDate() === date.getDate()
+          );
+        });
+      }
+      
+      filtered = locationFiltered.filter((event) =>
         event.location.toLowerCase().includes(newLocation.toLowerCase())
       );
     }
 
-    if (newCategory !== "Event Category") {
-      filtered = filtered.filter((event) => event.category === newCategory);
+    if (newCategory !== "Tipo de evento") {
+      let categoryFiltered = [...events];
+      
+      if (date) {
+        categoryFiltered = categoryFiltered.filter((event) => {
+          const eventDate = new Date(event.date);
+          return (
+            eventDate.getFullYear() === date.getFullYear() &&
+            eventDate.getMonth() === date.getMonth() &&
+            eventDate.getDate() === date.getDate()
+          );
+        });
+      }
+      
+      if (newLocation !== "Ubicación") {
+        categoryFiltered = categoryFiltered.filter((event) =>
+          event.location.toLowerCase().includes(newLocation.toLowerCase())
+        );
+      }
+      
+      
+      filtered = categoryFiltered.filter((event) => {
+        const categoryMatch = event.category?.toLowerCase() === newCategory.toLowerCase();
+        const categoriesMatch = event.categories?.some(
+          (cat) => cat?.toLowerCase() === newCategory.toLowerCase()
+        );
+        return categoryMatch || categoriesMatch;
+      });
     }
 
     setFilteredEvents(filtered);
     return filtered;
+  };
+  const clearAllFilters = () => {
+    setIsDateFilterActive(false);
+    setFilters({
+      location: "Ubicación",
+      category: "Tipo de evento",
+    });
+    setFilteredEvents(events);
+    return events;
   };
 
   const dateHasEvent = (date: Date) => {
@@ -119,8 +166,7 @@ export const useEventsData = () => {
         eventDate.getDate() === date.getDate()
       );
     });
-  };
-  return {
+  };  return {
     events,
     filteredEvents,
     selectedDate,
@@ -128,6 +174,7 @@ export const useEventsData = () => {
     loading,
     error,
     filterEvents,
+    clearAllFilters,
     dateHasEvent,
   };
 };

@@ -63,7 +63,6 @@ const Dashboard: React.FC = () => {
           totalClicks: response.data.totalClicks,
         }));
       } catch (error) {
-        console.error("Error fetching dashboard data:", error);
         let errorMessage = "Failed to fetch dashboard data";
 
         if (axios.isAxiosError(error)) {
@@ -91,7 +90,7 @@ const Dashboard: React.FC = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-[calc(100vh-4rem)]">
-        Loading...
+        Cargando...
       </div>
     );
   }
@@ -113,28 +112,28 @@ const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6">
         {!isAgent && (
           <StatCard
-            title="Total Agents"
+            title="Total de agentes"
             value={dashboardData.totalAgents}
             icon={<FiUsers size={20} />}
           />
         )}
         <StatCard
-          title="Total Number of Form submission"
+          title="Total de formularios enviados"
           value={dashboardData.totalForms}
           icon={<FiFileText size={20} />}
         />
         <StatCard
-          title="Total Activities"
+          title="Total de actividades"
           value={dashboardData.totalActivities}
           icon={<BsWindowStack size={20} />}
         />
         <StatCard
-          title="Total Clicks on contact"
+          title="Total de clics en contacto"
           value={dashboardData.totalClicks}
           icon={<LuMousePointerClick size={20} />}
         />
         <StatCard
-          title="Total Events"
+          title="Total de eventos"
           value={dashboardData.totalEvents || "0"}
           icon={<FiCalendar size={20} />}
         />

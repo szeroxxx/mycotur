@@ -15,6 +15,7 @@ interface EventCardProps {
   image: string;
   isSelected: boolean;
   category: string;
+  categories?: string[];
   onClick: () => void;
 }
 
@@ -27,62 +28,99 @@ const EventCard: React.FC<EventCardProps> = ({
   location,
   owner,
   category,
+  categories,
   isSelected,
   onClick,
-}) => {  const router = useRouter();
+}) => {
+  const displayCategories = categories && categories.length > 0 ? categories : (category ? [category] : []);
+  const hasMultipleCategories = displayCategories.length > 1;
+ 
+  const router = useRouter();
+  
   const handleCardClick = () => {
     onClick();
     router.push(createEventUrl(title, id));
   };
-
+  
   return (
     <div
-      className={`bg-[rgba(255,255,255)] rounded-[16px] shadow-sm cursor-pointer transition-all border ${
+      className={`event-card-mobile p-3 sm:p-4 mb-3 rounded-2xl border cursor-pointer transition-all duration-300 ${
         isSelected
-          ? "border-[rgba(194,91,52)] shadow-md"
-          : "border-[#E5E7EB] hover:border-[rgba(194,91,52)]"
+          ? "border-[rgba(194,91,52)] shadow-xl ring-2 ring-[rgba(194,91,52,0.2)] bg-gradient-to-br from-orange-50 to-white transform"
+          : "border-[rgba(226,225,223,0.4)] hover:border-[rgba(194,91,52,0.6)] shadow-md"
       }`}
       onClick={handleCardClick}
     >
-      <div className="relative h-40">
+      <div className="relative w-full aspect-[402/252] min-h-[180px] max-h-[252px]">
         <Image
           src={image}
           alt={title}
           fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="object-cover rounded-[8px]"
+          sizes="(max-width: 480px) 95vw, (max-width: 640px) 90vw, (max-width: 768px) 45vw, (max-width: 1024px) 30vw, (max-width: 1280px) 25vw, 402px"
+          className="rounded-xl object-cover"
           loading="lazy"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             target.src = "/default-activity-image.png";
           }}
         />
-        <div className="absolute top-2 right-2 bg-[rgba(238,242,255)] text-[rgba(79,70,229)] text-xs px-2 py-1 rounded-[20px]">
-          {category}
+        
+        <div className="absolute top-2 right-2">
+          {displayCategories.length > 0 && (
+            <div
+              className="bg-gradient-to-r from-[rgba(238,242,255)] to-[rgba(248,250,252)] text-[rgba(79,70,229)] text-xs px-2 sm:px-3 py-1 sm:py-1.5 rounded-full shadow-sm border border-[rgba(79,70,229,0.1)] relative group"
+              title={hasMultipleCategories ? displayCategories.join(", ") : displayCategories[0]}
+            >
+              <span className="font-medium">
+                {hasMultipleCategories
+                  ? `${displayCategories[0]} + ${displayCategories.length - 1} más`
+                  : displayCategories[0]
+                }
+              </span>
+            </div>
+          )}
         </div>
+        
+        {isSelected && (
+          <div className="absolute top-2 left-2 bg-[rgba(194,91,52)] text-white text-xs px-2 py-1 rounded-full shadow-sm">
+            <span className="font-medium">Seleccionado</span>
+          </div>
+        )}
       </div>
-
-      <div className="p-4">
-        <h3 className="font-medium text-[rgba(22,21,37)] mb-2">
+      
+      <div className="mt-3 sm:mt-4">
+        <h3 className="text-[rgba(68,63,63)] text-sm sm:text-base md:text-lg font-semibold leading-tight mb-2 line-clamp-2">
           {title}
         </h3>
-
-        <div className="space-y-2 text-sm">
-          <div className="flex items-center gap-2 text-[rgba(68,63,63)]">
-            <CalendarDays className="w-4 h-4 text-gray-500" />
-            <span>{format(new Date(date), "MMM dd, yyyy")}</span>
-            <Clock className="w-4 h-4 text-gray-500 ml-1" />
+        
+        <div className="space-y-1.5">
+          <div className="flex items-center text-[rgba(100,92,90)] text-xs sm:text-sm">
+            <CalendarDays 
+              size={14} 
+              className="mr-2 flex-shrink-0" 
+            />
+            <span className="font-medium">{format(new Date(date), "MMM dd, yyyy")}</span>
+            <Clock 
+              size={14} 
+              className="ml-3 mr-1 flex-shrink-0" 
+            />
             <span>{time}</span>
           </div>
-
-          <div className="flex items-center gap-2">
-            <User className="w-4 h-4 text-[rgba(68,63,63)]" />
-            <span className="text-[rgba(68,63,63)] truncate">{owner}</span>
+          
+          <div className="flex items-center text-[rgba(100,92,90)] text-xs sm:text-sm">
+            <User
+              size={14}
+              className="mr-2 flex-shrink-0"
+            />
+            <span className="truncate font-medium">{owner}</span>
           </div>
-
-          <div className="flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-[rgba(68,63,63)]" />
-            <span className="text-gray-600 truncate">{location}</span>
+          
+          <div className="flex items-center text-[rgba(100,92,90)] text-xs sm:text-sm">
+            <MapPin
+              size={14}
+              className="mr-2 flex-shrink-0"
+            />
+            <span className="truncate">{location}</span>
           </div>
         </div>
       </div>

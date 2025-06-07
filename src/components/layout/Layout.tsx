@@ -32,9 +32,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     "/login",
     "/admin/login",
     "/home",
-    "/activity-map",
-    "/event-calender",
-    "/discover-organiser",
+    "/mapa",
+    "/calendario-eventos",
+    "/organizadores",
     "/about",
     "/activity-details",
     "/event-detail",
@@ -43,7 +43,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     (route) =>
       router.pathname === route ||
       router.pathname.startsWith("/register/") ||
-      router.pathname.startsWith("/discover-organiser/") ||
+      router.pathname.startsWith("/organizadores/") ||
       router.pathname.startsWith("/activity-details/") ||
       router.pathname.startsWith("/event-detail/")
   );

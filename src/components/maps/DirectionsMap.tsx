@@ -63,7 +63,6 @@ const LeafletMapComponent: React.FC<{
 
       const L = (await import("leaflet")).default;
 
-      // Import CSS dynamically
       if (typeof window !== "undefined") {
         const link = document.createElement("link");
         link.rel = "stylesheet";
@@ -71,7 +70,6 @@ const LeafletMapComponent: React.FC<{
         document.head.appendChild(link);
       }
 
-      // Fix for default markers
       const iconDefault = L.Icon.Default.prototype as unknown as {
         _getIconUrl?: string;
       };
@@ -146,7 +144,6 @@ const LeafletMapComponent: React.FC<{
         .bindPopup("Event Location");
 
       if (userLocation) {
-        // Validate user location coordinates
         if (isNaN(userLocation.lat) || isNaN(userLocation.lng)) {
           console.warn("Invalid user location coordinates", userLocation);
           map.setView(

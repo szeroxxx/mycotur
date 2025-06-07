@@ -22,14 +22,14 @@ export const AgentForm: React.FC<AgentFormProps> = ({
     <form onSubmit={onSubmit} className="space-y-6">
       <div>
         <label className="block text-sm font-medium text-[#111827] mb-2">
-          Agent Name <RequiredIndicator />
+          Nombre del agente <RequiredIndicator />
         </label>
         <input
           type="text"
           name="name"
           value={agent.name || ''}
           onChange={onChange}
-          placeholder="Eg. John Fisher"
+          placeholder="Ej. John Fisher"
           className="w-full px-4 py-2 text-black border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
           required
         />
@@ -37,7 +37,7 @@ export const AgentForm: React.FC<AgentFormProps> = ({
 
       <div>
         <label className="block text-sm font-medium text-[#111827] mb-2">
-          Email <RequiredIndicator />
+          Correo electrónico <RequiredIndicator />
         </label>
         <input
           type="email"
@@ -56,13 +56,13 @@ export const AgentForm: React.FC<AgentFormProps> = ({
           onClick={onCancel}
           className="px-4 py-2 text-sm font-medium text-[#6B7280] hover:text-[#111827]"
         >
-          Cancel
+          Cerrar
         </button>
         <button
           type="submit"
           className="px-4 py-2 bg-[#D45B20] hover:bg-[#C44D16] text-white rounded-lg text-sm font-medium transition-colors"
         >
-          {agent.id ? 'Update' : 'Send Invite'}
+          {agent.id ? 'Update' : 'Enviar Invitación'}
         </button>
       </div>
     </form>

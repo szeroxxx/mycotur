@@ -113,11 +113,15 @@ const ActivitiesPage: React.FC = () => {
         setSelectedActivity((prev: Activity | null) => ({
           ...prev!,
           images: value,
-        }));
-      } else if (name === "videos" && Array.isArray(value)) {
+        }));      } else if (name === "videos" && Array.isArray(value)) {
         setSelectedActivity((prev: Activity | null) => ({
           ...prev!,
           videos: value,
+        }));
+      } else if (name === "categories" && Array.isArray(value)) {
+        setSelectedActivity((prev: Activity | null) => ({
+          ...prev!,
+          categories: value,
         }));
       } else {
         setSelectedActivity((prev: Activity | null) => ({
@@ -127,13 +131,13 @@ const ActivitiesPage: React.FC = () => {
       }
     }
   };
-
   const handleEdit = (activity: Activity) => {
     const activityCopy = {
       ...activity,
       images: activity.images || [],
       videos: activity.videos || [],
       mediaUrls: activity.mediaUrls ? [...activity.mediaUrls] : [],
+      categories: activity.categories || [],
     };
     setSelectedActivity(activityCopy);
     setIsModalOpen(true);
@@ -142,8 +146,7 @@ const ActivitiesPage: React.FC = () => {
   const handleDelete = (activity: Activity) => {
     setActivityToDelete(activity);
     setIsDeleteModalOpen(true);
-  };
-  const handleDuplicate = async (activity: Activity) => {
+  };  const handleDuplicate = async (activity: Activity) => {
 
     const duplicatedActivity = {
       ...activity,
@@ -151,8 +154,9 @@ const ActivitiesPage: React.FC = () => {
       title: `${activity.title} (Copy)`,
       images: [],
       videos: [],
-      mediaUrls: activity.mediaUrls ? [...activity.mediaUrls] : [], // Copy mediaUrls so user can modify them
+      mediaUrls: activity.mediaUrls ? [...activity.mediaUrls] : [],
       originalActivityId: activity.uuid,
+      categories: activity.categories || [],
     };
 
 
@@ -181,7 +185,7 @@ const ActivitiesPage: React.FC = () => {
           ...selectedActivity,
           images: selectedActivity.images || [],
           videos: selectedActivity.videos || [],
-          mediaUrls: selectedActivity.mediaUrls || [], // Include mediaUrls for duplication
+          mediaUrls: selectedActivity.mediaUrls || [],
         };
 
         await createActivity(createData);
@@ -213,13 +217,12 @@ const ActivitiesPage: React.FC = () => {
         );
       }
     }
-  };
-  const openAddModal = () => {
+  };  const openAddModal = () => {
     const newActivity = {
       id: "",
       uuid: "",
       title: "",
-      category: "",
+      categories: [],
       location: "",
       lat: "",
       lon: "",
@@ -242,7 +245,7 @@ const ActivitiesPage: React.FC = () => {
   return (
     <div className="min-h-screen">
       <Head>
-        <title>Activities | Mycotur</title>
+        <title>Actividades | Mycotur</title>
       </Head>
       {toast && (
         <div
@@ -265,7 +268,7 @@ const ActivitiesPage: React.FC = () => {
             />
             <input
               type="text"
-              placeholder="Search activities..."
+              placeholder="Buscar..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               disabled={isAgent && profileStatus?.needsUpdate}
@@ -286,7 +289,7 @@ const ActivitiesPage: React.FC = () => {
             }`}
           >
             <Plus className="mr-2" size={18} />
-            Add Activity
+            Añadir actividad
           </button>
         </div>
         <div className="bg-[rgba(255,255,255)] rounded-[16px] border border-[rgba(226,225,223)] flex flex-col">
@@ -299,7 +302,7 @@ const ActivitiesPage: React.FC = () => {
               onDuplicate={handleDuplicate}
             />
           </div>
-          {activities.length > 0 && (
+          {activities.length > 0 && !(isAgent && profileStatus?.needsUpdate) && (
             <div className="border-t border-[rgba(226,225,223)] bg-white rounded-b-[16px] ">
               <Pagination
                 currentPage={pagination.currentPage}
@@ -320,7 +323,7 @@ const ActivitiesPage: React.FC = () => {
           >
             <div className="flex justify-between items-center mb-4 sm:mb-6">
               <h2 className="text-lg sm:text-xl font-medium text-[rgba(68,63,63)]">
-                {selectedActivity?.id ? "Edit Activity" : "Add Activity"}
+                {selectedActivity?.id ? "Editar Actividades" : "Agregar Nuevas Actividades"}
               </h2>
               <button
                 onClick={() => {

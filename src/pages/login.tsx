@@ -53,7 +53,7 @@ const AgentLogin: React.FC = () => {
         <div className="w-full lg:w-5/12 xl:w-4/12 flex items-center justify-center p-10">
           <div className="w-full max-w-md bg-[rgba(255,255,255)] rounded-lg border border-gray-200 shadow-md p-8">
             <h2 className="text-xl font-semibold text-center text-[rgb(68,63,63)] mb-6">
-              Welcome back!
+              ¡Bienvenido de nuevo!
             </h2>
 
             {error && (
@@ -68,7 +68,7 @@ const AgentLogin: React.FC = () => {
                   htmlFor="email"
                   className="block text-sm font-medium text-[rgb(68,63,63)] mb-1"
                 >
-                  Email
+                  Correo electrónico
                 </label>
                 <input
                   id="email"
@@ -86,7 +86,7 @@ const AgentLogin: React.FC = () => {
                   htmlFor="password"
                   className="block text-sm font-medium text-[rgb(68,63,63)] mb-1"
                 >
-                  Password
+                  Contraseña
                 </label>
                 <div className="relative">
                   <input
@@ -116,7 +116,7 @@ const AgentLogin: React.FC = () => {
                 className="w-full bg-[rgb(194,91,52)] hover:bg-[rgb(174,81,42)] text-white font-medium py-2.5 px-4 rounded transition-colors"
                 disabled={isLoading}
               >
-                {isLoading ? "Logging in..." : "Log in"}
+                {isLoading ? "Iniciar sesión..." : "Iniciar sesión"}
               </button>
             </form>
           </div>

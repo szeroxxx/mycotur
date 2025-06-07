@@ -42,10 +42,10 @@ export const ActivityList: React.FC<ActivityListProps> = ({
         className="bg-[rgba(255,255,255)] border border-red-400 text-red-700 p-4 rounded relative"
         role="alert"
       >
-        <strong className="font-bold">Profile Incomplete</strong>
+        <strong className="font-bold">Perfil Incompleto</strong>
         <span className="block sm:inline">
           {" "}
-          Please complete your profile before adding activities.
+          Por favor completa tu perfil antes de añadir actividades.
         </span>
         <div>
           <span className="block sm:inline"> {profileStatus?.message}</span>
@@ -65,12 +65,12 @@ export const ActivityList: React.FC<ActivityListProps> = ({
           className="mx-auto mb-4 opacity-50"
         />
         <h3 className="text-lg font-medium text-[rgba(68,63,63)] mb-2">
-          No Activity Found
+          No se encontraron actividades
         </h3>
         <p className="text-sm text-[rgba(100,92,90)]">
           {" "}
-          There are no activity added yet. Click the &quot;Add Activity&quot;
-          button to create one.
+          No se han añadido actividades aún. Haz clic en el botón &quot;Añadir actividad&quot;
+          para crear una.
         </p>
       </div>
     );
@@ -87,25 +87,25 @@ export const ActivityList: React.FC<ActivityListProps> = ({
                     scope="col"
                     className="py-3.5 px-6 text-left text-xs font-medium text-[rgba(100,92,90)] uppercase tracking-wider bg-[rgba(244,242,242)]"
                   >
-                    Title
+                    Actividad
                   </th>
                   <th
                     scope="col"
                     className="py-3.5 px-6 text-left text-xs font-medium text-[rgba(100,92,90)] uppercase tracking-wider bg-[rgba(244,242,242)]"
                   >
-                    Category
+                    Categoría
                   </th>
                   <th
                     scope="col"
                     className="py-3.5 px-6 text-left text-xs font-medium text-[rgba(100,92,90)] uppercase tracking-wider bg-[rgba(244,242,242)]"
                   >
-                    Location
+                    Ubicación
                   </th>
                   <th
                     scope="col"
                     className="py-3.5 px-6 text-left text-xs font-medium text-[rgba(100,92,90)] uppercase tracking-wider bg-[rgba(244,242,242)]"
                   >
-                    Actions
+                    Acción
                   </th>
                 </tr>
               </thead>

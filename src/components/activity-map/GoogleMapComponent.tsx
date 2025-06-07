@@ -180,9 +180,6 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
     if (!isLoaded || !mapInstanceRef.current || !selectedLocation) return;
 
     if (isNaN(selectedLocation.lat) || isNaN(selectedLocation.lon)) {
-      console.warn(
-        `Cannot center map on selected location "${selectedLocation.title}" due to invalid coordinates`
-      );
       return;
     }
 
@@ -238,7 +235,7 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({
         <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[rgba(229,114,0)] mx-auto mb-2"></div>
-            <p className="text-gray-600 text-sm">Loading map...</p>
+            <p className="text-gray-600 text-sm">Cargando mapa...</p>
           </div>
         </div>
       )}

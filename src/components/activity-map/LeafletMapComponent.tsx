@@ -144,9 +144,6 @@ const LeafletMapComponent: React.FC<LeafletMapComponentProps> = ({
     if (!map || !selectedLocation) return;
 
     if (isNaN(selectedLocation.lat) || isNaN(selectedLocation.lon)) {
-      console.warn(
-        `Cannot center map on selected location "${selectedLocation.title}" due to invalid coordinates`
-      );
       return;
     }
 

@@ -37,71 +37,71 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
   }>({});
   const validateFirstName = (name: string): string | null => {
     if (!name.trim()) {
-      return "First name is required";
+      return "El nombre es obligatorio";
     }
     if (!/^[a-zA-Z\s]+$/.test(name.trim())) {
-      return "First name should only contain letters and spaces";
+      return "El nombre solo debe contener letras y espacios";
     }
     if (name.trim().length < 2) {
-      return "First name should be at least 2 characters long";
+      return "El nombre debe tener al menos 2 caracteres";
     }
     if (name.trim().length > 50) {
-      return "First name should not exceed 50 characters";
+      return "El nombre no debe exceder los 50 caracteres";
     }
     return null;
   };
 
   const validatePhoneNumber = (phone: string): string | null => {
     if (!phone.trim()) {
-      return "Phone number is required";
+      return "El número de teléfono es obligatorio";
     }
     const cleanPhone = phone.replace(/\D/g, "");
     if (cleanPhone.length < 10) {
-      return "Phone number should be at least 10 digits";
+      return "El número de teléfono debe tener al menos 10 dígitos";
     }
     if (cleanPhone.length > 15) {
-      return "Phone number should not exceed 15 digits";
+      return "El número de teléfono no debe exceder los 15 dígitos";
     }
     if (!/^[\d\s\-\(\)\+]+$/.test(phone)) {
-      return "Phone number contains invalid characters";
+      return "El número de teléfono contiene caracteres no válidos";
     }
     return null;
   };
 
   const validateEmail = (email: string): string | null => {
     if (!email.trim()) {
-      return "Email is required";
+      return "El correo electrónico es obligatorio";
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return "Please enter a valid email address";
+      return "Por favor ingresa una dirección de correo electrónico válida";
     }
     if (email.length > 254) {
-      return "Email address is too long";
+      return "La dirección de correo electrónico es demasiado larga";
     }
     return null;
   };
 
   const validateNumberOfPeople = (num: string): string | null => {
     if (!num.trim()) {
-      return "Number of people is required";
+      return "El número de personas es obligatorio";
     }
     const number = parseInt(num);
     if (isNaN(number)) {
-      return "Please enter a valid number";
+      return "Por favor ingresa un número válido";
     }
     if (number < 1) {
-      return "Number of people must be at least 1";
+      return "El número de personas debe ser al menos 1";
     }
     if (number > 100) {
-      return "Number of people cannot exceed 100";
+      return "El número de personas no puede exceder 100";
     }
     return null;
   };
 
   const validateMessage = (message: string): string | null => {
     if (message.length > 500) {
-      return "Message should not exceed 500 characters";
+      return "El mensaje no debe exceder los 500 caracteres";
     }
     return null;
   };
@@ -198,7 +198,6 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) {
-      console.log("Form validation failed");
       return;
     }
 
@@ -222,7 +221,7 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
     } catch (error) {
       console.error("RSVPForm submission error:", error);
       setSubmitError(
-        error instanceof Error ? error.message : "Failed to submit RSVP"
+        error instanceof Error ? error.message : "Error al enviar RSVP"
       );
     } finally {
       setIsSubmitting(false);
@@ -238,7 +237,7 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
     <div className="w-full max-w-none lg:max-w-sm lg:mx-auto overflow-hidden">
       <div className="p-6 space-y-4 bg-white rounded-xl shadow-lg border border-gray-200">
         <h2 className="text-xl font-semibold text-gray-700 text-center mb-6">
-          RSVP Now
+          Confirma tu asistencia ahora
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -247,7 +246,7 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
               htmlFor="firstName"
               className="text-sm font-medium text-gray-700 mb-2 block"
             >
-              First Name *
+              Nombre *
             </Label>
             <Input
               id="firstName"
@@ -271,12 +270,12 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
               htmlFor="phoneNumber"
               className="text-sm font-medium text-gray-700 mb-2 block"
             >
-              Phone Number *
+              Número de Teléfono *
             </Label>
             <Input
               id="phoneNumber"
               name="phoneNumber"
-              placeholder="enter your primary phone number"
+              placeholder="ingresa tu número de teléfono principal"
               className={`text-gray-600 w-full h-11 px-3 border rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
                 fieldErrors.phoneNumber ? "border-red-500" : "border-gray-300"
               }`}
@@ -295,7 +294,7 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
               htmlFor="email"
               className="text-sm font-medium text-gray-700 mb-2 block"
             >
-              Email *
+              Correo electrónico *
             </Label>
             <Input
               id="email"
@@ -320,7 +319,7 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
               htmlFor="numberOfPeople"
               className="text-sm font-medium text-gray-700 mb-2 block"
             >
-              How many People *
+              ¿Cuántas personas? *
             </Label>
             <Input
               id="numberOfPeople"
@@ -346,7 +345,7 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
               htmlFor="message"
               className="text-sm font-medium text-gray-700 mb-2 block"
             >
-              Tell us more
+              Cuéntanos más
               <span className="text-xs text-gray-500 ml-2">
                 ({formData.message.length}/500)
               </span>
@@ -354,7 +353,7 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
             <textarea
               id="message"
               name="message"
-              placeholder="this message will directly shows to organiser"
+              placeholder="este mensaje se mostrará directamente al organizador"
               rows={3}
               className={`text-gray-600 w-full px-3 py-3 border rounded-md text-sm placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
                 fieldErrors.message ? "border-red-500" : "border-gray-300"
@@ -383,14 +382,14 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
 
       <div className="mt-2 px-6 py-6 bg-white rounded-xl shadow-lg border border-gray-200">
         <h3 className="text-lg font-semibold text-gray-900 mb-4 leading-tight">
-          View organiser details and contact them for more information
+          Ver detalles del organizador y contactarlo para más información
         </h3>
         <Button
           variant="outline"
           className="w-full bg-gray-700 text-white hover:bg-gray-900 border-gray-800 py-3 font-medium rounded-md transition-colors"
           onClick={handleGetContactInfo}
         >
-          Get Contact Information
+          Obtener información de contacto
         </Button>
       </div>
     </div>

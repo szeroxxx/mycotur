@@ -6,11 +6,12 @@ export interface Event {
   eventDate: string;
   eventTime: string;
   category: string;
+  categories: string[];
   description: string;
   email: string;
   phone: string;
   url: string;
-  fees: string;  images: File[];
+  fees: string;images: File[];
   videos: File[];
   mediaUrls?: {
     name: string;

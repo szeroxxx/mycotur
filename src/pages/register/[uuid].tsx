@@ -88,7 +88,7 @@ const RegisterPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[rgba(255,255,255)] flex items-center justify-center">
-        Loading...
+        Cargando...
       </div>
     );
   }
@@ -99,7 +99,7 @@ const RegisterPage: React.FC = () => {
         <div className="w-full lg:w-5/12 xl:w-4/12 flex items-center justify-center p-10">
           <div className="w-full max-w-md bg-[rgba(255,255,255)] rounded-lg border border-gray-200 shadow-md p-8">
             <h2 className="text-xl font-semibold text-center text-[rgb(68,63,63)] mb-6">
-              Welcome to Mycotur
+              Crea tu cuenta en Mycotour
             </h2>
 
             {error && (
@@ -111,7 +111,7 @@ const RegisterPage: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label className="block text-sm font-medium text-[rgb(68,63,63)] mb-1">
-                  Name
+                  Nombre
                 </label>
                 <input
                   type="text"
@@ -123,7 +123,7 @@ const RegisterPage: React.FC = () => {
 
               <div>
                 <label className="block text-sm font-medium text-[rgb(68,63,63)] mb-1">
-                  Email
+                  Correo electrónico
                 </label>
                 <input
                   type="email"
@@ -135,7 +135,7 @@ const RegisterPage: React.FC = () => {
 
               <div>
                 <label className="block text-sm font-medium text-[rgb(68,63,63)] mb-1">
-                  Set Password
+                  Crea una contraseña
                 </label>
                 <div className="relative">
                   <input
@@ -162,7 +162,7 @@ const RegisterPage: React.FC = () => {
 
               <div>
                 <label className="block text-sm font-medium text-[rgb(68,63,63)] mb-1">
-                  Re-enter Password
+                  Confirma tu contraseña
                 </label>
                 <div className="relative">
                   <input
@@ -191,7 +191,7 @@ const RegisterPage: React.FC = () => {
                 type="submit"
                 className="w-full bg-[rgb(194,91,52)] hover:bg-[rgb(174,81,42)] text-white font-medium py-2.5 px-4 rounded transition-colors"
               >
-                Create Account
+                Crear cuenta
               </button>
             </form>
           </div>

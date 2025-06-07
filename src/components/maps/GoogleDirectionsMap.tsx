@@ -421,7 +421,6 @@ const GoogleDirectionsMap: React.FC<DirectionsMapProps> = ({
     return `${hours}h ${remainingMinutes}m`;
   }; 
   
-  // Open in Google Maps
   // const openInGoogleMaps = useCallback(() => {
   //   if (userLocation) {
   //     const origin = `${userLocation.lat},${userLocation.lng}`;

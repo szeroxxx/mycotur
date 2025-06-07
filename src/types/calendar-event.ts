@@ -7,4 +7,8 @@ export type CalendarEvent = {
   owner: string;
   image: string;
   category: string;
+  categories?: string[];
+  description?: string;
+  lat?: string;
+  lon?: string;
 };

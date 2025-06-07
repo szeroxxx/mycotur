@@ -1,28 +1,9 @@
 export const getMediaUrl = (
-  fileName: string,
-  isPublic: boolean = false
+  fileId: string,
 ): string => {
-  let extractedFileName = fileName;
-  if (fileName.includes("uploads\\\\")) {
-    extractedFileName = fileName.replace(/.*uploads\\\\/, "");
-  } else if (fileName.includes("uploads\\")) {
-    extractedFileName = fileName.replace(/.*uploads\\/, "");
-  } else if (fileName.includes("uploads/")) {
-    extractedFileName = fileName.replace(/.*uploads\//, "");
-  } else if (fileName.includes("\\")) {
-    const parts = fileName.split("\\");
-    extractedFileName = parts[parts.length - 1];
-  } else if (fileName.includes("/")) {
-    const parts = fileName.split("/");
-    extractedFileName = parts[parts.length - 1];
-  }
-  extractedFileName = extractedFileName.replace(/^[\\\/]+/, "");
-  const encodedFileName = encodeURIComponent(extractedFileName);
+  const encodedFileId = encodeURIComponent(fileId);
   const URL = process.env.NEXTAUTH_BACKEND_URL;
   const baseUrl = `${URL}/api`;
-  if (isPublic) {
-    return `${baseUrl}/profile-image/${encodedFileName}`;
-  }
-  const finalUrl = `${baseUrl}/image/${encodedFileName}`;
+  const finalUrl = `${baseUrl}/files/${encodedFileId}`;
   return finalUrl;
 };

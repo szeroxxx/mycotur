@@ -10,7 +10,7 @@ interface Photo {
 
 interface PhotoGalleryProps {
   photos: Photo[];
-  category?: string;
+  category?: string | string[];
   totalPhotos?: number;
 }
 
@@ -29,7 +29,7 @@ const renderMedia = (media: Photo, className: string) => {
         poster=""
       >
         <source src={media.url} type="video/mp4" />
-        Your browser does not support the video tag.
+        Su navegador no admite la etiqueta de video.
       </video>
     );
   } else {
@@ -49,6 +49,12 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
 
   const displayPhotos = photos.slice(0, 5);
   const remainingPhotos = totalPhotos ? totalPhotos - 5 : 0;
+
+  const categories = Array.isArray(category) ? category : [category];
+  const displayCategory =
+    categories.length > 1
+      ? `${categories[0]} + ${categories.length - 1} más`
+      : categories[0];
 
   const openModal = (index: number) => {
     setSelectedImageIndex(index);
@@ -123,10 +129,13 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
                 </div>
               )}
             </>
-          )}
+          )}{" "}
           <div className="absolute top-3 left-3 z-10">
-            <span className="bg-white/20 backdrop-blur-md border border-white/30 px-3 py-1 rounded-full text-sm font-medium text-white shadow-lg">
-              {category}
+            <span
+              className="bg-white/20 backdrop-blur-md border border-white/30 px-3 py-1 rounded-full text-sm font-medium text-white shadow-lg"
+              title={categories.join(", ")}
+            >
+              {displayCategory}
             </span>
           </div>
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 rounded-lg"></div>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { BsWindowX } from "react-icons/bs";
 
 interface DeleteModalProps {
@@ -10,7 +10,7 @@ interface DeleteModalProps {
 export const DeleteModal: React.FC<DeleteModalProps> = ({
   isOpen,
   onClose,
-  onConfirm
+  onConfirm,
 }) => {
   if (!isOpen) return null;
 
@@ -19,25 +19,27 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
       <div className="bg-[rgba(255,255,255)] rounded-lg p-6 shadow-lg max-w-sm w-full">
         <div className="flex flex-col items-center text-center">
           <div className="mb-4 bg-[rgba(254,242,242)] rounded-full p-4">
-            <BsWindowX size={25} className="text-[rgba(220,38,38)]"/>
+            <BsWindowX size={25} className="text-[rgba(220,38,38)]" />
           </div>
-          <h3 className="text-xl font-semibold text-[rgba(68,63,63)] mb-2">Remove Activity?</h3>
+          <h3 className="text-xl font-semibold text-[rgba(68,63,63)] mb-2">
+            ¿Eliminar Actividad?
+          </h3>
           <p className="text-sm text-[rgba(100,92,90)] mb-6">
-            Are you sure you want to remove this activity?
-            This action can not be undone.
+            ¿Está seguro de que desea eliminar esta actividad? Esta acción no se
+            puede deshacer.
           </p>
           <div className="flex justify-center space-x-4 w-full">
             <button
               onClick={onClose}
               className="cursor-pointer flex-1 basis-[120px] px-4 py-2 text-sm font-medium text-[rgba(68,63,63)] hover:text-[#111827] border border-[rgba(199,195,193)] rounded-lg transition-colors"
             >
-              Cancel
+              Cancelar
             </button>
             <button
               onClick={onConfirm}
               className="cursor-pointer flex-1 basis-[120px] px-4 py-2 text-sm font-medium bg-[rgba(220,38,38)] hover:bg-red-600 text-[rgba(255,255,255)] border border-[rgba(199,195,193)] rounded-lg transition-colors"
             >
-              Yes, Remove
+              Sí, Eliminar
             </button>
           </div>
         </div>

@@ -14,7 +14,8 @@ interface ApiActivityResponse {
   id: number;
   uuid: string;
   title: string;
-  category: string;
+  category?: string; 
+  categories?: string[];
   location: string;
   lat: string;
   lon: string;
@@ -57,7 +58,7 @@ export const useActivities = () => {
 
         const queryParams = new URLSearchParams({
           page: page.toString(),
-          limit: "12", // Use fixed page size to avoid dependency issues
+          limit: "12",
         });
 
         if (searchTerm) {
@@ -85,7 +86,8 @@ export const useActivities = () => {
             id: item.id.toString(),
             uuid: item.uuid,
             title: item.title,
-            category: item.category,
+            categories:
+              item.categories || (item.category ? [item.category] : []),
             location: item.location,
             lat: item.lat,
             lon: item.lon,
@@ -116,7 +118,6 @@ export const useActivities = () => {
     },
     [showToast, searchTerm, categoryFilter, locationFilter]
   );
-
   const createActivity = useCallback(
     async (
       activity: Omit<Activity, "id"> & { originalActivityId?: string }
@@ -125,16 +126,16 @@ export const useActivities = () => {
         const formData = new FormData();
 
         if (activity.images && activity.images.length > 0) {
-          const maxSize = 10 * 1024 * 1024; // 10MB
+          const maxSize = 10 * 1024 * 1024;
           const allowedImageTypes = ["image/jpeg", "image/png", "image/webp"];
 
           for (const image of activity.images) {
             if (!allowedImageTypes.includes(image.type)) {
-              showToast("error", "Only JPG, PNG and WebP images are allowed");
+              showToast("error", "Solo se permiten imágenes JPG, PNG y WebP");
               return;
             }
             if (image.size > maxSize) {
-              showToast("error", "Images must be less than 10MB");
+              showToast("error", "Las imágenes deben ser inferiores a 10MB");
               return;
             }
           }
@@ -146,18 +147,21 @@ export const useActivities = () => {
 
           for (const video of activity.videos) {
             if (!allowedVideoTypes.includes(video.type)) {
-              showToast("error", "Only MP4, WebM and MOV videos are allowed");
+              showToast("error", "Solo se permiten videos MP4, WebM y MOV");
               return;
             }
             if (video.size > maxSize) {
-              showToast("error", "Videos must be less than 15MB");
+              showToast("error", "Los videos deben ser inferiores a 15MB");
               return;
             }
           }
         }
 
         formData.append("title", activity.title);
-        formData.append("category", activity.category);
+        formData.append(
+          "categories",
+          JSON.stringify(activity.categories || [])
+        );
         formData.append("startMonth", activity.startMonth);
         formData.append("endMonth", activity.endMonth);
         formData.append("phone", activity.phone);
@@ -171,12 +175,11 @@ export const useActivities = () => {
         }
         if (activity.lon) {
           formData.append("lon", activity.lon.toString());
-        } // Add originalActivityId if this is a duplicate
+        }
         if (activity.originalActivityId) {
           formData.append("originalActivityId", activity.originalActivityId);
         }
 
-        // Add mediaUrls if provided (for duplication with selective media)
         if (activity.mediaUrls && activity.mediaUrls.length > 0) {
           formData.append("mediaUrls", JSON.stringify(activity.mediaUrls));
         }
@@ -209,12 +212,12 @@ export const useActivities = () => {
             ...activity,
             id: response.data.id,
           };
-          showToast("success", "Activity created successfully");
+          showToast("success", "Actividad creada con éxito");
           await fetchActivities(1);
           return newActivity;
         }
       } catch (error) {
-        let errorMessage = "Failed to create activity";
+        let errorMessage = "Falló al crear la actividad";
         if (axios.isAxiosError(error)) {
           errorMessage = error.response?.data?.message || error.message;
         } else if (error instanceof Error) {
@@ -232,39 +235,41 @@ export const useActivities = () => {
         const formData = new FormData();
 
         if (activity.images && activity.images.length > 0) {
-          const maxSize = 15 * 1024 * 1024; // 15MB
+          const maxSize = 15 * 1024 * 1024; 
           const allowedImageTypes = ["image/jpeg", "image/png", "image/webp"];
 
           for (const image of activity.images) {
             if (!allowedImageTypes.includes(image.type)) {
-              showToast("error", "Only JPG, PNG and WebP images are allowed");
+              showToast("error", "Solo se permiten imágenes JPG, PNG y WebP");
               return;
             }
             if (image.size > maxSize) {
-              showToast("error", "Images must be less than 15MB");
+              showToast("error", "Las imágenes deben ser inferiores a 15MB");
               return;
             }
           }
         }
 
         if (activity.videos && activity.videos.length > 0) {
-          const maxSize = 15 * 1024 * 1024; // 15MB
+          const maxSize = 15 * 1024 * 1024;
           const allowedVideoTypes = ["video/mp4", "video/webm", "video/mov"];
 
           for (const video of activity.videos) {
             if (!allowedVideoTypes.includes(video.type)) {
-              showToast("error", "Only MP4, WebM and MOV videos are allowed");
+              showToast("error", "Solo se permiten videos MP4, WebM y MOV");
               return;
             }
             if (video.size > maxSize) {
-              showToast("error", "Videos must be less than 15MB");
+              showToast("error", "Los videos deben ser inferiores a 15MB");
               return;
             }
           }
         }
-
         formData.append("title", activity.title);
-        formData.append("category", activity.category);
+        formData.append(
+          "categories",
+          JSON.stringify(activity.categories || [])
+        );
         formData.append("startMonth", activity.startMonth);
         formData.append("endMonth", activity.endMonth);
         formData.append("phone", activity.phone);
@@ -307,14 +312,14 @@ export const useActivities = () => {
           }
         );
         if (response.status === 200) {
-          showToast("success", "Activity updated successfully");
+          showToast("success", "Actividad actualizada con éxito");
           await fetchActivities(pagination.currentPage);
           return activity;
         }
-        showToast("error", "Failed to update activity");
+        showToast("error", "Falló al actualizar la actividad");
       } catch (error) {
         console.error("Error updating activity:", error);
-        let errorMessage = "Failed to update activity";
+        let errorMessage = "No se ha actualizado la actividad";
         if (axios.isAxiosError(error)) {
           errorMessage = error.response?.data?.message || error.message;
         } else if (error instanceof Error) {
@@ -343,16 +348,16 @@ export const useActivities = () => {
         const response = await axiosInstance.request(config);
 
         if (response.status === 200) {
-          showToast("success", "Activity deleted successfully");
+          showToast("success", "Actividad eliminada con éxito");
           await fetchActivities(pagination.currentPage);
         } else {
           throw new Error(
-            response.data?.message || "Failed to delete activity"
+            response.data?.message || "No se ha eliminado la actividad"
           );
         }
       } catch (error) {
         console.error("Error deleting activity:", error);
-        let errorMessage = "Failed to delete activity";
+        let errorMessage = "No se ha eliminado la actividad";
 
         if (axios.isAxiosError(error)) {
           errorMessage = error.response?.data?.message || error.message;
@@ -384,7 +389,7 @@ export const useActivities = () => {
       return response.data.data.map((item: ApiActivityResponse) => ({
         id: item.id.toString(),
         title: item.title,
-        category: item.category,
+        categories: item.categories || (item.category ? [item.category] : []),
         location: item.location,
         startMonth: item.startMonth?.substring(0, 7) || "",
         endMonth: item.endMonth?.substring(0, 7) || "",
@@ -425,12 +430,10 @@ export const useActivities = () => {
     setLocationFilter(location);
   }, []);
 
-  // Initial load
   useEffect(() => {
     fetchActivities(1);
   }, []);
 
-  // Refetch when filters change
   useEffect(() => {
     if (searchTerm || categoryFilter || locationFilter) {
       fetchActivities(1);

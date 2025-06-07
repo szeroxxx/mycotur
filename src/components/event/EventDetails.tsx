@@ -42,19 +42,18 @@ const EventDetails: React.FC<EventDetailsProps> = ({
   organizer,
   location,
 }) => {
-  // Function to open Google Maps directly
   const openInGoogleMaps = () => {
     if (!location.coordinates) return;
-    
+
     const destination = `${location.coordinates.lat},${location.coordinates.lng}`;
     const url = `https://www.google.com/maps/search/?api=1&query=${destination}`;
-    window.open(url, '_blank');
+    window.open(url, "_blank");
   };
-  
+
   useEffect(() => {
     if (location.coordinates) {
       googleMapsLoader.load().catch((error) => {
-        console.warn('Failed to preload Google Maps:', error);
+        console.warn("Failed to preload Google Maps:", error);
       });
     }
   }, [location.coordinates]);
@@ -93,7 +92,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-[rgba(68,63,63)]">
-                  Date and Time
+                  Cuándo y Dónde
                 </span>
               </div>
               <span className="text-[rgba(100,92,90)]">
@@ -110,7 +109,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-[rgba(68,63,63)]">
-                    Location
+                    Ubicación
                   </span>
                 </div>
                 <span className="text-[rgba(100,92,90)]">
@@ -123,7 +122,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({
       </div>
       <div>
         <h3 className="text-lg font-semibold text-[rgba(68,63,63)] mb-4">
-          Description
+          Descripción
         </h3>
         <p className="text-sm text-[rgba(100,92,90)] leading-relaxed">
           {description.main}
@@ -151,43 +150,51 @@ const EventDetails: React.FC<EventDetailsProps> = ({
           </div>
           <div>
             <h3 className="text-sm font-semibold text-[rgba(68,63,63)]">
-              Meet the organizer {organizer.name}
+              Conoce al organizador {organizer.name}
             </h3>
             <p className="text-xs text-[rgba(100,92,90)]">
-              {organizer.eventsHosted} Events Hosted
+              {organizer.eventsHosted} Eventos organizados
             </p>
-          </div>          <div className="flex gap-2 ">
+          </div>{" "}
+          <div className="flex gap-2 ">
             {organizer.socialLinks.youtube && (
-              <div 
-                onClick={() => window.open(organizer.socialLinks.youtube, '_blank')}
-                className="cursor-pointer w-10 h-10 text-[rgba(229,114,0)] border border-[rgba(199,195,193)] rounded flex items-center justify-center">
+              <div
+                onClick={() =>
+                  window.open(organizer.socialLinks.youtube, "_blank")
+                }
+                className="cursor-pointer w-10 h-10 text-[rgba(229,114,0)] border border-[rgba(199,195,193)] rounded flex items-center justify-center"
+              >
                 <IoLogoYoutube className="w-6 h-6" />
               </div>
             )}
             {organizer.socialLinks.facebook && (
               <div
-                onClick={() => window.open(organizer.socialLinks.facebook, '_blank')}
-                className="cursor-pointer w-10 h-10 text-[rgba(229,114,0)] border border-[rgba(199,195,193)] rounded flex items-center justify-center">
+                onClick={() =>
+                  window.open(organizer.socialLinks.facebook, "_blank")
+                }
+                className="cursor-pointer w-10 h-10 text-[rgba(229,114,0)] border border-[rgba(199,195,193)] rounded flex items-center justify-center"
+              >
                 <IoLogoFacebook className="w-6 h-6" />
               </div>
             )}
             {organizer.socialLinks.instagram && (
               <div
-                onClick={() => window.open(organizer.socialLinks.instagram, '_blank')}
-                className="cursor-pointer w-10 h-10 text-[rgba(229,114,0)] border border-[rgba(199,195,193)] rounded flex items-center justify-center">
+                onClick={() =>
+                  window.open(organizer.socialLinks.instagram, "_blank")
+                }
+                className="cursor-pointer w-10 h-10 text-[rgba(229,114,0)] border border-[rgba(199,195,193)] rounded flex items-center justify-center"
+              >
                 <RiInstagramFill className="w-6 h-6" />
               </div>
             )}
           </div>
         </div>
-      </div>{" "}      <div>
+      </div>{" "}
+      <div>
         <h3 className="text-lg font-semibold text-[rgba(68,63,63)] mb-4">
-          Event Address
+          Dirección del Evento
         </h3>
-        <StaticMapView
-          location={location}
-          onGetDirections={openInGoogleMaps}
-        />
+        <StaticMapView location={location} onGetDirections={openInGoogleMaps} />
         <p className="text-sm text-[rgba(100,92,90)] mt-2">
           {location.address}
         </p>

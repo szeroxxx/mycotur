@@ -22,22 +22,21 @@ const ActivityMapPage = () => {
     setSelectedActivity,
     setSearchLocation,
   } = useActivitiesData();
-  
-  const { 
-    locations: activityLocations, 
-    // isLoading: locationsLoading 
+
+  const {
+    locations: activityLocations,
+    // isLoading: locationsLoading
   } = useActivityLocations();
-  
+
   const [locationFilter, setLocationFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [showMobileMap, setShowMobileMap] = useState(false);
-
   const handleFilterChange = useCallback(
     (type: "location" | "category", value: string) => {
       if (type === "location") {
-        setLocationFilter(value === "Location" ? "" : value);
+        setLocationFilter(value === "Ubicación" ? "" : value);
       } else {
-        setCategoryFilter(value === "Event Category" ? "" : value);
+        setCategoryFilter(value === "Tipo de evento" ? "" : value);
       }
     },
     []
@@ -65,15 +64,17 @@ const ActivityMapPage = () => {
       <div className="hidden lg:flex h-[calc(100vh-5rem)] overflow-hidden scrollbar-hide">
         <div className="w-1/3 flex flex-col border-r border-[rgba(226,225,223,0.6)]">
           <div className="p-6 flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide touch-scroll">
-            <div className="space-y-6">              <SearchBar
-                locationFilter={locationFilter || "Location"}
-                categoryFilter={categoryFilter || "Event Category"}
+            <div className="space-y-6">
+              {" "}
+              <SearchBar
+                locationFilter={locationFilter || "Ubicación"}
+                categoryFilter={categoryFilter || "Tipo de evento"}
                 onFilterChange={handleFilterChange}
                 onSearch={() =>
                   filterActivities("", locationFilter, categoryFilter)
                 }
                 variant="compact"
-                customLocations={activityLocations.map(loc => loc.location)}
+                customLocations={activityLocations.map((loc) => loc.location)}
                 useCustomLocations={true}
               />
               <div className="space-y-4">
@@ -81,13 +82,14 @@ const ActivityMapPage = () => {
                   <div className="text-center py-12">
                     <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[rgba(194,91,52)]"></div>
                     <p className="mt-4 text-[rgba(100,92,90)]">
-                      Loading activities...
+                      Cargando actividades...{" "}
                     </p>
                   </div>
                 ) : filteredActivities.length === 0 ? (
                   <div className="text-center py-12 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-[rgba(226,225,223,0.3)]">
                     <p className="text-[rgba(100,92,90)] text-lg">
-                      No activities found for the selected filters.
+                      No se encontraron actividades para los filtros
+                      seleccionados.{" "}
                     </p>
                   </div>
                 ) : (
@@ -99,7 +101,7 @@ const ActivityMapPage = () => {
                       title={activity.title}
                       user={activity.user}
                       location={activity.location}
-                      category={activity.category}
+                      category={activity.categories}
                       image={activity.image}
                       isSelected={selectedActivity?.id === activity.id}
                       onClick={() => setSelectedActivity(activity)}
@@ -138,12 +140,12 @@ const ActivityMapPage = () => {
             {showMobileMap ? (
               <>
                 <List size={16} />
-                <span className="text-sm">Show List</span>
+                <span className="text-sm">Mostrar Lista</span>
               </>
             ) : (
               <>
                 <Map size={16} />
-                <span className="text-sm">Show Map</span>
+                <span className="text-sm">Mostrar Mapa</span>
               </>
             )}
           </button>
@@ -185,29 +187,29 @@ const ActivityMapPage = () => {
                   }}
                 />
               )}
-            </div>            <div className="p-4 pb-2">
+            </div>{" "}
+            <div className="p-4 pb-2">
               <SearchBar
-                locationFilter={locationFilter || "Location"}
-                categoryFilter={categoryFilter || "Event Category"}
+                locationFilter={locationFilter || "Ubicación"}
+                categoryFilter={categoryFilter || "Tipo de evento"}
                 onFilterChange={handleFilterChange}
                 variant="compact"
-                customLocations={activityLocations.map(loc => loc.location)}
+                customLocations={activityLocations.map((loc) => loc.location)}
                 useCustomLocations={true}
               />
             </div>
-
             <div className="px-4 pb-20 space-y-4">
               {loading ? (
                 <div className="text-center py-12">
                   <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[rgba(194,91,52)]"></div>
                   <p className="mt-4 text-[rgba(100,92,90)]">
-                    Loading activities...
+                    Cargando actividades...
                   </p>
                 </div>
               ) : filteredActivities.length === 0 ? (
                 <div className="text-center py-12 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-[rgba(226,225,223,0.3)]">
                   <p className="text-[rgba(100,92,90)] text-base">
-                    No activities found for the selected filters.
+                    No se encontraron actividades para los filtros seleccionados.
                   </p>
                 </div>
               ) : (
@@ -219,7 +221,7 @@ const ActivityMapPage = () => {
                     title={activity.title}
                     user={activity.user}
                     location={activity.location}
-                    category={activity.category}
+                    category={activity.categories}
                     image={activity.image}
                     isSelected={selectedActivity?.id === activity.id}
                     onClick={() => setSelectedActivity(activity)}

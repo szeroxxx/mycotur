@@ -30,15 +30,15 @@ const submitRSVP = async (
     if (response.status === 200 || response.status === 201) {
       showToast(
         "success",
-        "Your information is sent to organiser, they will \nconnect you soon via submitted details"
+        "Hemos enviado tu información al organizador. Muy \npronto se pondrá en contacto contigo para \ncontarte más"
       );
       return true;
     } else {
-      showToast("error", response.data.message || "Failed to submit RSVP");
+      showToast("error", response.data.message || "Fallo al enviar RSVP");
       return false;
     }
   } catch (error) {
-    let errorMessage = "Failed to submit RSVP";
+    let errorMessage = "Fallo al enviar RSVP";
     if (axios.isAxiosError(error)) {
       errorMessage =
         error.response?.data?.message || error.message || errorMessage;
@@ -110,7 +110,7 @@ const ActivityDetailPage: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-orange-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading activity details...</p>
+          <p className="mt-4 text-gray-600">Cargando detalles de actividad...</p>
         </div>
       </div>
     );
@@ -122,16 +122,16 @@ const ActivityDetailPage: React.FC = () => {
         <div className="text-center">
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
           <h1 className="text-2xl font-bold text-gray-800 mb-2">
-            Activity Not Found
+            Actividad No Encontrada
           </h1>
           <p className="text-gray-600 mb-4">
-            {error || "The requested activity could not be found."}
+            {error || "La actividad solicitada no se pudo encontrar."}
           </p>
           <button
             onClick={() => router.back()}
             className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors"
           >
-            Go Back
+            Regresar
           </button>
         </div>
       </div>
@@ -140,7 +140,7 @@ const ActivityDetailPage: React.FC = () => {
   return (
     <PublicLayout>
       <Head>
-        <title>Activity Details | Mycotur</title>
+        <title>{activityData.title} | Mycotur</title>
       </Head>
       <ActivityContactModal
         isOpen={isContactModalOpen}
@@ -174,11 +174,10 @@ const ActivityDetailPage: React.FC = () => {
         <EventHeader title={activityData.title} />
 
         <div className="px-4 py-2">
-          {" "}
-          <div className="mb-8">
+          {" "}          <div className="mb-8">
             <PhotoGallery
               photos={activityData.photos}
-              category={activityData.category}
+              category={activityData.categories}
               totalPhotos={activityData.totalPhotos}
             />
           </div>

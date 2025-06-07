@@ -23,25 +23,27 @@ const ContactModal: React.FC<ContactModalProps> = ({
       <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold text-[rgb(68,63,63)]">
-            Contact Information
+            Información de Contacto
           </h2>
         </div>
 
         <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-[rgb(68,63,63)]">
-              Email
-            </label>
-            <div className="w-full p-1 text-[rgb(68,63,63)]">
-              {contactInfo.email || "Not provided"}
+          {contactInfo.email && (
+            <div>
+              <label className="block text-sm font-medium text-[rgb(68,63,63)]">
+                Correo electrónico
+              </label>
+              <div className="w-full p-1 text-[rgb(68,63,63)]">
+                {contactInfo.email}
+              </div>
             </div>
-          </div>{" "}
-          <div>
-            <label className="block text-sm font-medium text-[rgb(68,63,63)]">
-              Facebook
-            </label>
-            <div className="w-full p-1 text-[rgb(68,63,63)] ">
-              {contactInfo.facebook ? (
+          )}
+          {contactInfo.facebook && (
+            <div>
+              <label className="block text-sm font-medium text-[rgb(68,63,63)]">
+                Facebook
+              </label>
+              <div className="w-full p-1 text-[rgb(68,63,63)] ">
                 <a
                   href={contactInfo.facebook}
                   target="_blank"
@@ -50,17 +52,15 @@ const ContactModal: React.FC<ContactModalProps> = ({
                 >
                   {contactInfo.facebook}
                 </a>
-              ) : (
-                "Not provided"
-              )}
+              </div>
             </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-[rgb(68,63,63)] mb-1">
-              Instagram
-            </label>
-            <div className="w-full p-1 text-[rgb(68,63,63)]">
-              {contactInfo.instagram ? (
+          )}
+          {contactInfo.instagram && (
+            <div>
+              <label className="block text-sm font-medium text-[rgb(68,63,63)] mb-1">
+                Instagram
+              </label>
+              <div className="w-full p-1 text-[rgb(68,63,63)]">
                 <a
                   href={contactInfo.instagram}
                   target="_blank"
@@ -69,17 +69,15 @@ const ContactModal: React.FC<ContactModalProps> = ({
                 >
                   {contactInfo.instagram}
                 </a>
-              ) : (
-                "Not provided"
-              )}
+              </div>
             </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-[rgb(68,63,63)] mb-1">
-              YouTube
-            </label>
-            <div className="w-full p-1 text-[rgb(68,63,63)]">
-              {contactInfo.youtube ? (
+          )}
+          {contactInfo.youtube && (
+            <div>
+              <label className="block text-sm font-medium text-[rgb(68,63,63)] mb-1">
+                YouTube
+              </label>
+              <div className="w-full p-1 text-[rgb(68,63,63)]">
                 <a
                   href={contactInfo.youtube}
                   target="_blank"
@@ -88,11 +86,9 @@ const ContactModal: React.FC<ContactModalProps> = ({
                 >
                   {contactInfo.youtube}
                 </a>
-              ) : (
-                "Not provided"
-              )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         <div className="mt-3">
@@ -100,7 +96,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
             onClick={onClose}
             className="cursor-pointer w-full px-4 py-2 text-[rgba(68,63,63)] rounded-lg text-sm border border-[rgba(199,195,193)] font-medium transition-colors"
           >
-            Close
+            Cerrar
           </button>
         </div>
       </div>

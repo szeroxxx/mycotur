@@ -106,7 +106,7 @@ const OrganiserCard: React.FC<OrganiserCardProps> = ({
                   />
                 </svg>
                 <span className="text-xs text-[rgba(100,92,90)]">
-                  Total Event ({totalEvents})
+                  Eventos Totales ({totalEvents})
                 </span>
               </div>
 
@@ -145,7 +145,7 @@ const OrganiserCard: React.FC<OrganiserCardProps> = ({
                 className="text-xs text-[rgba(100,92,90)] col-span-2 cursor-pointer hover:text-[rgba(229,114,0)] transition-colors duration-200"
                 onClick={() => setIsExpanded(true)}
               >
-                +{categories.length - 4} more categories
+                +{categories.length - 4} más categorías
               </div>
             )}
             {isExpanded && (
@@ -153,7 +153,7 @@ const OrganiserCard: React.FC<OrganiserCardProps> = ({
                 className="text-xs text-[rgba(100,92,90)] col-span-2 cursor-pointer hover:text-[rgba(229,114,0)] transition-colors duration-200"
                 onClick={() => setIsExpanded(false)}
               >
-                Show less
+                Mostrar menos
               </div>
             )}
           </div>{" "}
@@ -180,7 +180,7 @@ const OrganiserCard: React.FC<OrganiserCardProps> = ({
                 onClick={handleOpen}
                 className="cursor-pointer w-full py-3 bg-[rgba(68,63,63)] text-[rgba(255,255,255)]s text-sm rounded-md hover:bg-gray-700 transition-colors"
               >
-                Get Contact Information
+                Obtener Información de Contacto
               </button>
             </div>
           </div>

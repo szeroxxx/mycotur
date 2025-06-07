@@ -145,7 +145,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onWidthChange }) => {
             <SidebarItem
               href="/dashboard"
               icon={<RxDashboard size={20} />}
-              text="Dashboard"
+              text="Tablero"
               isActive={path === "/dashboard"}
               isExpanded={true}
               onClick={closeMobileMenu}
@@ -153,7 +153,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onWidthChange }) => {
             <SidebarItem
               href="/activities"
               icon={<BsWindowStack size={20} />}
-              text="Activities"
+              text="Actividades"
               isActive={path.includes("/activities")}
               isExpanded={true}
               onClick={closeMobileMenu}
@@ -161,7 +161,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onWidthChange }) => {
             <SidebarItem
               href="/events"
               icon={<FiCalendar size={20} />}
-              text="Events"
+              text="Eventos"
               isActive={path.includes("/events")}
               isExpanded={true}
               onClick={closeMobileMenu}
@@ -170,7 +170,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onWidthChange }) => {
               <SidebarItem
                 href="/agents"
                 icon={<FiUsers size={20} />}
-                text="Agents"
+                text="Agentes"
                 isActive={path.includes("/agents")}
                 isExpanded={true}
                 onClick={closeMobileMenu}
@@ -180,7 +180,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onWidthChange }) => {
               <SidebarItem
                 href="/profile"
                 icon={<FiUser size={20} />}
-                text="My Profile"
+                text="Mi Perfil"
                 isActive={path.includes("/profile")}
                 isExpanded={true}
                 onClick={closeMobileMenu}
@@ -244,21 +244,21 @@ const Sidebar: React.FC<SidebarProps> = ({ onWidthChange }) => {
         <SidebarItem
           href="/dashboard"
           icon={<RxDashboard size={20} />}
-          text="Dashboard"
+          text="Tablero"
           isActive={path === "/dashboard"}
           isExpanded={isExpanded}
         />
         <SidebarItem
           href="/activities"
           icon={<BsWindowStack size={20} />}
-          text="Activities"
+          text="Actividades"
           isActive={path.includes("/activities")}
           isExpanded={isExpanded}
         />
         <SidebarItem
           href="/events"
           icon={<FiCalendar size={20} />}
-          text="Events"
+          text="Eventos"
           isActive={path.includes("/events")}
           isExpanded={isExpanded}
         />
@@ -266,7 +266,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onWidthChange }) => {
           <SidebarItem
             href="/agents"
             icon={<FiUsers size={20} />}
-            text="Agents"
+            text="Agentes"
             isActive={path.includes("/agents")}
             isExpanded={isExpanded}
           />
@@ -275,7 +275,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onWidthChange }) => {
           <SidebarItem
             href="/profile"
             icon={<FiUser size={20} />}
-            text="My Profile"
+            text="Mi Perfil"
             isActive={path.includes("/profile")}
             isExpanded={isExpanded}
           />

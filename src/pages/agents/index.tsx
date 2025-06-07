@@ -22,9 +22,9 @@ const AgentsPage: React.FC = () => {
     pagination,
     toast,
     searchTerm,
-    statusFilter,
+    // statusFilter,
     setSearchTerm,
-    setStatusFilter,
+    // setStatusFilter,
     setPage,
     createAgent,
     updateAgent,
@@ -102,7 +102,7 @@ const AgentsPage: React.FC = () => {
   return (
     <>
       <Head>
-        <title>Agents | Mycotur</title>
+        <title>Agente | Mycotur</title>
       </Head>
       {toast && (
         <div
@@ -125,13 +125,13 @@ const AgentsPage: React.FC = () => {
                 <IoSearchOutline className="cursor-pointer absolute left-3 top-1/2 transform -translate-y-1/2 text-[rgba(142,133,129)]" />
                 <input
                   type="text"
-                  placeholder="Search"
+                  placeholder="Buscar"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full sm:w-64 pl-10 pr-4 py-2 border border-[rgba(199,195,193)] shadow-sm shadow-[rgba(24,27,37,0.04)] text-[rgba(142,133,129)] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[rgba(194,91,52)] focus:border-[rgba(194,91,52)] disabled:opacity-50 disabled:cursor-not-allowed"
                 />
               </div>{" "}
-              <select
+              {/* <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="cursor-pointer w-full sm:w-48 px-4 py-2 text-[rgba(142,133,129)] border border-[rgba(199,195,193)] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20] disabled:opacity-50 disabled:cursor-not-allowed"
@@ -139,14 +139,14 @@ const AgentsPage: React.FC = () => {
                 <option value="">All Status</option>
                 <option value="active">Active</option>
                 <option value="invited">Invited</option>
-              </select>
+              </select> */}
             </div>
             <button
               onClick={openAddModal}
               className="cursor-pointer w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-[rgba(194,91,52)] hover:bg-[#C44D16] text-[rgba(255,255,255)] rounded-lg text-sm font-medium transition-colors"
             >
               <FiPlus className="mr-2" />
-              Add Agent
+              Añadir agentes
             </button>
           </div>
         </div>
@@ -177,7 +177,7 @@ const AgentsPage: React.FC = () => {
           <div className="bg-[rgba(255,255,255)] rounded-lg shadow-xl p-4 sm:p-6 w-full max-w-lg max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4 sm:mb-6">
               <h2 className="text-lg sm:text-xl font-bold text-[#111827]">
-                {selectedAgent?.id ? "Edit Agent" : "Add Agent"}
+                {selectedAgent?.id ? "Edit Agent" : "Añadir nuevo agente"}
               </h2>
               <button
                 onClick={() => {

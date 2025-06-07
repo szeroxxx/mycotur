@@ -1,4 +1,8 @@
-import { GOOGLE_MAPS_API_KEY, TARGET_REGIONS,  REGION_KEYWORDS } from './googleMapsConfig';
+import {
+  GOOGLE_MAPS_API_KEY,
+  TARGET_REGIONS,
+  REGION_KEYWORDS,
+} from "./googleMapsConfig";
 
 export interface GooglePlaceSuggestion {
   place_id: string;
@@ -39,74 +43,73 @@ class GooglePlacesService {
 
   /**
    * Check if a place description contains any of the target regions
-   */  private isInTargetRegion(description: string): boolean {
+   */ private isInTargetRegion(description: string): boolean {
     const lowerDescription = description.toLowerCase();
-    
-    // First check for exact region matches
-    const exactMatch = TARGET_REGIONS.some(region => 
+
+    const exactMatch = TARGET_REGIONS.some((region) =>
       lowerDescription.includes(region.toLowerCase())
     );
-    
+
     if (exactMatch) return true;
-    
-    // If no exact match, check if the location is in Ávila region
-    const inAvila = lowerDescription.includes('ávila') || 
-                   lowerDescription.includes('avila');
-    
-    // If location is in Ávila, also check for partial region matches
+
+    const inAvila =
+      lowerDescription.includes("ávila") || lowerDescription.includes("avila");
+
     if (inAvila) {
-      return REGION_KEYWORDS.some(keyword => 
+      return REGION_KEYWORDS.some((keyword) =>
         lowerDescription.includes(keyword.toLowerCase())
       );
     }
-    
+
     return false;
   }
-  /**
-   * Get place details including coordinates
-   */
-  private async getPlaceDetails(placeId: string): Promise<{ lat: number; lng: number } | null> {
+
+  private async getPlaceDetails(
+    placeId: string
+  ): Promise<{ lat: number; lng: number } | null> {
     try {
       const response = await fetch(`/api/places/details?place_id=${placeId}`);
-      if (!response.ok) throw new Error('Failed to fetch place details');
-      
+      if (!response.ok) throw new Error("Failed to fetch place details");
+
       const data = await response.json();
       if (data.result?.geometry?.location) {
         return {
           lat: data.result.geometry.location.lat,
-          lng: data.result.geometry.location.lng
+          lng: data.result.geometry.location.lng,
         };
       }
       return null;
     } catch (error) {
-      console.error('Error fetching place details:', error);
-      // Return default coordinates for the region if API fails
+      console.error("Error fetching place details:", error);
       return { lat: 40.5, lng: -5.0 };
     }
   }
 
   /**
    * Search for places using Google Places Autocomplete API
-   */  async searchPlaces(query: string): Promise<LocationSuggestion[]> {
+   */ async searchPlaces(query: string): Promise<LocationSuggestion[]> {
     if (query.length < 3) return [];
 
     try {
-      // Add region context to the query if it doesn't include region keywords
       let enhancedQuery = query;
-      if (!TARGET_REGIONS.some(region => query.toLowerCase().includes(region.toLowerCase()))) {
+      if (
+        !TARGET_REGIONS.some((region) =>
+          query.toLowerCase().includes(region.toLowerCase())
+        )
+      ) {
         enhancedQuery = `${query} Ávila`;
       }
-      
-      // Use your backend API endpoint to avoid CORS issues
+
       const response = await fetch(`/api/places/autocomplete`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-        },        body: JSON.stringify({
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
           input: enhancedQuery,
-          types: 'geocode', // Only geographical locations
-          language: 'es' // Spanish language
-        })
+          types: "geocode",
+          language: "es",
+        }),
       });
 
       if (!response.ok) {
@@ -114,47 +117,53 @@ class GooglePlacesService {
       }
 
       const data = await response.json();
-      
+
       if (!data.predictions) return [];
 
-      // Filter results to only include our target regions
-      const filteredPredictions = data.predictions.filter((prediction: GooglePlaceSuggestion) => 
-        this.isInTargetRegion(prediction.description)
-      );      // Convert Google Places format to our LocationSuggestion format
+      const filteredPredictions = data.predictions.filter(
+        (prediction: GooglePlaceSuggestion) =>
+          this.isInTargetRegion(prediction.description)
+      );
       const suggestions: LocationSuggestion[] = [];
-      
+
       for (const prediction of filteredPredictions.slice(0, 5)) {
-        // Get coordinates for each place (simplified approach)
-        let coordinates = { lat: 40.5, lng: -5.0 }; // Default coordinates for the region
-        
+        let coordinates = { lat: 40.5, lng: -5.0 };
+
         try {
-          const detailedCoords = await this.getPlaceDetails(prediction.place_id);
+          const detailedCoords = await this.getPlaceDetails(
+            prediction.place_id
+          );
           if (detailedCoords) {
             coordinates = detailedCoords;
           }
         } catch (error) {
-          console.error('Error getting coordinates for', prediction.description, error);
+          console.error(
+            "Error getting coordinates for",
+            prediction.description,
+            error
+          );
         }
-        
+
         suggestions.push({
           display_name: prediction.description,
           display_place: prediction.structured_formatting.main_text,
-          display_address: prediction.structured_formatting.secondary_text || '',
+          display_address:
+            prediction.structured_formatting.secondary_text || "",
           place_id: prediction.place_id,
           lat: coordinates.lat.toString(),
           lon: coordinates.lng.toString(),
           address: {
             name: prediction.structured_formatting.main_text,
-            state: 'Castilla y León',
-            country: 'España',
-            city: prediction.structured_formatting.main_text
-          }
+            state: "Castilla y León",
+            country: "España",
+            city: prediction.structured_formatting.main_text,
+          },
         });
       }
 
       return suggestions;
     } catch (error) {
-      console.error('Error searching places:', error);
+      console.error("Error searching places:", error);
       return [];
     }
   }

@@ -75,7 +75,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="space-y-3">
             <h3 className="text-lg font-semibold text-[rgba(68,63,63)]">
-              View Upcoming Event Dates
+              Próximos eventos organizados
             </h3>
             {eventDates.length > 0 ? (
               eventDates.map((eventDate) => (
@@ -89,20 +89,20 @@ const EventDetails: React.FC<EventDetailsProps> = ({
                       {eventDate.date} at {eventDate.time}
                     </span>
                     <span className="font-medium text-[rgba(229,114,0)] cursor-pointer">
-                      Read more details
+                      Ver evento
                     </span>
                   </div>
                 </div>
               ))
             ) : (
               <p className="text-sm text-[rgba(100,92,90)]">
-                No upcoming events scheduled at this time.
+                No se encontraron eventos programados en este momento.
               </p>
             )}{" "}
           </div>
           <div>
             <h3 className="text-lg font-semibold text-[rgba(68,63,63)]">
-              Seasons
+              Temporadas
             </h3>
             <p className="text-sm text-[rgba(100,92,90)] leading-relaxed">
               {seasons.availableMonths}
@@ -117,7 +117,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({
       </div>{" "}
       <div>
         <h3 className="text-lg font-semibold text-[rgba(68,63,63)] mb-4">
-          Description
+          Descripción
         </h3>
         <p className="text-sm text-[rgba(100,92,90)] leading-relaxed">
           {description.main}
@@ -145,10 +145,10 @@ const EventDetails: React.FC<EventDetailsProps> = ({
           </div>
           <div>
             <h3 className="text-sm font-semibold text-[rgba(68,63,63)]">
-              Meet the organizer {organizer.name}
+              Conoce al organizador  {organizer.name}
             </h3>
             <p className="text-xs text-[rgba(100,92,90)]">
-              {organizer.eventsHosted} Events Hosted
+              {organizer.eventsHosted} Eventos Organizados
             </p>
           </div>
           <div className="flex gap-2 ">
@@ -177,7 +177,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({
         </div>
       </div>{" "}      <div>
         <h3 className="text-lg font-semibold text-[rgba(68,63,63)] mb-4">
-          Event Address
+          Lugar del evento
         </h3>
         <StaticMapView
           location={location}

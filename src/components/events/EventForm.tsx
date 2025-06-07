@@ -35,6 +35,7 @@ interface EventFormProps {
   activities: Activity[];
   onActivitySelect?: (activity: Activity | undefined) => void;
   isLoading?: boolean;
+  onCategoriesChange?: (categories: string[]) => void;
 }
 
 const RequiredIndicator = () => (
@@ -50,6 +51,7 @@ export const EventForm: React.FC<EventFormProps> = ({
   activities,
   onActivitySelect,
   isLoading = false,
+  onCategoriesChange,
 }) => {
   const [locationInput, setLocationInput] = useState(event.location || "");
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([]);
@@ -58,13 +60,17 @@ export const EventForm: React.FC<EventFormProps> = ({
   const [locationError, setLocationError] = useState<string | null>(null);
   const locationRef = useRef<HTMLDivElement>(null);
 
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    event.categories || (event.category ? [event.category] : [])
+  );
+  const [categoriesError, setCategoriesError] = useState<string | null>(null);
+
   const [previewImages, setPreviewImages] = useState<string[]>([]);
   const [previewVideos, setPreviewVideos] = useState<string[]>([]);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const [hoverVideoIndex, setHoverVideoIndex] = useState<number | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
-
   useEffect(() => {
     if (event.location && event.location !== locationInput) {
       setLocationInput(event.location);
@@ -72,6 +78,29 @@ export const EventForm: React.FC<EventFormProps> = ({
       setLocationError(null);
     }
   }, [event.location]);
+
+  useEffect(() => {
+    const eventCategories =
+      event.categories || (event.category ? [event.category] : []);
+    setSelectedCategories(eventCategories);
+  }, [event.categories, event.category]);
+
+  const handleCategoryChange = (categoryTitle: string) => {
+    const updatedCategories = selectedCategories.includes(categoryTitle)
+      ? selectedCategories.filter((cat) => cat !== categoryTitle)
+      : [...selectedCategories, categoryTitle];
+
+    setSelectedCategories(updatedCategories);
+    setCategoriesError(
+      updatedCategories.length === 0
+        ? "Seleccione al menos una categoría"
+        : null
+    );
+
+    if (onCategoriesChange) {
+      onCategoriesChange(updatedCategories);
+    }
+  };
 
   const handleAutoFillActivitySelect = (
     e: React.ChangeEvent<HTMLSelectElement>
@@ -103,18 +132,6 @@ export const EventForm: React.FC<EventFormProps> = ({
         },
       } as React.ChangeEvent<HTMLSelectElement>);
 
-      // // Auto-fill event name if available
-      // if (selectedActivity.title) {
-      //   onChange({
-      //     ...e,
-      //     target: {
-      //       ...e.target,
-      //       name: "event",
-      //       value: selectedActivity.title,
-      //     },
-      //   } as React.ChangeEvent<HTMLSelectElement>);
-      // }
-
       if (selectedActivity.description) {
         onChange({
           ...e,
@@ -140,7 +157,9 @@ export const EventForm: React.FC<EventFormProps> = ({
 
     if (isValidLocation && value !== locationInput) {
       setIsValidLocation(false);
-      setLocationError("Please select a location from the suggestions below");
+      setLocationError(
+        "Seleccione una ubicación de las sugerencias a continuación"
+      );
       const clearEvent = {
         target: {
           name: "location",
@@ -160,25 +179,27 @@ export const EventForm: React.FC<EventFormProps> = ({
 
         if (suggestions.length === 0) {
           setLocationError(
-            "No valid locations found. Please search for places in Valle del Tiétar, La Moraña, Valle de Amblés, Sierra de Gredos, or Alberche Pinares."
+            "No se encontraron ubicaciones válidas. Por favor, busca lugares en Valle del Tiétar, La Moraña, Valle de Amblés, Sierra de Gredos o Alberche Pinares."
           );
         } else {
           setLocationError(
-            "Please select a location from the suggestions below"
+            "Seleccione una ubicación de las sugerencias a continuación"
           );
         }
       } catch (error) {
         console.error("Error fetching locations:", error);
         setSuggestions([]);
         setShowSuggestions(false);
-        setLocationError("Error fetching locations. Please try again.");
+        setLocationError(
+          "Error al buscar ubicaciones. Por favor, inténtalo de nuevo."
+        );
       }
     } else {
       setSuggestions([]);
       setShowSuggestions(false);
       if (value.length > 0 && !isValidLocation) {
         setLocationError(
-          "Please enter at least 3 characters to search for locations"
+          "Por favor, ingresa al menos 3 caracteres para buscar ubicaciones"
         );
       } else {
         setLocationError(null);
@@ -219,13 +240,9 @@ export const EventForm: React.FC<EventFormProps> = ({
     try {
       const totalImageCount = previewImages.length;
       if (index < 0 || index >= totalImageCount) {
-        console.error(
-          "Invalid image index:",
-          index,
-          "Total images:",
-          totalImageCount
+        setUploadError(
+          "Selección de imagen no válida. Por favor, inténtalo de nuevo."
         );
-        setUploadError("Invalid image selection. Please try again.");
         return;
       }
       const currentImages = [...(event.images || [])];
@@ -247,7 +264,6 @@ export const EventForm: React.FC<EventFormProps> = ({
           return true;
         });
 
-
         const mediaEvent = {
           target: {
             name: "mediaUrls",
@@ -261,18 +277,8 @@ export const EventForm: React.FC<EventFormProps> = ({
         if (newImageIndex >= 0 && newImageIndex < currentImages.length) {
           const updatedImages = currentImages.filter((_, idx) => {
             const shouldKeep = idx !== newImageIndex;
-            if (!shouldKeep) {
-              console.log("Removing from images array at index:", idx);
-            }
             return shouldKeep;
           });
-
-          console.log(
-            "Updated images count:",
-            updatedImages.length,
-            "vs original:",
-            currentImages.length
-          );
 
           const imageEvent = {
             target: {
@@ -288,16 +294,17 @@ export const EventForm: React.FC<EventFormProps> = ({
             "Available:",
             currentImages.length
           );
-          setUploadError("Failed to remove image. Invalid selection.");
+          setUploadError("Fallo al eliminar la imagen. Selección no válida.");
           return;
         }
       }
 
       setUploadError(null);
-      console.log("✅ Image removal completed successfully");
     } catch (error) {
       console.error("❌ Error in handleImageRemove:", error);
-      setUploadError("Failed to remove image. Please try again.");
+      setUploadError(
+        "Fallo al eliminar la imagen. Por favor, inténtalo de nuevo."
+      );
     }
   };
   const handleVideoRemove = (index: number) => {
@@ -310,7 +317,9 @@ export const EventForm: React.FC<EventFormProps> = ({
           "Total videos:",
           totalVideoCount
         );
-        setUploadError("Invalid video selection. Please try again.");
+        setUploadError(
+          "Selección de video no válida. Por favor, inténtalo de nuevo."
+        );
         return;
       }
 
@@ -331,20 +340,11 @@ export const EventForm: React.FC<EventFormProps> = ({
               media.name === videoToRemove.name &&
               media.type === videoToRemove.type
             );
-            if (!shouldKeep) {
-              console.log("Removing from mediaUrls:", media);
-            }
+
             return shouldKeep;
           }
           return true;
         });
-
-        console.log(
-          "Updated mediaUrls count:",
-          updatedMediaUrls.length,
-          "vs original:",
-          currentMediaUrls.length
-        );
 
         const mediaEvent = {
           target: {
@@ -359,18 +359,9 @@ export const EventForm: React.FC<EventFormProps> = ({
         if (newVideoIndex >= 0 && newVideoIndex < currentVideos.length) {
           const updatedVideos = currentVideos.filter((_, idx) => {
             const shouldKeep = idx !== newVideoIndex;
-            if (!shouldKeep) {
-              console.log("Removing from videos array at index:", idx);
-            }
+
             return shouldKeep;
           });
-
-          console.log(
-            "Updated videos count:",
-            updatedVideos.length,
-            "vs original:",
-            currentVideos.length
-          );
 
           const videoEvent = {
             target: {
@@ -386,16 +377,17 @@ export const EventForm: React.FC<EventFormProps> = ({
             "Available:",
             currentVideos.length
           );
-          setUploadError("Failed to remove video. Invalid selection.");
+          setUploadError("Fallo al eliminar el video. Selección no válida.");
           return;
         }
       }
 
       setUploadError(null);
-      console.log("✅ Video removal completed successfully");
     } catch (error) {
       console.error("❌ Error in handleVideoRemove:", error);
-      setUploadError("Failed to remove video. Please try again.");
+      setUploadError(
+        "Fallo al eliminar el video. Por favor, inténtalo de nuevo."
+      );
     }
   };
 
@@ -411,21 +403,21 @@ export const EventForm: React.FC<EventFormProps> = ({
     for (const file of newFiles) {
       if (ALLOWED_IMAGE_TYPES.includes(file.type)) {
         if (file.size > 10 * 1024 * 1024) {
-          setUploadError(`Image ${file.name} exceeds 10MB limit`);
+          setUploadError(`La imagen ${file.name} excede el límite de 10MB`);
           return;
         }
         imageFiles.push(file);
       } else if (ALLOWED_VIDEO_TYPES.includes(file.type)) {
         if (file.size > MAX_VIDEO_SIZE_MB * 1024 * 1024) {
           setUploadError(
-            `Video ${file.name} exceeds ${MAX_VIDEO_SIZE_MB}MB limit`
+            `El video ${file.name} excede el límite de ${MAX_VIDEO_SIZE_MB}MB`
           );
           return;
         }
         videoFiles.push(file);
       } else {
         setUploadError(
-          `File ${file.name} is not allowed. Only JPG, PNG, WebP images and MP4, WebM, MOV videos are supported.`
+          `El archivo ${file.name} no está permitido. Solo se admiten imágenes JPG, PNG, WebP y videos MP4, WebM, MOV.`
         );
         return;
       }
@@ -443,9 +435,9 @@ export const EventForm: React.FC<EventFormProps> = ({
     if (totalImages + imageFiles.length > MAX_IMAGES) {
       const remaining = MAX_IMAGES - totalImages;
       setUploadError(
-        `Too many images. Maximum ${MAX_IMAGES} images allowed. You can upload ${
-          remaining > 0 ? remaining : "no"
-        } more image${remaining !== 1 ? "s" : ""}.`
+        `Demasiadas imágenes. Máximo ${MAX_IMAGES} imágenes permitidas. Puedes subir ${
+          remaining > 0 ? remaining : "ninguna"
+        } imagen${remaining !== 1 ? "es" : ""} más.`
       );
       return;
     }
@@ -453,15 +445,17 @@ export const EventForm: React.FC<EventFormProps> = ({
     if (totalVideos + videoFiles.length > MAX_VIDEOS) {
       const remaining = MAX_VIDEOS - totalVideos;
       setUploadError(
-        `Too many videos. Maximum ${MAX_VIDEOS} videos allowed. You can upload ${
-          remaining > 0 ? remaining : "no"
-        } more video${remaining !== 1 ? "s" : ""}.`
+        `Demasiados videos. Máximo ${MAX_VIDEOS} videos permitidos. Puedes subir ${
+          remaining > 0 ? remaining : "ningún"
+        } video${remaining !== 1 ? "s" : ""} más.`
       );
       return;
     }
     for (const file of newFiles) {
       if (file.size > MAX_VIDEO_SIZE_MB * 1024 * 1024) {
-        setUploadError(`Files must be less than ${MAX_VIDEO_SIZE_MB}MB`);
+        setUploadError(
+          `Los archivos deben ser menores de ${MAX_VIDEO_SIZE_MB}MB`
+        );
         return;
       }
     }
@@ -469,12 +463,6 @@ export const EventForm: React.FC<EventFormProps> = ({
     try {
       if (imageFiles.length > 0) {
         const updatedImages = [...existingImages, ...imageFiles];
-        console.log(
-          "Adding",
-          imageFiles.length,
-          "new images. Total will be:",
-          updatedImages.length
-        );
 
         const imageEvent = {
           target: {
@@ -485,15 +473,8 @@ export const EventForm: React.FC<EventFormProps> = ({
         onChange(imageEvent);
       }
 
-      // Update videos if any
       if (videoFiles.length > 0) {
         const updatedVideos = [...existingVideos, ...videoFiles];
-        console.log(
-          "Adding",
-          videoFiles.length,
-          "new videos. Total will be:",
-          updatedVideos.length
-        );
 
         const videoEvent = {
           target: {
@@ -503,8 +484,6 @@ export const EventForm: React.FC<EventFormProps> = ({
         } as unknown as React.ChangeEvent<HTMLInputElement>;
         onChange(videoEvent);
       }
-
-      console.log("✅ Media upload processing completed");
     } finally {
       setIsUploading(false);
     }
@@ -548,14 +527,12 @@ export const EventForm: React.FC<EventFormProps> = ({
     const newPreviewImages: string[] = [];
     const newPreviewVideos: string[] = [];
 
-    // Process existing media URLs first
     if (event.mediaUrls && event.mediaUrls.length > 0) {
       const imageMedias = event.mediaUrls.filter((media) =>
         media.type.startsWith("image")
       );
       const existingImageUrls = imageMedias.map((media) => {
         const url = getMediaUrl(media.name);
-        console.log("Adding existing image URL:", url);
         return url;
       });
 
@@ -565,7 +542,6 @@ export const EventForm: React.FC<EventFormProps> = ({
 
       const existingVideoUrls = videoMedias.map((media) => {
         const url = getMediaUrl(media.name);
-        console.log("Adding existing video URL:", url);
         return url;
       });
 
@@ -573,11 +549,9 @@ export const EventForm: React.FC<EventFormProps> = ({
       newPreviewVideos.push(...existingVideoUrls);
     }
 
-    // Process new uploaded files
     if (event.images && event.images.length > 0) {
       const fileUrls = event.images.map((file) => {
         const url = URL.createObjectURL(file);
-        console.log("Adding new image blob URL:", url);
         return url;
       });
       newPreviewImages.push(...fileUrls);
@@ -586,18 +560,10 @@ export const EventForm: React.FC<EventFormProps> = ({
     if (event.videos && event.videos.length > 0) {
       const videoUrls = event.videos.map((file) => {
         const url = URL.createObjectURL(file);
-        console.log("Adding new video blob URL:", url);
         return url;
       });
       newPreviewVideos.push(...videoUrls);
     }
-
-    console.log(
-      "Final preview arrays - Images:",
-      newPreviewImages.length,
-      "Videos:",
-      newPreviewVideos.length
-    );
 
     setPreviewImages(newPreviewImages);
     setPreviewVideos(newPreviewVideos);
@@ -624,12 +590,18 @@ export const EventForm: React.FC<EventFormProps> = ({
     (event.videos?.length || 0) +
     (event.mediaUrls?.filter((media) => media.type.startsWith("video"))
       .length || 0);
-
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!isValidLocation || !event.location) {
-      setLocationError("Please select a valid location from the suggestions");
+      setLocationError(
+        "Por favor, seleccione una ubicación válida de las sugerencias"
+      );
+      return;
+    }
+
+    if (selectedCategories.length === 0) {
+      setCategoriesError("Seleccione al menos una categoría");
       return;
     }
 
@@ -640,15 +612,15 @@ export const EventForm: React.FC<EventFormProps> = ({
     <form onSubmit={handleFormSubmit} className="space-y-6">
       <div>
         <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
-          Fetch data direct from activity details(optional)
-        </label>{" "}
+          Obtener datos directamente de los detalles de la actividad (opcional){" "}
+        </label>
         <select
           name="activityName"
           value={event.activityId?.toString() || ""}
           onChange={handleAutoFillActivitySelect}
           className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
         >
-          <option value="">Select your Activity</option>
+          <option value="">Seleccione tu Actividad</option>
           {activities.map((activity) => (
             <option key={activity.id} value={activity.id.toString()}>
               {activity.title}
@@ -658,7 +630,7 @@ export const EventForm: React.FC<EventFormProps> = ({
       </div>
       <div>
         <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
-          Select Activity <RequiredIndicator />
+          Seleccionar Actividad <RequiredIndicator />
         </label>{" "}
         <select
           name="activityId"
@@ -667,7 +639,7 @@ export const EventForm: React.FC<EventFormProps> = ({
           className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
           required
         >
-          <option value="">Select your Activity</option>
+          <option value="">Seleccione tu Actividad</option>
           {activities.map((activity) => (
             <option key={activity.id} value={activity.id.toString()}>
               {activity.title}
@@ -677,14 +649,14 @@ export const EventForm: React.FC<EventFormProps> = ({
       </div>
       <div>
         <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
-          Event Title <RequiredIndicator />
+          Título del Evento <RequiredIndicator />
         </label>
         <input
           type="text"
           name="event"
           value={event.event || ""}
           onChange={onChange}
-          placeholder="Event name"
+          placeholder="Nombre del evento"
           className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
           required
         />
@@ -692,7 +664,7 @@ export const EventForm: React.FC<EventFormProps> = ({
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
-            Event Date <RequiredIndicator />
+            Fecha del Evento <RequiredIndicator />
           </label>
           <div className="relative">
             <input
@@ -720,7 +692,7 @@ export const EventForm: React.FC<EventFormProps> = ({
         </div>
         <div>
           <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
-            Event Time <RequiredIndicator />
+            Hora del Evento <RequiredIndicator />
           </label>
           <div className="relative">
             <input
@@ -752,29 +724,55 @@ export const EventForm: React.FC<EventFormProps> = ({
             />
           </div>
         </div>
-      </div>
+      </div>{" "}
       <div>
         <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
-          Event Category <RequiredIndicator />
+          Categorías del Evento <RequiredIndicator />
         </label>
-        <select
-          name="category"
-          value={event.category || ""}
-          onChange={onChange}
-          className="w-full px-4 py-2 border text-[rgba(142,133,129)] border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
-          required
-        >
-          <option value="">Select Category</option>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 border border-[#E5E7EB] rounded-lg bg-gray-50/50">
           {categories.map((category) => (
-            <option key={category.uuid} value={category.title}>
-              {category.title}
-            </option>
+            <label
+              key={category.uuid}
+              className="flex items-center space-x-2 text-sm cursor-pointer hover:bg-white/80 p-2 rounded-md transition-colors"
+            >
+              <input
+                type="checkbox"
+                checked={selectedCategories.includes(category.title)}
+                onChange={() => handleCategoryChange(category.title)}
+                className="w-4 h-4 text-[#D45B20] bg-gray-100 border-gray-300 rounded focus:ring-[#D45B20] focus:ring-2"
+              />
+              <span className="text-[rgba(68,63,63)] select-none">
+                {category.title}
+              </span>
+            </label>
           ))}
-        </select>
+        </div>
+        {categoriesError && (
+          <p className="mt-1 text-sm text-red-600">{categoriesError}</p>
+        )}
+        {selectedCategories.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-1">
+            {selectedCategories.map((categoryTitle) => (
+              <span
+                key={categoryTitle}
+                className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[#D45B20]/10 text-[#D45B20] border border-[#D45B20]/20"
+              >
+                {categoryTitle}
+                <button
+                  type="button"
+                  onClick={() => handleCategoryChange(categoryTitle)}
+                  className="ml-1 hover:bg-[#D45B20]/20 rounded-full p-0.5 transition-colors"
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
       </div>{" "}
       <div>
         <label className="block text-sm font-sm text-[rgba(68,63,63)] mb-2">
-          Location <RequiredIndicator />
+          Ubicación <RequiredIndicator />
         </label>
         <div className="relative" ref={locationRef}>
           <input
@@ -782,7 +780,7 @@ export const EventForm: React.FC<EventFormProps> = ({
             name="location"
             value={locationInput}
             onChange={handleLocationChange}
-            placeholder="Search for locations in Valle del Tiétar, Sierra de Gredos..."
+            placeholder="Buscar ubicaciones en Valle del Tiétar, Sierra de Gredos..."
             className={`w-full px-4 py-2 text-[rgba(142,133,129)] border rounded-lg text-sm focus:outline-none focus:ring-1 ${
               isValidLocation && event.location
                 ? "border-green-500 focus:ring-green-500 focus:border-green-500"
@@ -802,7 +800,7 @@ export const EventForm: React.FC<EventFormProps> = ({
                   clipRule="evenodd"
                 />
               </svg>
-              Valid location selected
+              Ubicación válida seleccionada
             </div>
           )}
 
@@ -812,7 +810,7 @@ export const EventForm: React.FC<EventFormProps> = ({
 
           {!isValidLocation && !locationError && (
             <div className="mt-2 text-sm text-gray-500">
-              Type to search and select a location from Google Maps suggestions
+              Escriba para buscar y seleccione una ubicación de las sugerencias de Google Maps
             </div>
           )}
 
@@ -839,9 +837,9 @@ export const EventForm: React.FC<EventFormProps> = ({
             locationInput.length > 2 && (
               <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4">
                 <div className="text-sm text-gray-500 text-center">
-                  No locations found in target regions. Try searching for places
-                  in Valle del Tiétar, La Moraña, Valle de Amblés, Sierra de
-                  Gredos, or Alberche Pinares.
+                  No se han encontrado ubicaciones en las regiones objetivo. Intenta buscar lugares
+                  en Valle del Tiétar, La Moraña, Valle de Amblés, Sierra de
+                  Gredos, o Alberche Pinares.
                 </div>
               </div>
             )}
@@ -849,7 +847,7 @@ export const EventForm: React.FC<EventFormProps> = ({
       </div>
       <div>
         <label className="block text-sm font-sm text-[rgba(68,63,63)] mb-1">
-          Contact Information (People can view this detail)
+          Información de contacto pública (Las personas pueden ver estos detalles)
           <RequiredIndicator />
         </label>
         <div className="space-y-4">
@@ -858,7 +856,7 @@ export const EventForm: React.FC<EventFormProps> = ({
             name="email"
             value={event.email || ""}
             onChange={onChange}
-            placeholder="Email address"
+            placeholder="Dirección de correo electrónico"
             className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
             required
           />
@@ -867,12 +865,12 @@ export const EventForm: React.FC<EventFormProps> = ({
             name="phone"
             value={event.phone || ""}
             onChange={onChange}
-            placeholder="Phone number"
+            placeholder="Número de teléfono"
             className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
             required={!event.phone && !event.url}
           />
           <input
-            placeholder="Enter link"
+            placeholder="Introducir enlace"
             type="text"
             name="url"
             value={event.url || ""}
@@ -884,27 +882,27 @@ export const EventForm: React.FC<EventFormProps> = ({
       </div>
       <div>
         <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
-          Fees
+          Precio de la actividad
         </label>
         <textarea
           name="fees"
           value={event.fees || ""}
           onChange={onChange}
-          placeholder="Maximum if there are any fees involved, such as a $50 charge per person covering food and all activities"
+          placeholder="Describe cómo funciona el precio de la actividad, si va por personas, por grupo y si hay algún gasto extra incluído"
           rows={3}
           className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
         />
       </div>
       <div>
         <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
-          Description <RequiredIndicator />
+          Descripción <RequiredIndicator />
         </label>
         <textarea
           name="description"
           value={event.description || ""}
           onChange={onChange}
           maxLength={1000}
-          placeholder="Write more details about the event"
+          placeholder="Escribe una descripción de la actividad"
           rows={3}
           className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
           required
@@ -912,7 +910,7 @@ export const EventForm: React.FC<EventFormProps> = ({
       </div>{" "}
       <div>
         <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
-          Event Images & Videos
+          Imágenes del Evento y Videos
         </label>
         <div>
           {previewImages.length > 0 && (
@@ -950,7 +948,7 @@ export const EventForm: React.FC<EventFormProps> = ({
                             ? "scale-100 opacity-100"
                             : "scale-75 opacity-0"
                         }`}
-                      aria-label="Remove image"
+                      aria-label="Eliminar imagen"
                     >
                       <MdDelete />
                     </button>
@@ -1042,8 +1040,8 @@ export const EventForm: React.FC<EventFormProps> = ({
               }`}
             >
               {isUploading
-                ? "Uploading..."
-                : "Click to upload images and videos"}
+                ? "Cargando..."
+                : "Haga clic para cargar imágenes y videos"}
             </div>
             <p className="text-xs text-[#6B7280] mt-2">
               {uploadError ? (
@@ -1053,7 +1051,7 @@ export const EventForm: React.FC<EventFormProps> = ({
               )}
             </p>
             <p className="text-xs text-[#6B7280] mt-1">
-              Supported: JPG, PNG, WebP, MP4, WebM, MOV
+              Formatos admitidos: JPG, PNG, WebP, MP4, WebM, MOV
             </p>
           </div>
         </div>
@@ -1062,15 +1060,15 @@ export const EventForm: React.FC<EventFormProps> = ({
         <button
           type="button"
           onClick={onCancel}
-          className="cursor-pointer px-4 py-2 text-sm font-medium text-[#6B7280] hover:text-[rgba(68,63,63)]"
+          className="px-4 py-2 text-sm font-medium text-[#6B7280] hover:text-[rgba(68,63,63)]"
           disabled={isLoading}
         >
-          Cancel
+          Cancelar
         </button>{" "}
         <button
           type="submit"
           disabled={isLoading || !isValidLocation || !event.location}
-          className={`cursor-pointer px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
+          className={`px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
             isLoading || !isValidLocation || !event.location
               ? "bg-[#D45B20]/70 cursor-not-allowed"
               : "bg-[#D45B20] hover:bg-[#C44D16]"
@@ -1100,11 +1098,11 @@ export const EventForm: React.FC<EventFormProps> = ({
           )}
           {isLoading
             ? event.id
-              ? "Updating..."
-              : "Saving..."
+              ? "Actualización..."
+              : "Ahorro..."
             : event.id
-            ? "Update"
-            : "Save"}
+            ? "Actualizar"
+            : "Guardar"}
         </button>
       </div>
     </form>

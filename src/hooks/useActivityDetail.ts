@@ -8,6 +8,7 @@ interface RawActivityDetailData {
   title: string;
   owner: string;
   category: string;
+  categories?: string[];
   location: string;
   lat: string;
   lon: string;
@@ -52,6 +53,7 @@ export interface ActivityDetailData {
   }[];
   totalPhotos: number;
   category: string;
+  categories: string[];
   eventDates: {
     id: string;
     date: string;
@@ -111,6 +113,7 @@ export const useActivityDetail = (uuid: string | undefined) => {
       })),
       totalPhotos: data.photos.length,
       category: data.category,
+      categories: data.categories || (data.category ? [data.category] : []),
       eventDates: data.eventDates || [],
       seasons: {
         availableMonths: `${

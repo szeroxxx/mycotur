@@ -34,10 +34,10 @@ const DiscoverOrganiserPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [locationFilter, setLocationFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
-  
-  const { 
-    locations: organizerLocations, 
-    // isLoading: locationsLoading 
+
+  const {
+    locations: organizerLocations,
+    // isLoading: locationsLoading
   } = useOrganizerLocations();
 
   useEffect(() => {
@@ -73,8 +73,7 @@ const DiscoverOrganiserPage = () => {
           organiser.address.toLowerCase().includes(locationFilter.toLowerCase())
       );
     }
-
-    if (categoryFilter && categoryFilter !== "Event Category") {
+    if (categoryFilter && categoryFilter !== "Tipo de evento") {
       filtered = filtered.filter((organiser) =>
         organiser.categories.some(
           (category) =>
@@ -88,13 +87,12 @@ const DiscoverOrganiserPage = () => {
   useEffect(() => {
     filterOrganisers();
   }, [filterOrganisers]);
-
   const handleFilterChange = useCallback(
     (type: "location" | "category", value: string) => {
       if (type === "location") {
-        setLocationFilter(value === "Location" ? "" : value);
+        setLocationFilter(value === "Ubicación" ? "" : value);
       } else {
-        setCategoryFilter(value === "Event Category" ? "" : value);
+        setCategoryFilter(value === "Tipo de evento" ? "" : value);
       }
     },
     []
@@ -108,7 +106,7 @@ const DiscoverOrganiserPage = () => {
     return (
       <PublicLayout>
         <div className="flex items-center justify-center min-h-screen">
-          <div className="text-lg text-gray-600">Loading organisers...</div>
+          <div className="text-lg text-gray-600">Cargando organizadores...</div>
         </div>
       </PublicLayout>
     );
@@ -122,21 +120,22 @@ const DiscoverOrganiserPage = () => {
         </div>
       </PublicLayout>
     );
-  }  return (
+  }
+  return (
     <PublicLayout>
       <Head>
         <title>Discover Organisers | Mycotur</title>
       </Head>
-      
+
       <div className="hidden lg:block min-h-screen bg-gradient-to-br from-[rgba(244,242,242)] to-[rgba(248,250,252)]">
         <div className="container mx-auto px-6 py-8">
           <div className="mb-8">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-              <div>
-              </div>              <div className="lg:w-96">
+              <div></div>{" "}
+              <div className="lg:w-96">
                 <SearchBar
-                  locationFilter={locationFilter || "Location"}
-                  categoryFilter={categoryFilter || "Event Category"}
+                  locationFilter={locationFilter || "Ubicación"}
+                  categoryFilter={categoryFilter || "Tipo de evento"}
                   onFilterChange={handleFilterChange}
                   onSearch={handleSearch}
                   variant="compact"
@@ -150,12 +149,14 @@ const DiscoverOrganiserPage = () => {
           {loading ? (
             <div className="text-center py-20">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[rgba(194,91,52)]"></div>
-              <p className="mt-6 text-[rgba(100,92,90)] text-lg">Loading organisers...</p>
+              <p className="mt-6 text-[rgba(100,92,90)] text-lg">
+                Cargando organizadores...
+              </p>
             </div>
           ) : filteredOrganisers.length === 0 ? (
             <div className="text-center py-20 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-[rgba(226,225,223,0.3)]">
               <p className="text-[rgba(100,92,90)] text-lg">
-                No organisers found for the selected filters.
+                No se encontraron organizadores para los filtros seleccionados.
               </p>
             </div>
           ) : (
@@ -180,10 +181,12 @@ const DiscoverOrganiserPage = () => {
         </div>
       </div>
 
-      <div className="lg:hidden min-h-screen bg-gradient-to-br from-[rgba(244,242,242)] to-[rgba(248,250,252)]">        <div className="sticky top-0 z-20  border-b border-[rgba(226,225,223,0.4)] p-4">
+      <div className="lg:hidden min-h-screen bg-gradient-to-br from-[rgba(244,242,242)] to-[rgba(248,250,252)]">
+        {" "}
+        <div className="sticky top-0 z-20  border-b border-[rgba(226,225,223,0.4)] p-4">
           <SearchBar
-            locationFilter={locationFilter || "Location"}
-            categoryFilter={categoryFilter || "Event Category"}
+            locationFilter={locationFilter || "Ubicación"}
+            categoryFilter={categoryFilter || "Tipo de evento"}
             onFilterChange={handleFilterChange}
             onSearch={handleSearch}
             variant="mobile"
@@ -191,17 +194,18 @@ const DiscoverOrganiserPage = () => {
             useCustomLocations={true}
           />
         </div>
-
         <div className="p-4">
           {loading ? (
             <div className="text-center py-16">
               <div className="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-[rgba(194,91,52)]"></div>
-              <p className="mt-4 text-[rgba(100,92,90)]">Loading organisers...</p>
+              <p className="mt-4 text-[rgba(100,92,90)]">
+                Cargando organizadores...
+              </p>
             </div>
           ) : filteredOrganisers.length === 0 ? (
             <div className="text-center py-16 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-[rgba(226,225,223,0.3)]">
               <p className="text-[rgba(100,92,90)]">
-                No organisers found for the selected filters.
+                No se encontraron organizadores para los filtros seleccionados.
               </p>
             </div>
           ) : (

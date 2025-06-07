@@ -60,7 +60,6 @@ const ProfilePage: React.FC = () => {
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
 
-  // Address suggestion states
   const [addressInput, setAddressInput] = useState("");
   const [addressSuggestions, setAddressSuggestions] = useState<
     LocationSuggestion[]
@@ -70,7 +69,6 @@ const ProfilePage: React.FC = () => {
   const [addressError, setAddressError] = useState<string | null>(null);
   const addressRef = useRef<HTMLDivElement>(null);
 
-  // Other states
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -139,7 +137,6 @@ const ProfilePage: React.FC = () => {
     }
   }, []);
 
-  // Initialize address input when profile data changes
   useEffect(() => {
     if (profileData.address && profileData.address !== addressInput) {
       setAddressInput(profileData.address);
@@ -182,7 +179,6 @@ const ProfilePage: React.FC = () => {
     };
   }, [isEditing, profileData]);
 
-  // Close address suggestions when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -201,7 +197,7 @@ const ProfilePage: React.FC = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showAddressSuggestions]);
-  // Clear saved form data after successful save
+
   const handleSave = async () => {
     try {
       if (!validateSocialInputs()) {
@@ -255,11 +251,13 @@ const ProfilePage: React.FC = () => {
 
   const validatePassword = () => {
     if (newPassword.length < 8) {
-      setPasswordError("Password must be at least 8 characters long");
+      setPasswordError(
+        "La contraseña debe tener al menos 8 caracteres de longitud"
+      );
       return false;
     }
     if (newPassword !== confirmPassword) {
-      setPasswordError("Passwords do not match");
+      setPasswordError("Las contraseñas no coinciden");
       return false;
     }
     setPasswordError("");
@@ -273,7 +271,7 @@ const ProfilePage: React.FC = () => {
       if (url && !url.startsWith("http://") && !url.startsWith("https://")) {
         errors[
           platform as keyof SocialErrors
-        ] = `Please enter a valid URL starting with http:// or https://`;
+        ] = `Ingrese una URL válida a partir de http:// o https://`;
         isValid = false;
       }
     });
@@ -288,7 +286,9 @@ const ProfilePage: React.FC = () => {
 
     if (isValidAddress && value !== addressInput) {
       setIsValidAddress(false);
-      setAddressError("Please select an address from the suggestions below");
+      setAddressError(
+        "Seleccione una dirección de las sugerencias a continuación"
+      );
       setProfileData((prev) => ({
         ...prev,
         address: "",
@@ -305,25 +305,27 @@ const ProfilePage: React.FC = () => {
 
         if (suggestions.length === 0) {
           setAddressError(
-            "No valid locations found. Please search for places in Valle del Tiétar, La Moraña, Valle de Amblés, Sierra de Gredos, or Alberche Pinares."
+            "No se encontraron ubicaciones válidas. Busque lugares en Valle del Tiétar, La Moraña, Valle de Amblés, Sierra de Gredos o Alberche Pinares."
           );
         } else {
           setAddressError(
-            "Please select an address from the suggestions below"
+            "Seleccione una dirección de las sugerencias a continuación"
           );
         }
       } catch (error) {
         console.error("Error fetching addresses:", error);
         setAddressSuggestions([]);
         setShowAddressSuggestions(false);
-        setAddressError("Error fetching addresses. Please try again.");
+        setAddressError(
+          "Error al buscar direcciones. Por favor, inténtalo de nuevo."
+        );
       }
     } else {
       setAddressSuggestions([]);
       setShowAddressSuggestions(false);
       if (value.length > 0 && !isValidAddress) {
         setAddressError(
-          "Please enter at least 3 characters to search for addresses"
+          "Ingrese al menos 3 caracteres para buscar direcciones"
         );
       } else {
         setAddressError(null);
@@ -360,9 +362,9 @@ const ProfilePage: React.FC = () => {
       setNewPassword("");
       setConfirmPassword("");
     } catch (err) {
-      console.log('err::: ', err);
+      console.log("err::: ", err);
       setPasswordError(
-        "Failed to change password. Please check your current password."
+        "No se ha cambiado la contraseña. Por favor, compruebe su contraseña actual."
       );
     }
   };
@@ -409,7 +411,7 @@ const ProfilePage: React.FC = () => {
       }));
     } catch (error) {
       setUploadError(
-        error instanceof Error ? error.message : "Failed to upload image"
+        error instanceof Error ? error.message : "No se pudo cargar la imagen."
       );
     } finally {
       setIsUploadingImage(false);
@@ -420,7 +422,7 @@ const ProfilePage: React.FC = () => {
   return (
     <>
       <Head>
-        <title>My Profile | Mycotur</title>
+        <title>Mi Perfil | Mycotur</title>
       </Head>
       {toast && (
         <div
@@ -437,7 +439,7 @@ const ProfilePage: React.FC = () => {
       <div className="max-w-3xl mx-auto p-4 sm:p-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-xl sm:text-2xl font-semibold text-[rgb(68,63,63)]">
-            My Profile
+            Mi Perfil
           </h1>
           {!isEditing ? (
             <button
@@ -452,13 +454,13 @@ const ProfilePage: React.FC = () => {
                 onClick={handleCancelEdit}
                 className="cursor-pointer px-3 sm:px-4 py-2 text-[rgba(68,63,63)] hover:text-[#111827] font-medium text-sm"
               >
-                Cancel
+                Cancelar
               </button>
               <button
                 onClick={handleSave}
                 className="cursor-pointer px-3 sm:px-4 py-2 bg-[#D45B20] hover:bg-[#C44D16] text-white rounded-lg text-sm font-medium transition-colors"
               >
-                Save
+                Guardar
               </button>
             </div>
           )}
@@ -482,7 +484,7 @@ const ProfilePage: React.FC = () => {
                       />
                     </div>
                   )}
-                </div>  
+                </div>
                 <button
                   onClick={() =>
                     document.getElementById("profile-image-input")?.click()
@@ -507,13 +509,13 @@ const ProfilePage: React.FC = () => {
               </div>
               <div className="text-center">
                 <p className="text-sm text-[rgba(100,92,90)] mb-1">
-                  Profile Picture
+                  Imagen de Perfil
                 </p>
                 <p className="text-xs text-[rgba(100,92,90)]">
-                  Click the edit button to upload a new image
+                  Haga clic en el botón de edición para cargar una nueva imagen
                 </p>
                 <p className="text-xs text-[rgba(100,92,90)]">
-                  Supported: JPG, PNG, WebP (max 5MB)
+                  Compatible: JPG, PNG, WebP (max 5MB)
                 </p>
               </div>
               {uploadError && (
@@ -533,7 +535,9 @@ const ProfilePage: React.FC = () => {
                   />
                 </div>
                 <div className="flex-grow text-center sm:text-left">
-                  <p className="text-sm text-[rgba(100,92,90)]">Name</p>
+                  <p className="text-sm text-[rgba(100,92,90)]">
+                    Nombre de la organización
+                  </p>
                   {isEditing ? (
                     <input
                       type="text"
@@ -562,7 +566,9 @@ const ProfilePage: React.FC = () => {
                   />
                 </div>
                 <div className="flex-grow text-center sm:text-left">
-                  <p className="text-sm text-[rgba(100,92,90)]">Email</p>
+                  <p className="text-sm text-[rgba(100,92,90)]">
+                    Correo electrónico
+                  </p>
                   <p className="text-[rgb(68,63,63)] font-medium break-all sm:break-normal">
                     {profileData.email}
                   </p>
@@ -576,7 +582,9 @@ const ProfilePage: React.FC = () => {
                   />
                 </div>
                 <div className="flex-grow text-center sm:text-left">
-                  <p className="text-sm text-[rgba(100,92,90)]">Primary Mail</p>
+                  <p className="text-sm text-[rgba(100,92,90)]">
+                    Correo electrónico principal
+                  </p>
                   {isEditing ? (
                     <input
                       type="email"
@@ -587,7 +595,7 @@ const ProfilePage: React.FC = () => {
                           primaryMail: e.target.value,
                         }))
                       }
-                      placeholder="Enter your primary email"
+                      placeholder="Ingrese su correo electrónico principal"
                       className="w-full p-2 text-[rgb(68,63,63)] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#D45B20] text-sm"
                     />
                   ) : (
@@ -605,7 +613,7 @@ const ProfilePage: React.FC = () => {
                   />
                 </div>
                 <div className="flex-grow text-center sm:text-left">
-                  <p className="text-sm text-[rgba(100,92,90)]">Address</p>
+                  <p className="text-sm text-[rgba(100,92,90)]">Dirección</p>
                   {isEditing ? (
                     <div className="relative" ref={addressRef}>
                       <input
@@ -630,9 +638,9 @@ const ProfilePage: React.FC = () => {
                         !isValidAddress &&
                         addressInput.length === 0 && (
                           <p className="mt-1 text-sm text-gray-500">
-                            You must select an address from the suggestions that
-                            appear as you type. Manual address entry is not
-                            allowed.
+                            Debe seleccionar una dirección de las sugerencias
+                            que aparece mientras escribes. La entrada de
+                            dirección manual no es permitido.
                           </p>
                         )}
                       {isValidAddress && profileData.address && (
@@ -648,7 +656,7 @@ const ProfilePage: React.FC = () => {
                               clipRule="evenodd"
                             />
                           </svg>
-                          Valid address selected
+                          Dirección válida seleccionada
                         </p>
                       )}
                       {showAddressSuggestions &&
@@ -677,10 +685,10 @@ const ProfilePage: React.FC = () => {
                         addressInput.length > 2 && (
                           <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4">
                             <div className="text-sm text-gray-500 text-center">
-                              No addresses found in target regions. Try
-                              searching for places in Valle del Tiétar, La
-                              Moraña, Valle de Amblés, Sierra de Gredos, or
-                              Alberche Pinares.
+                              No se encontraron direcciones en las regiones
+                              objetivo. Intentar buscando lugares en Valle del
+                              Tiétar, La Moraña, Valle de Amblés, Sierra de
+                              Gredos, o Alberche Pinares.
                             </div>
                           </div>
                         )}
@@ -695,7 +703,7 @@ const ProfilePage: React.FC = () => {
             </div>
             <div className="space-y-2">
               <label className="block text-sm font-medium text-[rgb(68,63,63)]">
-                About us
+                Sobre nosotros
               </label>
               {isEditing ? (
                 <textarea
@@ -706,7 +714,7 @@ const ProfilePage: React.FC = () => {
                       about: e.target.value,
                     }))
                   }
-                  placeholder="Write more about you"
+                  placeholder="Escribe una descripción de vuestra organización y a qué os dedicáis."
                   rows={4}
                   className="w-full p-2 text-[rgb(68,63,63)] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#D45B20]"
                 />
@@ -718,7 +726,7 @@ const ProfilePage: React.FC = () => {
             </div>
             <div className="space-y-4">
               <h3 className="text-sm font-medium text-[rgb(68,63,63)]">
-                Social media
+                Enlaces de redes sociales
               </h3>
               <div className="space-y-3">
                 <div className="space-y-2">
@@ -755,7 +763,8 @@ const ProfilePage: React.FC = () => {
                         rel="noopener noreferrer"
                         className="text-[rgba(100,92,90)] hover:text-[#D45B20]"
                       >
-                        {profileData.social.facebook || "Not provided"}
+                        {profileData.social.facebook ||
+                          "Ingrese su enlace de perfil de Facebook"}
                       </a>
                     )}
                   </div>
@@ -800,7 +809,8 @@ const ProfilePage: React.FC = () => {
                         rel="noopener noreferrer"
                         className="text-[rgba(100,92,90)] hover:text-[#D45B20]"
                       >
-                        {profileData.social.instagram || "Not provided"}
+                        {profileData.social.instagram ||
+                          "Ingrese su enlace de perfil de Instagram"}
                       </a>
                     )}
                   </div>
@@ -842,7 +852,8 @@ const ProfilePage: React.FC = () => {
                         rel="noopener noreferrer"
                         className="text-[rgba(100,92,90)] hover:text-[#D45B20]"
                       >
-                        {profileData.social.youtube || "Not provided"}
+                        {profileData.social.youtube ||
+                          "Ingrese su enlace de perfil de Youtube"}
                       </a>
                     )}
                   </div>
@@ -856,7 +867,7 @@ const ProfilePage: React.FC = () => {
             </div>{" "}
             <div className="space-y-4">
               <h3 className="text-sm font-medium text-[rgb(68,63,63)]">
-                Categories
+                Categorías
               </h3>
               <div className="space-y-3">
                 {categories.map((category) => {
@@ -880,7 +891,7 @@ const ProfilePage: React.FC = () => {
                               isEditing && toggleCategory(category)
                             }
                             disabled={!isEditing}
-                            className="w-4 h-4 text-[#D45B20] bg-white border-gray-300 rounded focus:ring-[#D45B20]"
+                            className="cursor-pointer w-4 h-4 text-[#D45B20] bg-white border-gray-300 rounded focus:ring-[#D45B20]"
                           />
                         </div>
                         <div>
@@ -902,7 +913,7 @@ const ProfilePage: React.FC = () => {
                 onClick={() => setIsChangePasswordOpen(true)}
                 className="text-[#D45B20] hover:text-[#C44D16] font-medium"
               >
-                Change Password
+                Cambiar Contraseña
               </button>
             )}
           </div>
@@ -913,7 +924,7 @@ const ProfilePage: React.FC = () => {
           <div className="bg-white rounded-lg shadow-xl p-4 sm:p-6 w-full max-w-md max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4 sm:mb-6">
               <h2 className="text-lg sm:text-xl font-semibold text-[rgb(68,63,63)]">
-                Change Password
+                Cambiar Contraseña
               </h2>
               <button
                 onClick={() => setIsChangePasswordOpen(false)}
@@ -925,7 +936,7 @@ const ProfilePage: React.FC = () => {
             <form onSubmit={handleChangePassword} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-[rgb(68,63,63)] mb-1">
-                  Current Password
+                  Contraseña actual
                 </label>
                 <input
                   type="password"
@@ -937,7 +948,7 @@ const ProfilePage: React.FC = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-[rgb(68,63,63)] mb-1">
-                  New Password
+                  Nueva contraseña
                 </label>
                 <input
                   type="password"
@@ -949,7 +960,7 @@ const ProfilePage: React.FC = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-[rgb(68,63,63)] mb-1">
-                  Confirm New Password
+                  Confirmar nueva contraseña
                 </label>
                 <input
                   type="password"
@@ -968,13 +979,13 @@ const ProfilePage: React.FC = () => {
                   onClick={() => setIsForgotPasswordOpen(true)}
                   className="text-[#D45B20] hover:text-[#C44D16] text-sm font-medium order-2 sm:order-1"
                 >
-                  Forgot Password?
+                  ¿Has olvidado tu contraseña?
                 </button>
                 <button
                   type="submit"
                   className="w-full sm:w-auto px-4 py-2 bg-[#D45B20] hover:bg-[#C44D16] text-white rounded-lg text-sm font-medium transition-colors order-1 sm:order-2"
                 >
-                  Update
+                  Actualizar
                 </button>
               </div>
             </form>
@@ -986,7 +997,7 @@ const ProfilePage: React.FC = () => {
           <div className="bg-white rounded-lg shadow-xl p-4 sm:p-6 w-full max-w-md max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4 sm:mb-6">
               <h2 className="text-lg sm:text-xl font-semibold text-[rgb(68,63,63)]">
-                Forgot Password?
+                ¿Has olvidado tu contraseña?
               </h2>
               <button
                 onClick={() => setIsForgotPasswordOpen(false)}
@@ -1004,7 +1015,7 @@ const ProfilePage: React.FC = () => {
             >
               <div>
                 <label className="block text-sm font-medium text-[rgb(68,63,63)] mb-1">
-                  Email
+                  Correo electrónico
                 </label>
                 <input
                   type="email"
@@ -1019,13 +1030,13 @@ const ProfilePage: React.FC = () => {
                   onClick={() => setIsForgotPasswordOpen(false)}
                   className="w-full sm:w-auto px-4 py-2 text-[rgba(68,63,63)] hover:text-[#111827] font-medium text-center"
                 >
-                  Cancel
+                  Cancelar
                 </button>
                 <button
                   type="submit"
                   className="w-full sm:w-auto px-4 py-2 bg-[#D45B20] hover:bg-[#C44D16] text-white rounded-lg text-sm font-medium transition-colors"
                 >
-                  Continue
+                  Continuar
                 </button>
               </div>
             </form>

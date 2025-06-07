@@ -20,6 +20,7 @@ const emptyEvent: Event = {
   eventDate: "",
   eventTime: "",
   category: "",
+  categories: [],
   location: "",
   description: "",
   email: "",
@@ -47,7 +48,8 @@ const EventsPage: React.FC = () => {
     needsUpdate: boolean;
     fields: string[];
     message: string;
-  } | null>(null);  const [categories, setCategories] = useState<Category[]>([]);
+  } | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { fetchAllActivities } = useActivities();
   const {
@@ -126,9 +128,19 @@ const EventsPage: React.FC = () => {
     }));
   };
 
+  const handleCategoriesChange = (categories: string[]) => {
+    if (selectedEvent) {
+      setSelectedEvent((prev) => ({
+        ...prev!,
+        categories: categories,
+        category: categories.length > 0 ? categories[0] : "",
+      }));
+    }
+  };
   const handleEdit = (event: Event) => {
     const formattedEvent = {
       ...event,
+      categories: event.categories || (event.category ? [event.category] : []),
       eventDate: event.eventDate
         ? new Date(event.eventDate).toISOString().split("T")[0]
         : "",
@@ -221,7 +233,7 @@ const EventsPage: React.FC = () => {
   return (
     <>
       <Head>
-        <title>Events | Mycotur</title>
+        <title>Eventos | Mycotur</title>
       </Head>
       {toast && (
         <div
@@ -242,12 +254,12 @@ const EventsPage: React.FC = () => {
               <IoSearchOutline className="cursor-pointer absolute left-3 top-1/2 transform -translate-y-1/2 text-[rgba(142,133,129)]" />
               <input
                 type="text"
-                placeholder="Search"
+                placeholder="Buscar"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                disabled={(isAgent && profileStatus?.needsUpdate)}
+                disabled={isAgent && profileStatus?.needsUpdate}
                 className={`w-full sm:w-64 pl-10 pr-4 py-2 border border-[rgba(199,195,193)] shadow-sm shadow-[rgba(24,27,37,0.04)] text-[rgba(142,133,129)] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[rgba(194,91,52)] focus:border-[rgba(194,91,52)] ${
-                  (isAgent && profileStatus?.needsUpdate)
+                  isAgent && profileStatus?.needsUpdate
                     ? "bg-gray-100 cursor-not-allowed"
                     : ""
                 }`}
@@ -256,14 +268,14 @@ const EventsPage: React.FC = () => {
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              disabled={(isAgent && profileStatus?.needsUpdate)}
+              disabled={isAgent && profileStatus?.needsUpdate}
               className={` w-full sm:w-48 px-4 py-2 text-[rgba(142,133,129)] border border-[rgba(199,195,193)] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20] ${
-                (isAgent && profileStatus?.needsUpdate)
+                isAgent && profileStatus?.needsUpdate
                   ? "bg-gray-100 cursor-not-allowed"
                   : "cursor-pointer"
               }`}
             >
-              <option value="">Categories</option>
+              <option value="">Categorías</option>
               {categories.map((category) => (
                 <option key={category.uuid} value={category.title}>
                   {category.title}
@@ -281,7 +293,7 @@ const EventsPage: React.FC = () => {
             } text-[rgba(255,255,255)] rounded-lg text-sm font-medium transition-colors`}
           >
             <FiPlus className="mr-2" />
-            Add Event
+            Añadir Evento
           </button>
         </div>
 
@@ -294,7 +306,7 @@ const EventsPage: React.FC = () => {
               onDelete={handleDelete}
             />
           </div>
-          {events.length > 0 && (
+          {events.length > 0 && !(isAgent && profileStatus?.needsUpdate) && (
             <div className="border-t border-[rgba(226,225,223)] bg-white rounded-b-[16px]">
               <Pagination
                 currentPage={pagination.currentPage}
@@ -312,7 +324,7 @@ const EventsPage: React.FC = () => {
           <div className="bg-[rgba(255,255,255)] rounded-lg shadow-xl p-4 sm:p-6 w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto scrollbar-hide">
             <div className="flex justify-between items-center mb-4 sm:mb-6">
               <h2 className="text-lg sm:text-xl font-medium text-[rgba(68,63,63)]">
-                {selectedEvent?.id ? "Edit Event" : "Add Event"}
+                {selectedEvent?.id ? "Editar Evento" : "Añadir Evento "}
               </h2>
               <button
                 onClick={() => {
@@ -323,7 +335,8 @@ const EventsPage: React.FC = () => {
               >
                 ✕
               </button>
-            </div>            <EventForm
+            </div>{" "}
+            <EventForm
               event={selectedEvent!}
               categories={categories}
               onSubmit={handleSubmit}
@@ -334,6 +347,7 @@ const EventsPage: React.FC = () => {
               }}
               activities={dropdownActivities}
               onActivitySelect={handleActivitySelect}
+              onCategoriesChange={handleCategoriesChange}
               isLoading={isSubmitting}
             />
           </div>

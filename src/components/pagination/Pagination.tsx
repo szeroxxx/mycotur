@@ -25,7 +25,7 @@ export const Pagination: React.FC<PaginationProps> = ({
                 : "text-gray-700 hover:bg-gray-50 "
             }`}
         >
-          Previous
+          Anterior
         </button>
         <button
           onClick={() => onPageChange(currentPage + 1)}
@@ -37,13 +37,13 @@ export const Pagination: React.FC<PaginationProps> = ({
                 : "text-gray-700 hover:bg-gray-50"
             }`}
         >
-          Next
+          Siguiente
         </button>
       </div>
       <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
         <div>
           <p className="text-sm text-[rgba(100,92,90)]">
-            Page <span className="font-medium">{currentPage}</span> of{" "}
+            Página <span className="font-medium">{currentPage}</span> de{" "}
             <span className="font-medium">{totalPages}</span>
           </p>
         </div>
@@ -62,7 +62,7 @@ export const Pagination: React.FC<PaginationProps> = ({
                     : "text-gray-500 hover:bg-[#FFF5F1] rounded-[10px] cursor-pointer"
                 }`}
             >
-              <span className="sr-only">Previous</span>
+              <span className="sr-only">Anterior</span>
               <svg
                 className="h-5 w-5"
                 viewBox="0 0 20 20"
@@ -75,7 +75,7 @@ export const Pagination: React.FC<PaginationProps> = ({
                   clipRule="evenodd"
                 />
               </svg>
-              <span>Previous</span>
+              <span>Anterior</span>
             </button>
             {pages.map((page) => (
               <button
@@ -101,8 +101,8 @@ export const Pagination: React.FC<PaginationProps> = ({
                     : "text-gray-500 hover:bg-[#FFF5F1] rounded-[10px] cursor-pointer"
                 }`}
             >
-              <span>Next</span>
-              <span className="sr-only">Next</span>
+              <span>Siguiente</span>
+              <span className="sr-only">Siguiente</span>
               <svg
                 className="h-5 w-5"
                 viewBox="0 0 20 20"

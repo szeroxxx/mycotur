@@ -275,7 +275,7 @@ export const useProfile = (): UseProfileReturn => {
         if (!allowedTypes.includes(file.type)) {
           throw new Error("Only JPG, PNG, and WebP images are allowed");
         }
-        const maxSize = 5 * 1024 * 1024; // 5MB
+        const maxSize = 5 * 1024 * 1024;
         if (file.size > maxSize) {
           throw new Error("Image size must be less than 5MB");
         }

@@ -8,19 +8,19 @@ interface Category {
   description: string;
 }
 
-interface Location {
-  uuid: string;
-  location: string;
-}
+// interface Location {
+//   uuid: string;
+//   location: string;
+// }
 
-const defaultLocation: Location = {
-  uuid: "",
-  location: "Location",
-};
+// const defaultLocation: Location = {
+//   uuid: "",
+//   location: "Ubicación",
+// };
 
 const defaultCategory: Category = {
   uuid: "",
-  title: "Event Category",
+  title: "Tipo de evento",
   description: "",
 };
 
@@ -42,8 +42,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
   // onSearch,
   className = "",
   variant = "full",
-  customLocations = [],
-  useCustomLocations = false,
+  // customLocations = [],
+  // useCustomLocations = false,
 }) => {
   const { categories, isLoading, error } = useData();
 
@@ -52,20 +52,20 @@ const SearchBar: React.FC<SearchBarProps> = ({
     [categories]
   );
   
-  const locationOptions = useMemo(() => {
-    if (useCustomLocations) {
-      const customLocationObjects = customLocations.map((location, index) => ({
-        uuid: `custom-${index}`,
-        location: location,
-      }));
-      return [defaultLocation, ...customLocationObjects];
-    } else {
-      return [defaultLocation];
-    }
-  }, [useCustomLocations, customLocations]);
+  // const locationOptions = useMemo(() => {
+  //   if (useCustomLocations) {
+  //     const customLocationObjects = customLocations.map((location, index) => ({
+  //       uuid: `custom-${index}`,
+  //       location: location,
+  //     }));
+  //     return [defaultLocation, ...customLocationObjects];
+  //   } else {
+  //     return [defaultLocation];
+  //   }
+  // }, [useCustomLocations, customLocations]);
 
   const hasActiveFilters = useMemo(() => {
-    return locationFilter !== "Location" || categoryFilter !== "Event Category";
+    return locationFilter !== "Ubicación" || categoryFilter !== "Tipo de evento";
   }, [locationFilter, categoryFilter]);
 
   const handleFilterChange = (
@@ -76,9 +76,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   const handleClearFilters = (): void => {
-    onFilterChange("location", "Location");
-    onFilterChange("category", "Event Category");
+    onFilterChange("location", "Ubicación");
+    onFilterChange("category", "Tipo de evento");
   };
+  console.log('locationFilter::: ', locationFilter);
 
   if (isLoading) {
     return (
@@ -115,7 +116,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
       )}
 
       <div className="flex gap-2">
-        <div
+        {/* <div
           className={
             variant === "compact" || variant === "mobile"
               ? "flex-1 min-w-0"
@@ -133,7 +134,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
               </option>
             ))}
           </select>
-        </div>
+        </div> */}
         <div
           className={
             variant === "compact" || variant === "mobile"
