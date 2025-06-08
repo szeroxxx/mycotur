@@ -22,24 +22,24 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
             <BsWindowX size={25} className="text-[rgba(220,38,38)]" />
           </div>
           <h3 className="text-xl font-semibold text-[#111827] mb-2">
-            Remove Event?
+            ¿Eliminar Evento?
           </h3>
           <p className="text-sm text-[#6B7280] mb-6">
-            Are you sure you want to remove this event? This action cannot be
-            undone.
+            ¿Está seguro de que desea eliminar este evento? Esta acción no se puede
+            deshacer.
           </p>
           <div className="flex justify-center space-x-4 w-full">
             <button
               onClick={onClose}
               className="cursor-pointer flex-1 basis-[120px] px-4 py-2 text-sm font-medium text-[rgba(68,63,63)] hover:text-[#111827] border border-[rgba(199,195,193)] rounded-lg transition-colors"
             >
-              Cancel
+              Cancelar
             </button>
             <button
               onClick={onConfirm}
               className="cursor-pointer flex-1 basis-[120px] px-4 py-2 text-sm font-medium bg-[rgba(220,38,38)] hover:bg-red-600 text-[rgba(255,255,255)] border border-[rgba(199,195,193)] rounded-lg transition-colors"
             >
-              Yes, Remove
+              Sí, Eliminar
             </button>
           </div>
         </div>

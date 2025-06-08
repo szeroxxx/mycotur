@@ -146,7 +146,7 @@ const AgentsPage: React.FC = () => {
               className="cursor-pointer w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-[rgba(194,91,52)] hover:bg-[#C44D16] text-[rgba(255,255,255)] rounded-lg text-sm font-medium transition-colors"
             >
               <FiPlus className="mr-2" />
-              Añadir agentes
+              Agregar Agentes
             </button>
           </div>
         </div>

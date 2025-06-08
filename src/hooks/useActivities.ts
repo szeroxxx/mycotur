@@ -212,7 +212,7 @@ export const useActivities = () => {
             ...activity,
             id: response.data.id,
           };
-          showToast("success", "Actividad creada con éxito");
+          showToast("success", "Actividad creada exitosamente");
           await fetchActivities(1);
           return newActivity;
         }

@@ -103,9 +103,9 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
 
   return (
     <>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3 h-[350px]">
         <div
-          className="relative overflow-hidden rounded-lg cursor-pointer transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl group"
+          className="relative overflow-hidden rounded-lg cursor-pointer transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl group h-full"
           onClick={() => openModal(0)}
         >
           {displayPhotos[0] && (
@@ -141,11 +141,11 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 rounded-lg"></div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 h-full">
           {displayPhotos.slice(1, 5).map((photo, index) => (
             <div
               key={photo.id || index}
-              className="relative overflow-hidden rounded-lg cursor-pointer transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl group"
+              className="relative overflow-hidden rounded-lg cursor-pointer transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl group h-full"
               onClick={() => openModal(index + 1)}
             >
               {renderMedia(

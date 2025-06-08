@@ -746,7 +746,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
           name="notes"
           value={activity.notes || ""}
           onChange={onChange}
-          placeholder="Menciona si hay tarifas involucradas, como un cargo de 0 por persona que cubre comida y todas las actividades"
+          placeholder="Mencione si hay tarifas involucradas, como un cargo de $20 por persona que cubre comida y todas las actividades"
           rows={3}
           required
           className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"

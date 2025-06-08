@@ -251,7 +251,7 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
             <Input
               id="firstName"
               name="firstName"
-              placeholder="John"
+              placeholder="P. ej. Pedro García"
               className={`text-gray-600 w-full h-11 px-3 border rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
                 fieldErrors.firstName ? "border-red-500" : "border-gray-300"
               }`}
@@ -319,7 +319,7 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
               htmlFor="numberOfPeople"
               className="text-sm font-medium text-gray-700 mb-2 block"
             >
-              ¿Cuántas personas? *
+              Número de participantes*
             </Label>
             <Input
               id="numberOfPeople"
@@ -345,7 +345,7 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
               htmlFor="message"
               className="text-sm font-medium text-gray-700 mb-2 block"
             >
-              Cuéntanos más
+              Comentarios{" "}
               <span className="text-xs text-gray-500 ml-2">
                 ({formData.message.length}/500)
               </span>
@@ -353,7 +353,7 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
             <textarea
               id="message"
               name="message"
-              placeholder="este mensaje se mostrará directamente al organizador"
+              placeholder="Escribe un mensaje al organizador"
               rows={3}
               className={`text-gray-600 w-full px-3 py-3 border rounded-md text-sm placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
                 fieldErrors.message ? "border-red-500" : "border-gray-300"
@@ -375,7 +375,7 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
             disabled={isSubmitting}
             className="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-2 px-4 rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? "Submitting..." : "Submit RSVP"}
+            {isSubmitting ? "Enviando..." : "Enviar"}
           </Button>
         </form>
       </div>

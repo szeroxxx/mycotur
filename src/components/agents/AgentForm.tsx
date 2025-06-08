@@ -29,7 +29,7 @@ export const AgentForm: React.FC<AgentFormProps> = ({
           name="name"
           value={agent.name || ''}
           onChange={onChange}
-          placeholder="Ej. John Fisher"
+          placeholder="P. ej. Pedro García"
           className="w-full px-4 py-2 text-black border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
           required
         />

@@ -118,7 +118,7 @@ const Dashboard: React.FC = () => {
           />
         )}
         <StatCard
-          title="Total de formularios enviados"
+          title="Total de Envíos de Formularios"
           value={dashboardData.totalForms}
           icon={<FiFileText size={20} />}
         />

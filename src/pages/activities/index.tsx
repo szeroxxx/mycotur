@@ -289,7 +289,7 @@ const ActivitiesPage: React.FC = () => {
             }`}
           >
             <Plus className="mr-2" size={18} />
-            Añadir actividad
+            Agregar Actividad
           </button>
         </div>
         <div className="bg-[rgba(255,255,255)] rounded-[16px] border border-[rgba(226,225,223)] flex flex-col">

@@ -115,7 +115,7 @@ const OrganiserDetail: React.FC<OrganiserDetailProps> = ({ organiser }) => {
                   id="firstName" 
                   type="text" 
                   className="w-full border border-light p-2 rounded"
-                  placeholder="John"
+                  placeholder="P. ej. Pedro García"
                 />
               </div>
               

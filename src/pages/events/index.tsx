@@ -293,7 +293,7 @@ const EventsPage: React.FC = () => {
             } text-[rgba(255,255,255)] rounded-lg text-sm font-medium transition-colors`}
           >
             <FiPlus className="mr-2" />
-            Añadir Evento
+            Agregar Nuevo Evento
           </button>
         </div>
 

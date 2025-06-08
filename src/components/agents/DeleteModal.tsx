@@ -22,11 +22,11 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
             <BsPersonX size={25} className="text-[rgba(220,38,38)]" />
           </div>
           <h3 className="text-xl font-semibold text-[#111827] mb-2">
-            Remove Agent?
+            ¿Eliminar Agente?
           </h3>
           <p className="text-sm text-[#6B7280] mb-6">
-            Are you sure you want to remove this agent? All data related to this
-            agent will be permanently destroyed. This action cannot be undone.
+            ¿Está seguro de que desea eliminar este agente? Todos los datos relacionados con este
+            agente se eliminarán permanentemente. Esta acción no se puede deshacer.
           </p>
           <div className="flex justify-center space-x-4 w-full">
             <button

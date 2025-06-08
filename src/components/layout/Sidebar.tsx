@@ -145,7 +145,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onWidthChange }) => {
             <SidebarItem
               href="/dashboard"
               icon={<RxDashboard size={20} />}
-              text="Tablero"
+              text="Panel de Control"
               isActive={path === "/dashboard"}
               isExpanded={true}
               onClick={closeMobileMenu}
@@ -244,7 +244,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onWidthChange }) => {
         <SidebarItem
           href="/dashboard"
           icon={<RxDashboard size={20} />}
-          text="Tablero"
+          text="Panel de Control"
           isActive={path === "/dashboard"}
           isExpanded={isExpanded}
         />
