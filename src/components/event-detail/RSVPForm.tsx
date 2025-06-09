@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { validateSpanishPhoneNumber } from "../../utils/phoneValidation";
 
 export interface RSVPFormData {
   firstName: string;
@@ -50,22 +51,12 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
     }
     return null;
   };
-
   const validatePhoneNumber = (phone: string): string | null => {
     if (!phone.trim()) {
       return "El número de teléfono es obligatorio";
     }
-    const cleanPhone = phone.replace(/\D/g, "");
-    if (cleanPhone.length < 10) {
-      return "El número de teléfono debe tener al menos 10 dígitos";
-    }
-    if (cleanPhone.length > 15) {
-      return "El número de teléfono no debe exceder los 15 dígitos";
-    }
-    if (!/^[\d\s\-\(\)\+]+$/.test(phone)) {
-      return "El número de teléfono contiene caracteres no válidos";
-    }
-    return null;
+    const validation = validateSpanishPhoneNumber(phone);
+    return validation.isValid ? null : validation.errorMessage || null;
   };
 
   const validateEmail = (email: string): string | null => {
@@ -237,7 +228,7 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
     <div className="w-full max-w-none lg:max-w-sm lg:mx-auto overflow-hidden">
       <div className="p-6 space-y-4 bg-white rounded-xl shadow-lg border border-gray-200">
         <h2 className="text-xl font-semibold text-gray-700 text-center mb-6">
-          Confirma tu asistencia ahora
+          Deja tus datos al organizador
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -276,7 +267,7 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
             <Input
               id="phoneNumber"
               name="phoneNumber"
-              placeholder="ingresa tu número de teléfono principal"
+              placeholder="+34 666 666 666"
               className={`text-gray-600 w-full h-11 px-3 border rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
                 fieldErrors.phoneNumber ? "border-red-500" : "border-gray-300"
               }`}
@@ -382,7 +373,7 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
       </div>{" "}
       <div className="mt-2 px-6 py-6 bg-white rounded-xl shadow-lg border border-gray-200">
         <h3 className="text-lg font-semibold text-gray-900 mb-4 leading-tight">
-          Ver detalles del organizador y contactarlo para más información
+          Contacta tú mismo al organizador
         </h3>
         <Button
           variant="outline"

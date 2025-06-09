@@ -42,7 +42,8 @@ interface RawEventDetailData {
 
 export interface EventDetailData {
   id: string;
-  title: string;  photos: {
+  title: string;
+  photos: {
     id: string;
     url: string;
     alt: string;
@@ -92,11 +93,13 @@ export const useEventDetail = (uuid: string | undefined) => {
   const mapEventDetailData = (data: RawEventDetailData): EventDetailData => {
     return {
       id: data.uuid,
-      title: data.title,      photos: data.photos.map((media, index) => ({
+      title: data.title,
+      photos: data.photos.map((media, index) => ({
         id: (index + 1).toString(),
         url: getMediaUrl(media.name),
         alt: `${data.title} - Media ${index + 1}`,
-        type: media.type,      })),
+        type: media.type,
+      })),
       totalPhotos: data.photos.length,
       category: data.category,
       categories: data.categories || (data.category ? [data.category] : []),
@@ -135,18 +138,21 @@ export const useEventDetail = (uuid: string | undefined) => {
 
   useEffect(() => {
     const fetchEventDetail = async () => {
-      if (!uuid) return;      try {
+      if (!uuid) return;
+      try {
         setLoading(true);
         setError(null);
         const URL = process.env.NEXTAUTH_BACKEND_URL;
-        const response = await axiosInstance.get(`${URL}/api/visitor/event-detail/${uuid}`);
+        const response = await axiosInstance.get(
+          `${URL}/api/visitor/event-detail/${uuid}`
+        );
 
         if (response.data && response.data.data) {
           const mappedData = mapEventDetailData(response.data.data);
           setEventData(mappedData);
         }
       } catch (err) {
-        console.error('Error fetching event detail:', err);
+        console.error("Error fetching event detail:", err);
         setError("Failed to load event details");
       } finally {
         setLoading(false);

@@ -118,13 +118,13 @@ export const useActivityDetail = (uuid: string | undefined) => {
       seasons: {
         availableMonths: `${
           data.title
-        } adventure can be organised in between ${new Date(
+        } Esta actividad se puede organizar normalmente entre  ${new Date(
           data.startMonth
-        ).toLocaleDateString("en-US", { month: "long" })} to ${new Date(
+        ).toLocaleDateString("en-US", { month: "long" })} y ${new Date(
           data.endMonth
         ).toLocaleDateString("en-US", {
           month: "long",
-        })} (best prefer time from organiser)`,
+        })} `,
         unavailableMonths: undefined,
       },
       description: {

@@ -5,6 +5,7 @@ import { IoLogoFacebook } from "react-icons/io5";
 import { IoLogoYoutube } from "react-icons/io";
 import { createEventUrl } from "../../utils/urlHelpers";
 import StaticMapView from "../maps/StaticMapView";
+import { convertDateToSpanish } from "@/utils/dateHelpers";
 
 interface EventDate {
   id: string;
@@ -86,7 +87,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({
                   >
                     <Calendar className="text-[rgba(229,114,0)] flex-shrink-0 cursor-pointer" />
                     <span className="text-[rgba(100,92,90)] cursor-pointer">
-                      {eventDate.date} at {eventDate.time}
+                      {convertDateToSpanish(eventDate.date)} at {eventDate.time}
                     </span>
                     <span className="font-medium text-[rgba(229,114,0)] cursor-pointer">
                       Ver evento
@@ -145,7 +146,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({
           </div>
           <div>
             <h3 className="text-sm font-semibold text-[rgba(68,63,63)]">
-              Conoce al organizador  {organizer.name}
+              Organizado por  {organizer.name}
             </h3>
             <p className="text-xs text-[rgba(100,92,90)]">
               {organizer.eventsHosted} Eventos Organizados

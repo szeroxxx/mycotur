@@ -23,7 +23,7 @@ export const AgentRow: React.FC<AgentRowProps> = ({
             ? 'bg-[rgba(240,253,244)] text-[rgba(22,163,74)]' 
             : 'bg-[rgba(254,243,199)] text-[rgba(217,119,6)]'
         }`}>
-          {agent.status}
+          {agent.status === "active" ? "Activo" : "Inactivo"}
         </span>
       </td>
       <td className="py-4 px-6 whitespace-nowrap text-sm text-[rgba(68,63,63)]">

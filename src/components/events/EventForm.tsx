@@ -8,6 +8,7 @@ import {
   googlePlacesService,
   LocationSuggestion,
 } from "../../utils/googlePlacesService";
+import { validateSpanishPhoneNumber } from "../../utils/phoneValidation";
 
 const MAX_FILE_SIZE_MB = 10;
 const MAX_VIDEO_SIZE_MB = 15;
@@ -64,6 +65,9 @@ export const EventForm: React.FC<EventFormProps> = ({
     event.categories || (event.category ? [event.category] : [])
   );
   const [categoriesError, setCategoriesError] = useState<string | null>(null);
+
+  // Phone validation state
+  const [phoneError, setPhoneError] = useState<string | null>(null);
 
   const [previewImages, setPreviewImages] = useState<string[]>([]);
   const [previewVideos, setPreviewVideos] = useState<string[]>([]);
@@ -236,6 +240,23 @@ export const EventForm: React.FC<EventFormProps> = ({
     setIsValidLocation(true);
     setLocationError(null);
   };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const phoneValue = e.target.value;
+    onChange(e);
+
+    if (phoneValue.trim()) {
+      const validation = validateSpanishPhoneNumber(phoneValue);
+      if (!validation.isValid) {
+        setPhoneError(validation.errorMessage || null);
+      } else {
+        setPhoneError(null);
+      }
+    } else {
+      setPhoneError(null);
+    }
+  };
+
   const handleImageRemove = (index: number) => {
     try {
       const totalImageCount = previewImages.length;
@@ -589,8 +610,7 @@ export const EventForm: React.FC<EventFormProps> = ({
   const currentVideoCount =
     (event.videos?.length || 0) +
     (event.mediaUrls?.filter((media) => media.type.startsWith("video"))
-      .length || 0);
-  const handleFormSubmit = (e: React.FormEvent) => {
+      .length || 0);  const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!isValidLocation || !event.location) {
@@ -604,6 +624,16 @@ export const EventForm: React.FC<EventFormProps> = ({
       setCategoriesError("Seleccione al menos una categoría");
       return;
     }
+
+    // Validate phone number if provided
+    if (event.phone && event.phone.trim()) {
+      const phoneValidation = validateSpanishPhoneNumber(event.phone);
+      if (!phoneValidation.isValid) {
+        setPhoneError(phoneValidation.errorMessage || null);
+        return;
+      }
+    }
+    setPhoneError(null);
 
     onSubmit(e);
   };
@@ -859,16 +889,22 @@ export const EventForm: React.FC<EventFormProps> = ({
             placeholder="Dirección de correo electrónico"
             className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
             required
-          />
-          <input
+          />          <input
             type="tel"
             name="phone"
             value={event.phone || ""}
-            onChange={onChange}
+            onChange={handlePhoneChange}
             placeholder="Número de teléfono"
-            className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
+            className={`w-full px-4 py-2 text-[rgba(142,133,129)] border rounded-lg text-sm focus:outline-none focus:ring-1 ${
+              phoneError
+                ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                : "border-[#E5E7EB] focus:ring-[#D45B20] focus:border-[#D45B20]"
+            }`}
             required={!event.phone && !event.url}
           />
+          {phoneError && (
+            <p className="mt-1 text-sm text-red-600">{phoneError}</p>
+          )}
           <input
             placeholder="Introducir enlace"
             type="text"

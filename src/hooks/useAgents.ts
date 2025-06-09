@@ -113,9 +113,15 @@ export const useAgents = () => {
           if (error.response?.status === 400) {
             showToast("error", error.response?.data.error);
           } else if (error.response?.status === 500) {
-            showToast("error", "Error interno del servidor. Por favor, inténtalo de nuevo más tarde");
+            showToast(
+              "error",
+              "Error interno del servidor. Por favor, inténtalo de nuevo más tarde"
+            );
           } else {
-            showToast("error", "No se pudo invitar al agente. Por favor, inténtalo de nuevo");
+            showToast(
+              "error",
+              "No se pudo invitar al agente. Por favor, inténtalo de nuevo"
+            );
           }
         } else {
           console.error("Error creating agent:", error);
@@ -143,7 +149,9 @@ export const useAgents = () => {
       } catch (error) {
         console.error("Error updating agent:", error);
         const errorMessage =
-          error instanceof Error ? error.message : "No se pudo actualizar el agente";
+          error instanceof Error
+            ? error.message
+            : "No se pudo actualizar el agente";
         showToast("error", errorMessage);
         throw error;
       }
@@ -165,7 +173,9 @@ export const useAgents = () => {
       } catch (error) {
         console.error("Error deleting agent:", error);
         const errorMessage =
-          error instanceof Error ? error.message : "No se pudo eliminar el agente";
+          error instanceof Error
+            ? error.message
+            : "No se pudo eliminar el agente";
         showToast("error", errorMessage);
         throw error;
       }

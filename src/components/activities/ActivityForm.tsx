@@ -7,6 +7,7 @@ import {
   googlePlacesService,
   LocationSuggestion,
 } from "../../utils/googlePlacesService";
+import { validateSpanishPhoneNumber } from "../../utils/phoneValidation";
 
 interface Category {
   uuid: string;
@@ -51,6 +52,9 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
   const [isValidLocation, setIsValidLocation] = useState(!!activity.location);
   const [locationError, setLocationError] = useState<string | null>(null);
   const locationRef = useRef<HTMLDivElement>(null);
+
+  // Phone validation state
+  const [phoneError, setPhoneError] = useState<string | null>(null);
 
   const [previewImages, setPreviewImages] = useState<string[]>([]);
   const [previewVideos, setPreviewVideos] = useState<string[]>([]);
@@ -153,6 +157,21 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
     setShowSuggestions(false);
     setIsValidLocation(true);
     setLocationError(null);
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const phoneValue = e.target.value;
+    onChange(e);
+    if (phoneValue.trim()) {
+      const validation = validateSpanishPhoneNumber(phoneValue);
+      if (!validation.isValid) {
+        setPhoneError(validation.errorMessage || null);
+      } else {
+        setPhoneError(null);
+      }
+    } else {
+      setPhoneError(null);
+    }
   };
 
   const handleImageRemove = (index: number) => {
@@ -446,7 +465,6 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
       });
     };
   }, [activity.images, activity.videos, activity.mediaUrls, activity.id]);
-
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -454,6 +472,16 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
       setLocationError("Por favor, seleccione una ubicación válida de las sugerencias");
       return;
     }
+
+    // Validate phone number if provided
+    if (activity.phone && activity.phone.trim()) {
+      const phoneValidation = validateSpanishPhoneNumber(activity.phone);
+      if (!phoneValidation.isValid) {
+        setPhoneError(phoneValidation.errorMessage || null);
+        return;
+      }
+    }
+    setPhoneError(null);
 
     onSubmit(e);
   };
@@ -707,16 +735,22 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
           Información de contacto (Las personas pueden ver estos detalles)
           <RequiredIndicator />
         </label>
-        <div className="space-y-4">
-          <input
+        <div className="space-y-4">          <input
             type="tel"
             name="phone"
             value={activity.phone || ""}
-            onChange={onChange}
+            onChange={handlePhoneChange}
             placeholder="Número de teléfono"
-            className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
+            className={`w-full px-4 py-2 text-[rgba(142,133,129)] border rounded-lg text-sm focus:outline-none focus:ring-1 ${
+              phoneError
+                ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                : "border-[#E5E7EB] focus:ring-[#D45B20] focus:border-[#D45B20]"
+            }`}
             required
           />
+          {phoneError && (
+            <p className="mt-1 text-sm text-red-600">{phoneError}</p>
+          )}
           <input
             type="email"
             name="email"

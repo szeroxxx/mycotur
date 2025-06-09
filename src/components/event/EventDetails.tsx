@@ -150,7 +150,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({
           </div>
           <div>
             <h3 className="text-sm font-semibold text-[rgba(68,63,63)]">
-              Conoce al organizador {organizer.name}
+              Organizado por {organizer.name}
             </h3>
             <p className="text-xs text-[rgba(100,92,90)]">
               {organizer.eventsHosted} Eventos organizados
