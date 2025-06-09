@@ -5,7 +5,7 @@ import { IoLogoFacebook } from "react-icons/io5";
 import { IoLogoYoutube } from "react-icons/io";
 import { createEventUrl } from "../../utils/urlHelpers";
 import StaticMapView from "../maps/StaticMapView";
-import { convertDateToSpanish } from "@/utils/dateHelpers";
+import { convertDateToSpanish } from "../../utils/dateHelpers";
 
 interface EventDate {
   id: string;
