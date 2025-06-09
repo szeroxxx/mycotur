@@ -5,6 +5,7 @@ import { IoLogoFacebook } from "react-icons/io5";
 import { IoLogoYoutube } from "react-icons/io";
 import { googleMapsLoader } from "@/utils/googleMapsLoader";
 import StaticMapView from "../maps/StaticMapView";
+import { convertDateToSpanish } from "../../utils/dateHelpers";
 
 interface EventDetailsProps {
   date: string;
@@ -96,7 +97,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({
                 </span>
               </div>
               <span className="text-[rgba(100,92,90)]">
-                {formatDate(date)} {time}
+                {convertDateToSpanish(date)} {time}
               </span>
             </div>
           </div>
