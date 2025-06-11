@@ -99,7 +99,7 @@ export const useActivitiesData = () => {
       }
       if (
         currentFilters.category &&
-        currentFilters.category !== "Tipo de evento"
+        currentFilters.category !== "Categoría de la actividad"
       ) {
         result = result.filter((activity) => {
           const categoryMatch =

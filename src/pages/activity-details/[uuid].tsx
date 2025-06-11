@@ -148,6 +148,7 @@ const ActivityDetailPage: React.FC = () => {
         isOpen={isContactModalOpen}
         onClose={() => setIsContactModalOpen(false)}
         contactInfo={activityData.contact}
+        title={activityData.title}
       />{" "}
       {toast && (
         <div

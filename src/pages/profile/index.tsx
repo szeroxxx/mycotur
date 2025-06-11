@@ -620,7 +620,8 @@ const ProfilePage: React.FC = () => {
                         type="text"
                         value={addressInput}
                         onChange={handleAddressChange}
-                        placeholder="Empiece a escribir para buscar direcciones (ej., Valle del Tiétar, Sierra de Gredos...)"                        className={`w-full p-2 text-[rgb(68,63,63)] border rounded text-sm focus:outline-none focus:ring-1 ${
+                        placeholder="Empiece a escribir para buscar direcciones (ej., Valle del Tiétar, Sierra de Gredos...)"
+                        className={`w-full p-2 text-[rgb(68,63,63)] border rounded text-sm focus:outline-none focus:ring-1 ${
                           addressError && !isValidAddress
                             ? "border-red-500 focus:ring-red-500 focus:border-red-500"
                             : isValidAddress

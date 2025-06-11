@@ -100,7 +100,7 @@ export const useAgents = () => {
 
         if (response.data && response.data.message === "User created") {
           await fetchAgents();
-          showToast("success", "Agente agregado exitosamente");
+          showToast("success", "Agente añadido correctamente");
           return {
             ...agent,
             id: response.data.id || Date.now().toString(),

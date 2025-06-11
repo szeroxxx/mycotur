@@ -21,7 +21,7 @@ const Index = () => {
     events,
   } = useEventsData();  const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
   // const [locationFilter, setLocationFilter] = useState("Ubicación");
-  const [categoryFilter, setCategoryFilter] = useState("Tipo de evento");
+  const [categoryFilter, setCategoryFilter] = useState("Categoría del evento");
   const calendarEvents = events.map((event: CalendarEvent) => ({
     id: event.uuid,
     date: new Date(event.date),
@@ -48,7 +48,7 @@ const Index = () => {
     // if (type === "location") {
     //   setLocationFilter(value);
 
-    //   if (value === "Ubicación" && categoryFilter === "Tipo de evento") {
+    //   if (value === "Ubicación" && categoryFilter === "Categoría del evento") {
     //     clearAllFilters();
     //   } else {
     //     filterEvents(
@@ -60,7 +60,7 @@ const Index = () => {
     // } else {
       setCategoryFilter(value);
 
-      if (value === "Tipo de evento") {
+      if (value === "Categoría del evento") {
         clearAllFilters();
       } else {
         filterEvents(

@@ -75,13 +75,13 @@ export default NextAuth({
           );
 
           if (response.status !== 200) {
-            throw new Error("Authentication failed");
+            throw new Error("error de autenticación");
           }
 
           const { userData, token } = response.data;
 
           if (!userData || !token) {
-            throw new Error("Invalid response from authentication server");
+            throw new Error("Respuesta inválida del servidor de autenticación");
           }
           return {
             id: userData.uuid || userData.id.toString(),
@@ -96,12 +96,12 @@ export default NextAuth({
           const authError = error as AuthError;
           if (authError.response) {
             throw new Error(
-              authError.response.data.message || "Authentication failed"
+              authError.response.data.message || "Error de autenticación"
             );
           } else if (authError.request) {
-            throw new Error("No response from authentication server");
+            throw new Error("No hay respuesta del servidor de autenticación");
           } else {
-            throw new Error("Error during authentication process");
+            throw new Error("Error durante el proceso de autenticación");
           }
         }
       },

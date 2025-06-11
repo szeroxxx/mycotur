@@ -159,6 +159,7 @@ const EventDetailPage: React.FC = () => {
         isOpen={isContactModalOpen}
         onClose={() => setIsContactModalOpen(false)}
         contactInfo={eventData.contact}
+        title={eventData.title}
       />
 
       {toast && (

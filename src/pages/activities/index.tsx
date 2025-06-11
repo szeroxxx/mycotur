@@ -289,7 +289,7 @@ const ActivitiesPage: React.FC = () => {
             }`}
           >
             <Plus className="mr-2" size={18} />
-            Agregar Actividad
+            Añadir actividad
           </button>
         </div>
         <div className="bg-[rgba(255,255,255)] rounded-[16px] border border-[rgba(226,225,223)] flex flex-col">
@@ -323,7 +323,7 @@ const ActivitiesPage: React.FC = () => {
           >
             <div className="flex justify-between items-center mb-4 sm:mb-6">
               <h2 className="text-lg sm:text-xl font-medium text-[rgba(68,63,63)]">
-                {selectedActivity?.id ? "Editar Actividades" : "Agregar Nuevas Actividades"}
+                {selectedActivity?.id ? "Editar Actividades" : "Añadir nueva actividad"}
               </h2>
               <button
                 onClick={() => {

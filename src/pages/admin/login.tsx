@@ -46,7 +46,7 @@ const AdminLogin: React.FC = () => {
         "Login error:",
         err instanceof Error ? err.message : "Unknown error"
       );
-      setError("Authentication failed. Please try again.");
+      setError("Ocurrió un error. Inténtalo de nuevo más tarde.");
     } finally {
       setIsLoading(false);
     }
@@ -58,7 +58,7 @@ const AdminLogin: React.FC = () => {
         <div className="w-full lg:w-5/12 xl:w-4/12 flex items-center justify-center p-10">
           <div className="w-full max-w-md bg-[rgba(255,255,255)] rounded-lg border border-gray-200 shadow-md p-8">
             <h2 className="text-xl font-semibold text-center text-[rgb(68,63,63)] mb-6">
-              Admin Log in
+              Acceso para administradores
             </h2>
 
             {error && (
@@ -73,12 +73,12 @@ const AdminLogin: React.FC = () => {
                   htmlFor="email"
                   className="block text-sm font-medium text-[rgb(68,63,63)] mb-1"
                 >
-                  Email
+                  Correo electrónico
                 </label>
                 <input
                   id="email"
                   type="email"
-                  placeholder="admin@cotur.com"
+                  placeholder="tu@ejemplo.com"
                   className="w-full p-2.5 text-[rgb(142,133,129)] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -91,7 +91,7 @@ const AdminLogin: React.FC = () => {
                   htmlFor="password"
                   className="block text-sm font-medium text-[rgb(68,63,63)] mb-1"
                 >
-                  Password
+                  Contraseña
                 </label>
                 <div className="relative">
                   <input
@@ -121,7 +121,7 @@ const AdminLogin: React.FC = () => {
                 className="w-full bg-[rgb(194,91,52)] hover:bg-[rgb(174,81,42)] text-white font-medium py-2.5 px-4 rounded transition-colors"
                 disabled={isLoading}
               >
-                {isLoading ? "Logging in..." : "Log in"}
+                {isLoading ? "Iniciando sesión..." : "Iniciar sesión"}
               </button>
             </form>
           </div>

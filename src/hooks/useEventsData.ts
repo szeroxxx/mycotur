@@ -28,7 +28,7 @@ export const useEventsData = () => {
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState({
     location: "Ubicación",
-    category: "Tipo de evento",
+    category: "Categoría del evento",
   });
   const mapEventsData = (data: RawEventData[]): CalendarEvent[] => {
     return data.map((item) => ({
@@ -112,7 +112,7 @@ export const useEventsData = () => {
     //   );
     // }
 
-    if (newCategory !== "Tipo de evento") {
+    if (newCategory !== "Categoría del evento") {
       let categoryFiltered = [...events];
         if (date) {
         categoryFiltered = categoryFiltered.filter((event) => {
@@ -148,7 +148,7 @@ export const useEventsData = () => {
     setIsDateFilterActive(false);
     setFilters({
       location: "Ubicación",
-      category: "Tipo de evento",
+      category: "Categoría del evento",
     });
     setFilteredEvents(events);
     return events;

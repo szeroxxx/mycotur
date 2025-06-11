@@ -278,7 +278,7 @@ export const useEvents = () => {
             ...event,
             id: response.data.id,
           };
-          showToast("success", "Evento creado exitosamente");
+          showToast("success", "¡Evento creado con éxito!");
           fetchEvents(pagination.currentPage);
 
           return newEvent;

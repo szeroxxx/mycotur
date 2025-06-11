@@ -26,7 +26,7 @@ const AgentLogin: React.FC = () => {
         callbackUrl: "/dashboard",
       });
       if (!result) {
-        throw new Error("No response from server");
+        throw new Error("No hay respuesta del servidor");
       }
       if (result.error) {
         setError(result.error);
@@ -40,7 +40,7 @@ const AgentLogin: React.FC = () => {
       }
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "An error occurred during login"
+        err instanceof Error ? err.message : "Ocurrió un error durante el inicio de sesión"
       );
     } finally {
       setIsLoading(false);
@@ -73,7 +73,7 @@ const AgentLogin: React.FC = () => {
                 <input
                   id="email"
                   type="email"
-                  placeholder="your@email.com"
+                  placeholder="tu@ejemplo.com"
                   className="w-full p-2.5 text-[rgb(142,133,129)] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}

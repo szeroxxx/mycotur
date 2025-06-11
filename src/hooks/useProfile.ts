@@ -148,7 +148,7 @@ export const useProfile = (): UseProfileReturn => {
     try {
       const session = await getSession();
       if (!session?.user?.uuid || !session?.user?.accessToken) {
-        throw new Error("User session not found");
+        throw new Error("Sesión de usuario no encontrada");
       }
       const config = {
         method: "put",
@@ -165,13 +165,13 @@ export const useProfile = (): UseProfileReturn => {
 
       const response = await axiosInstance.request(config);
       if (response.status === 200) {
-        showToast("success", "Password changed successfully");
+        showToast("success", "Contraseña cambiada con éxito");
       } else {
-        throw new Error("Failed to change password");
+        throw new Error("Fallo al cambiar la contraseña");
       }
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "Failed to change password";
+        err instanceof Error ? err.message : "Fallo al cambiar la contraseña";
       showToast("error", message);
       throw err;
     }
@@ -194,15 +194,15 @@ export const useProfile = (): UseProfileReturn => {
       );
 
       if (response.status === 200) {
-        showToast("success", "Password reset instructions sent to your email");
+        showToast("success", "Instrucciones para restablecer la contraseña enviadas a su correo electrónico");
       } else {
-        throw new Error("Failed to process password reset request");
+        throw new Error("Fallo al procesar la solicitud de restablecimiento de contraseña");
       }
     } catch (err) {
       const message =
         err instanceof Error && err.message
           ? err.message
-          : "Failed to process password reset request";
+          : "Fallo al procesar la solicitud de restablecimiento de contraseña";
       showToast("error", message);
       throw err;
     }
@@ -211,7 +211,7 @@ export const useProfile = (): UseProfileReturn => {
     try {
       const session = await getSession();
       if (!session?.user?.uuid) {
-        showToast("error", "User session not found");
+        showToast("error", "Sesión de usuario no encontrada");
         return;
       }
       const uuid = localStorage.getItem("userUuid");
@@ -229,7 +229,7 @@ export const useProfile = (): UseProfileReturn => {
       return response.data;
     } catch (error) {
       console.error("Error checking profile completion:", error);
-      showToast("error", "Failed to check profile completion status");
+      showToast("error", "Fallo al verificar el estado de finalización del perfil");
     }
   }, [showToast]);
 
@@ -237,7 +237,7 @@ export const useProfile = (): UseProfileReturn => {
     try {
       const session = await getSession();
       if (!session?.user?.uuid) {
-        showToast("error", "User session not found");
+        showToast("error", "Sesión de usuario no encontrada");
         return;
       }
       const uuid = localStorage.getItem("userUuid");
@@ -254,7 +254,7 @@ export const useProfile = (): UseProfileReturn => {
       return [];
     } catch (error) {
       console.error("Error fetching categories:", error);
-      showToast("error", "Failed to fetch categories");
+      showToast("error", "Fallo al obtener las categorías");
       throw error;
     }
   }, [showToast]);
@@ -264,7 +264,7 @@ export const useProfile = (): UseProfileReturn => {
       try {
         const session = await getSession();
         if (!session?.user?.accessToken) {
-          throw new Error("User session not found");
+          throw new Error("Sesión de usuario no encontrada");
         }
         const allowedTypes = [
           "image/jpeg",
@@ -273,11 +273,11 @@ export const useProfile = (): UseProfileReturn => {
           "image/jpg",
         ];
         if (!allowedTypes.includes(file.type)) {
-          throw new Error("Only JPG, PNG, and WebP images are allowed");
+          throw new Error("Solo se permiten imágenes JPG, PNG y WebP");
         }
         const maxSize = 5 * 1024 * 1024;
         if (file.size > maxSize) {
-          throw new Error("Image size must be less than 5MB");
+          throw new Error("El tamaño de la imagen debe ser menor a 5MB");
         }
         const formData = new FormData();
         formData.append("profileImage", file);
@@ -297,17 +297,17 @@ export const useProfile = (): UseProfileReturn => {
           response.data &&
           response.data.message === "Profile image updated successfully"
         ) {
-          showToast("success", "Profile image updated successfully");
+          showToast("success", "Imagen de perfil actualizada con éxito");
           return response.data.data.profileImage;
         } else {
-          throw new Error("Failed to upload profile image");
+          throw new Error("Fallo al subir la imagen de perfil");
         }
       } catch (error) {
         console.error("Error uploading profile image:", error);
         const message =
           error instanceof Error
             ? error.message
-            : "Failed to upload profile image";
+            : "Fallo al subir la imagen de perfil";
         showToast("error", message);
         throw error;
       }

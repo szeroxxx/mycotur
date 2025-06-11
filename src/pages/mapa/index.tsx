@@ -29,13 +29,13 @@ const ActivityMapPage = () => {
   // } = useActivityLocations();  // const [locationFilter, setLocationFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [showMobileMap, setShowMobileMap] = useState(false);
-  
+
   const handleFilterChange = useCallback(
     (type: "location" | "category", value: string) => {
       // if (type === "location") {
       //   setLocationFilter(value === "Ubicación" ? "" : value);
       // } else {
-        setCategoryFilter(value === "Tipo de evento" ? "" : value);
+      setCategoryFilter(value === "Categoría de la actividad" ? "" : value);
       // }
     },
     []
@@ -64,13 +64,12 @@ const ActivityMapPage = () => {
         <div className="w-1/3 flex flex-col border-r border-[rgba(226,225,223,0.6)]">
           <div className="p-6 flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide touch-scroll">
             <div className="space-y-6">
-              {" "}              <SearchBar
+              {" "}
+              <SearchBar
                 locationFilter="Ubicación"
-                categoryFilter={categoryFilter || "Tipo de evento"}
+                categoryFilter={categoryFilter || "Categoría de la actividad"}
                 onFilterChange={handleFilterChange}
-                onSearch={() =>
-                  filterActivities("", "", categoryFilter)
-                }
+                onSearch={() => filterActivities("", "", categoryFilter)}
                 variant="compact"
                 // customLocations={activityLocations.map((loc) => loc.location)}
                 // useCustomLocations={true}
@@ -186,9 +185,11 @@ const ActivityMapPage = () => {
                 />
               )}
             </div>{" "}
-            <div className="p-4 pb-2">              <SearchBar
+            <div className="p-4 pb-2">
+              {" "}
+              <SearchBar
                 locationFilter="Ubicación"
-                categoryFilter={categoryFilter || "Tipo de evento"}
+                categoryFilter={categoryFilter || "Categoría de la actividad"}
                 onFilterChange={handleFilterChange}
                 variant="compact"
                 // customLocations={activityLocations.map((loc) => loc.location)}
@@ -206,7 +207,8 @@ const ActivityMapPage = () => {
               ) : filteredActivities.length === 0 ? (
                 <div className="text-center py-12 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-[rgba(226,225,223,0.3)]">
                   <p className="text-[rgba(100,92,90)] text-base">
-                    No se encontraron actividades para los filtros seleccionados.
+                    No se encontraron actividades para los filtros
+                    seleccionados.
                   </p>
                 </div>
               ) : (

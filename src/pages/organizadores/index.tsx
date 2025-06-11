@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axiosInstance from "../../utils/axiosConfig";
 import PublicLayout from "@/components/layout/PublicLayout";
-import SearchBar from "@/components/ui/SearchBar";
+import OrganizersSearchBar from "@/components/organiser/OrganizersSearchBar";
 import OrganiserCard from "@/components/organiser/OrganiserCard";
 import Head from "next/head";
 // import { useOrganizerLocations } from "@/hooks/useOrganizerLocations";
@@ -71,7 +71,7 @@ const DiscoverOrganiserPage = () => {
     //       organiser.address.toLowerCase().includes(locationFilter.toLowerCase())
     //   );
     // }
-    if (categoryFilter && categoryFilter !== "Tipo de evento") {
+    if (categoryFilter && categoryFilter !== "Categoría del organizadore") {
       filtered = filtered.filter((organiser) =>
         organiser.categories.some(
           (category) =>
@@ -89,7 +89,7 @@ const DiscoverOrganiserPage = () => {
       // if (type === "location") {
       //   setLocationFilter(value === "Ubicación" ? "" : value);
       // } else {
-        setCategoryFilter(value === "Tipo de evento" ? "" : value);
+        setCategoryFilter(value === "Categoría del organizadore" ? "" : value);
       // }
     },
     []
@@ -129,9 +129,9 @@ const DiscoverOrganiserPage = () => {
           <div className="mb-8">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
               <div></div>{" "}              <div className="lg:w-96">
-                <SearchBar
+                <OrganizersSearchBar
                   locationFilter="Ubicación"
-                  categoryFilter={categoryFilter || "Tipo de evento"}
+                  categoryFilter={categoryFilter || "Categoría del organizadore"}
                   onFilterChange={handleFilterChange}
                   onSearch={handleSearch}
                   variant="compact"
@@ -179,9 +179,9 @@ const DiscoverOrganiserPage = () => {
 
       <div className="lg:hidden min-h-screen bg-gradient-to-br from-[rgba(244,242,242)] to-[rgba(248,250,252)]">
         {" "}        <div className="sticky top-0 z-20  border-b border-[rgba(226,225,223,0.4)] p-4">
-          <SearchBar
+          <OrganizersSearchBar
             locationFilter="Ubicación"
-            categoryFilter={categoryFilter || "Tipo de evento"}
+            categoryFilter={categoryFilter || "Categoría del organizadore"}
             onFilterChange={handleFilterChange}
             onSearch={handleSearch}
             variant="mobile"
