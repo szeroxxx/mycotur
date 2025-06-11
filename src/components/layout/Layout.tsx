@@ -10,9 +10,9 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const router = useRouter();
-  const { status } = useSession();
-  const session = useSessionStorage();
-  const [sidebarWidth, setSidebarWidth] = useState(256); // 64 * 4 = 256px for w-64
+  const { data: session, status } = useSession();
+  useSessionStorage();
+  const [sidebarWidth, setSidebarWidth] = useState(256);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -28,6 +28,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const handleSidebarWidthChange = (width: number) => {
     setSidebarWidth(width);
   };
+
   const publicRoutes = [
     "/login",
     "/admin/login",
@@ -39,6 +40,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     "/activity-details",
     "/event-detail",
   ];
+
   const isPublicRoute = publicRoutes.some(
     (route) =>
       router.pathname === route ||
@@ -48,6 +50,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       router.pathname.startsWith("/event-detail/")
   );
 
+  if (isPublicRoute) {
+    return <>{children}</>;
+  }
   if (status === "loading") {
     return (
       <div className="min-h-screen bg-[rgba(255,255,255)] flex items-center justify-center">
@@ -56,15 +61,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     );
   }
 
-  if (!session && !isPublicRoute) {
+  if (!session) {
     const isAdminRoute =
       router.pathname.startsWith("/admin") ||
       router.pathname.startsWith("/agents");
     router.push(isAdminRoute ? "/admin/login" : "/login");
     return null;
-  }
-  if (isPublicRoute) {
-    return <>{children}</>;
   }
   return (
     <div className="min-h-screen bg-[rgba(255,255,255)]">

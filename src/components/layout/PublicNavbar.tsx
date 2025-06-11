@@ -10,11 +10,11 @@ const PublicNavbar = () => {
   const isActive = (path: string) => router.pathname === path;
   
   const navItems = [
-    { path: "/home", label: "Inicio", external: true, url: "https://mycotour.webflow.io/" },
+    { path: "/home", label: "Inicio", external: true, url: "https://avilamycotour.es/" },
     { path: "/mapa", label: "Catálogo de Actividades", external: false, url: "" },
     { path: "/calendario-eventos", label: "Eventos programados", external: false, url: "" },
-    { path: "/organizadores", label: "Organizadores de eventos", external: false, url: "" },
-    { path: "/about", label: "Sobre nosotros", external: true, url: "https://mycotour.webflow.io/about-us" },
+    { path: "/organizadores", label: "Descubre a los organizadores", external: false, url: "" },
+    { path: "/about", label: "Sobre nosotros", external: true, url: "https://avilamycotour.es/about-us" },
   ];
 
   const toggleMobileMenu = () => {

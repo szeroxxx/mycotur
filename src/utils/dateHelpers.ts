@@ -18,3 +18,33 @@ export function convertDateToSpanish(dateStr: string): string {
     const monthSpanish = monthTranslation[month] || month;
     return `${day} ${monthSpanish} ${year}`;
 }
+
+export const spanishMonths = [
+    { value: 1, name: "Enero" },
+    { value: 2, name: "Febrero" },
+    { value: 3, name: "Marzo" },
+    { value: 4, name: "Abril" },
+    { value: 5, name: "Mayo" },
+    { value: 6, name: "Junio" },
+    { value: 7, name: "Julio" },
+    { value: 8, name: "Agosto" },
+    { value: 9, name: "Septiembre" },
+    { value: 10, name: "Octubre" },
+    { value: 11, name: "Noviembre" },
+    { value: 12, name: "Diciembre" }
+];
+
+export function formatMonthToSpanish(monthValue: string): string {
+    if (!monthValue) return "";
+    
+    const [year, month] = monthValue.split("-");
+    const monthNumber = parseInt(month, 10);
+    const spanishMonth = spanishMonths.find(m => m.value === monthNumber);
+    
+    return spanishMonth ? `${spanishMonth.name} ${year}` : monthValue;
+}
+
+export function parseSpanishMonth(displayValue: string, originalValue: string): string {
+    // Keep the original format for the backend
+    return originalValue;
+}

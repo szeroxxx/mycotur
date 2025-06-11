@@ -21,7 +21,7 @@ interface Category {
 
 const defaultCategory: Category = {
   uuid: "",
-  title: "Tipo de evento",
+  title: "Categoría del evento",
   description: "",
 };
 
@@ -67,7 +67,7 @@ const EventSearchBar: React.FC<EventSearchBarProps> = ({
 
   const hasActiveFilters = useMemo(() => {
     return (
-      categoryFilter !== "Tipo de evento" // locationFilter !== "Ubicación" || 
+      categoryFilter !== "Categoría del evento" // locationFilter !== "Ubicación" || 
     );
   }, [categoryFilter]); // locationFilter, categoryFilter
 
@@ -79,7 +79,7 @@ const EventSearchBar: React.FC<EventSearchBarProps> = ({
   };
     const handleClearFilters = (): void => {
     // onFilterChange("location", "Ubicación");
-    onFilterChange("category", "Tipo de evento");
+    onFilterChange("category", "Categoría del evento");
   };
 
   const isLoading = categoriesLoading; // || locationsLoading;

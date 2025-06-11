@@ -22,11 +22,11 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
             <BsWindowX size={25} className="text-[rgba(220,38,38)]" />
           </div>
           <h3 className="text-xl font-semibold text-[rgba(68,63,63)] mb-2">
-            ¿Eliminar Actividad?
+            ¿Quieres eliminar esta actividad?
           </h3>
           <p className="text-sm text-[rgba(100,92,90)] mb-6">
-            ¿Está seguro de que desea eliminar esta actividad? Esta acción no se
-            puede deshacer.
+            Esta acción no se puede deshacer. ¿Estás seguro de que deseas
+            eliminar esta actividad de forma permanente?
           </p>
           <div className="flex justify-center space-x-4 w-full">
             <button
@@ -39,7 +39,7 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
               onClick={onConfirm}
               className="cursor-pointer flex-1 basis-[120px] px-4 py-2 text-sm font-medium bg-[rgba(220,38,38)] hover:bg-red-600 text-[rgba(255,255,255)] border border-[rgba(199,195,193)] rounded-lg transition-colors"
             >
-              Sí, Eliminar
+              Eliminar actividad
             </button>
           </div>
         </div>

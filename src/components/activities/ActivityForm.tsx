@@ -8,6 +8,7 @@ import {
   LocationSuggestion,
 } from "../../utils/googlePlacesService";
 import { validateSpanishPhoneNumber } from "../../utils/phoneValidation";
+import SpanishMonthPicker from "../ui/SpanishMonthPicker";
 
 interface Category {
   uuid: string;
@@ -469,7 +470,9 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
     e.preventDefault();
 
     if (!isValidLocation || !activity.location) {
-      setLocationError("Por favor, seleccione una ubicación válida de las sugerencias");
+      setLocationError(
+        "Por favor, seleccione una ubicación válida de las sugerencias"
+      );
       return;
     }
 
@@ -513,7 +516,8 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
       <div>
         {" "}
         <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
-          Categoría de Actividad <RequiredIndicator />
+          Selecciona a qué categorías pertenece esta actividad{" "}
+          <RequiredIndicator />
         </label>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 border border-[#E5E7EB] rounded-lg bg-gray-50/50">
           {categories.map((category) => (
@@ -674,31 +678,29 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
       <div className="w-full max-w-2xl">
         <div className="mb-4">
           <p className="text-[rgba(68,63,63)] text-sm mb-4 font-sm">
-            ¿Qué temporada crees que es la mejor para esta actividad?
+            ¿En qué temporada se puede realizar la actividad?
             <RequiredIndicator />
-          </p>{" "}
-          <div className="flex gap-4">
+          </p>{" "}          <div className="flex gap-4">
             <div className="w-full">
               <label className="block text-sm font-sm text-[rgba(142,133,129)] mb-2">
                 Mes de Inicio
               </label>
               <div className="relative">
-                <input
-                  type="month"
+                <SpanishMonthPicker
                   name="startMonth"
                   value={activity.startMonth || ""}
-                  onChange={onChange}
+                  onChange={(value) => {
+                    const event = {
+                      target: {
+                        name: "startMonth",
+                        value: value,
+                      },
+                    } as React.ChangeEvent<HTMLInputElement>;
+                    onChange(event);
+                  }}
                   required
                   className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20] cursor-pointer"
-                  style={{
-                    WebkitAppearance: "none",
-                    MozAppearance: "textfield",
-                    position: "relative",
-                    background: "transparent",
-                  }}
-                  onClick={(e) => {
-                    e.currentTarget.showPicker?.();
-                  }}
+                  placeholder="Seleccionar mes de inicio"
                 />
               </div>
             </div>
@@ -708,22 +710,21 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
                 Mes de finalización
               </label>
               <div className="relative">
-                <input
-                  type="month"
+                <SpanishMonthPicker
                   name="endMonth"
                   value={activity.endMonth || ""}
-                  onChange={onChange}
+                  onChange={(value) => {
+                    const event = {
+                      target: {
+                        name: "endMonth",
+                        value: value,
+                      },
+                    } as React.ChangeEvent<HTMLInputElement>;
+                    onChange(event);
+                  }}
                   required
                   className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20] cursor-pointer"
-                  style={{
-                    WebkitAppearance: "none",
-                    MozAppearance: "textfield",
-                    position: "relative",
-                    background: "transparent",
-                  }}
-                  onClick={(e) => {
-                    e.currentTarget.showPicker?.();
-                  }}
+                  placeholder="Seleccionar mes de finalización"
                 />
               </div>
             </div>
@@ -732,10 +733,13 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
       </div>
       <div>
         <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
-          Información de contacto (Las personas pueden ver estos detalles)
+          Datos de contacto (Estos datos serán visibles para quienes
+          vean la actividad)
           <RequiredIndicator />
         </label>
-        <div className="space-y-4">          <input
+        <div className="space-y-4">
+          {" "}
+          <input
             type="tel"
             name="phone"
             value={activity.phone || ""}
@@ -761,7 +765,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
             required={!activity.phone && !activity.url}
           />
           <input
-            placeholder="Ingrese el enlace"
+            placeholder="Enlace a página web"
             type="text"
             name="url"
             value={activity.url || ""}
@@ -773,14 +777,14 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
       </div>
       <div>
         <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
-          Tarifas
+          Precio
           <RequiredIndicator />
         </label>
         <textarea
           name="notes"
           value={activity.notes || ""}
           onChange={onChange}
-          placeholder="Mencione si hay tarifas involucradas, como un cargo de $20 por persona que cubre comida y todas las actividades"
+          placeholder="Ej. Actividad gratuita, 5€ por persona (incluye comida y materiales)"
           rows={3}
           required
           className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
@@ -794,7 +798,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
           name="description"
           value={activity.description || ""}
           onChange={onChange}
-          placeholder="Escribe más sobre la Actividad y cómo las personas pueden contactarte."
+          placeholder="Comparte más detalles sobre la actividad y cómo contactar contigo"
           rows={3}
           maxLength={1000}
           className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
@@ -803,7 +807,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
       </div>
       <div>
         <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
-          Actividad Imágenes & Videos
+          Imágenes de la actividad
         </label>
         <div>
           {previewImages.length > 0 && (
@@ -933,7 +937,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
             >
               {isUploading
                 ? "Cargando..."
-                : "Haga clic para cargar imágenes y videos"}
+                : "Haz clic para subir imágenes o vídeos"}
             </div>
             <p className="text-xs text-[#6B7280] mt-2">
               {uploadError ? (
@@ -943,7 +947,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
               )}
             </p>
             <p className="text-xs text-[#6B7280] mt-1">
-              Formatos admitidos: JPG, PNG, WebP, MP4, WebM, MOV
+              Formatos permitidos: JPG, PNG, WebP, MP4, WebM, MOV
             </p>
           </div>
         </div>

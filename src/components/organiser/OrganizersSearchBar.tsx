@@ -20,11 +20,11 @@ interface Category {
 
 const defaultCategory: Category = {
   uuid: "",
-  title: "Categoría de la actividad",
+  title: "Categoría del organizadore",
   description: "",
 };
 
-interface SearchBarProps {
+interface OrganizersSearchBarProps {
   locationFilter: string;
   categoryFilter: string;
   onFilterChange: (type: "location" | "category", value: string) => void;
@@ -35,7 +35,7 @@ interface SearchBarProps {
   useCustomLocations?: boolean;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({
+const OrganizersSearchBar: React.FC<OrganizersSearchBarProps> = ({
   locationFilter,
   categoryFilter,
   onFilterChange,
@@ -64,7 +64,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   //   }
   // }, [useCustomLocations, customLocations]);
   const hasActiveFilters = useMemo(() => {
-    return categoryFilter !== "Categoría de la actividad";
+    return categoryFilter !== "Categoría del organizadore";
   }, [categoryFilter]); 
 
   const handleFilterChange = (
@@ -76,7 +76,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   const handleClearFilters = (): void => {
     onFilterChange("location", "Ubicación");
-    onFilterChange("category", "Categoría de la actividad");
+    onFilterChange("category", "Categoría del organizadore");
   };
   console.log("locationFilter::: ", locationFilter);
 
@@ -171,4 +171,4 @@ const SearchBar: React.FC<SearchBarProps> = ({
   );
 };
 
-export default SearchBar;
+export default OrganizersSearchBar;

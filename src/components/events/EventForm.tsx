@@ -610,7 +610,8 @@ export const EventForm: React.FC<EventFormProps> = ({
   const currentVideoCount =
     (event.videos?.length || 0) +
     (event.mediaUrls?.filter((media) => media.type.startsWith("video"))
-      .length || 0);  const handleFormSubmit = (e: React.FormEvent) => {
+      .length || 0);
+  const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!isValidLocation || !event.location) {
@@ -642,7 +643,7 @@ export const EventForm: React.FC<EventFormProps> = ({
     <form onSubmit={handleFormSubmit} className="space-y-6">
       <div>
         <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
-          Obtener datos directamente de los detalles de la actividad (opcional){" "}
+          Rellenar automáticamente con una actividad existente (opcional)
         </label>
         <select
           name="activityName"
@@ -650,7 +651,7 @@ export const EventForm: React.FC<EventFormProps> = ({
           onChange={handleAutoFillActivitySelect}
           className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
         >
-          <option value="">Seleccione tu Actividad</option>
+          <option value="">Selecciona una actividad</option>
           {activities.map((activity) => (
             <option key={activity.id} value={activity.id.toString()}>
               {activity.title}
@@ -660,7 +661,7 @@ export const EventForm: React.FC<EventFormProps> = ({
       </div>
       <div>
         <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
-          Seleccionar Actividad <RequiredIndicator />
+          Actividad relacionada <RequiredIndicator />
         </label>{" "}
         <select
           name="activityId"
@@ -669,7 +670,7 @@ export const EventForm: React.FC<EventFormProps> = ({
           className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
           required
         >
-          <option value="">Seleccione tu Actividad</option>
+          <option value="">Selecciona una actividad</option>
           {activities.map((activity) => (
             <option key={activity.id} value={activity.id.toString()}>
               {activity.title}
@@ -679,14 +680,14 @@ export const EventForm: React.FC<EventFormProps> = ({
       </div>
       <div>
         <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
-          Título del Evento <RequiredIndicator />
+          Nombre del evento <RequiredIndicator />
         </label>
         <input
           type="text"
           name="event"
           value={event.event || ""}
           onChange={onChange}
-          placeholder="Nombre del evento"
+          placeholder="Ej. Ruta micológica al atardecer"
           className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
           required
         />
@@ -840,7 +841,8 @@ export const EventForm: React.FC<EventFormProps> = ({
 
           {!isValidLocation && !locationError && (
             <div className="mt-2 text-sm text-gray-500">
-              Escriba para buscar y seleccione una ubicación de las sugerencias de Google Maps
+              Escriba para buscar y seleccione una ubicación de las sugerencias
+              de Google Maps
             </div>
           )}
 
@@ -867,9 +869,9 @@ export const EventForm: React.FC<EventFormProps> = ({
             locationInput.length > 2 && (
               <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4">
                 <div className="text-sm text-gray-500 text-center">
-                  No se han encontrado ubicaciones en las regiones objetivo. Intenta buscar lugares
-                  en Valle del Tiétar, La Moraña, Valle de Amblés, Sierra de
-                  Gredos, o Alberche Pinares.
+                  No se han encontrado ubicaciones en las regiones objetivo.
+                  Intenta buscar lugares en Valle del Tiétar, La Moraña, Valle
+                  de Amblés, Sierra de Gredos, o Alberche Pinares.
                 </div>
               </div>
             )}
@@ -877,7 +879,7 @@ export const EventForm: React.FC<EventFormProps> = ({
       </div>
       <div>
         <label className="block text-sm font-sm text-[rgba(68,63,63)] mb-1">
-          Información de contacto pública (Las personas pueden ver estos detalles)
+          Datos de contacto (visibles para los usuarios)
           <RequiredIndicator />
         </label>
         <div className="space-y-4">
@@ -889,7 +891,8 @@ export const EventForm: React.FC<EventFormProps> = ({
             placeholder="Dirección de correo electrónico"
             className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
             required
-          />          <input
+          />{" "}
+          <input
             type="tel"
             name="phone"
             value={event.phone || ""}
@@ -906,7 +909,7 @@ export const EventForm: React.FC<EventFormProps> = ({
             <p className="mt-1 text-sm text-red-600">{phoneError}</p>
           )}
           <input
-            placeholder="Introducir enlace"
+            placeholder="Enlace (página web o redes)"
             type="text"
             name="url"
             value={event.url || ""}
@@ -918,13 +921,13 @@ export const EventForm: React.FC<EventFormProps> = ({
       </div>
       <div>
         <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
-          Precio de la actividad
+          Precio
         </label>
         <textarea
           name="fees"
           value={event.fees || ""}
           onChange={onChange}
-          placeholder="Describe cómo funciona el precio de la actividad, si va por personas, por grupo y si hay algún gasto extra incluído"
+          placeholder="Ej. Evento gratuito o 18€ por persona (incluye degustación)"
           rows={3}
           className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
         />
@@ -938,7 +941,7 @@ export const EventForm: React.FC<EventFormProps> = ({
           value={event.description || ""}
           onChange={onChange}
           maxLength={1000}
-          placeholder="Escribe una descripción de la actividad"
+          placeholder="Escribe más sobre el evento, horarios, punto de encuentro o detalles útiles"
           rows={3}
           className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
           required
@@ -946,7 +949,7 @@ export const EventForm: React.FC<EventFormProps> = ({
       </div>{" "}
       <div>
         <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
-          Imágenes del Evento y Videos
+          Haz clic para subir imágenes o vídeos del evento
         </label>
         <div>
           {previewImages.length > 0 && (
@@ -1077,7 +1080,7 @@ export const EventForm: React.FC<EventFormProps> = ({
             >
               {isUploading
                 ? "Cargando..."
-                : "Haga clic para cargar imágenes y videos"}
+                : "Haz clic para subir imágenes o vídeos del evento"}
             </div>
             <p className="text-xs text-[#6B7280] mt-2">
               {uploadError ? (
@@ -1087,7 +1090,7 @@ export const EventForm: React.FC<EventFormProps> = ({
               )}
             </p>
             <p className="text-xs text-[#6B7280] mt-1">
-              Formatos admitidos: JPG, PNG, WebP, MP4, WebM, MOV
+              Formatos permitidos: JPG, PNG, WebP, MP4, WebM, MOV
             </p>
           </div>
         </div>
@@ -1138,7 +1141,7 @@ export const EventForm: React.FC<EventFormProps> = ({
               : "Ahorro..."
             : event.id
             ? "Actualizar"
-            : "Guardar"}
+            : "Publicar evento"}
         </button>
       </div>
     </form>

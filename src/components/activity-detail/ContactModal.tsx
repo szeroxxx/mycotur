@@ -23,7 +23,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
       <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold text-[rgb(68,63,63)]">
-            Información de Contacto
+            Datos de contacto del organizador
           </h2>
         </div>
 

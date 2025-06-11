@@ -44,7 +44,7 @@ export const AgentForm: React.FC<AgentFormProps> = ({
           name="email"
           value={agent.email || ''}
           onChange={onChange}
-          placeholder="john@example.com"
+          placeholder="tu@ejemplo.com"
           className="w-full px-4 py-2 text-black border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
           required
         />

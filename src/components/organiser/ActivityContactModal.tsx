@@ -8,12 +8,14 @@ interface ActivityContactModalProps {
     phone?: string;
     link?: string;
   };
+  title: string;
 }
 
 const ActivityContactModal: React.FC<ActivityContactModalProps> = ({
   isOpen,
   onClose,
   contactInfo,
+  title,
 }) => {
   if (!isOpen) return null;
 
@@ -22,7 +24,7 @@ const ActivityContactModal: React.FC<ActivityContactModalProps> = ({
       <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold text-[rgb(68,63,63)]">
-            Información de Contacto
+            Datos de contacto del organizador
           </h2>
         </div>
 
@@ -40,13 +42,15 @@ const ActivityContactModal: React.FC<ActivityContactModalProps> = ({
           {contactInfo.phone && (
             <div>
               <label className="block text-sm font-medium text-[rgb(68,63,63)]">
-                Teléfono
+                Número de teléfono
               </label>
-              <div className="w-full p-1 text-[rgb(68,63,63)] ">
+              <div className="w-full p-1 text-[rgb(68,63,63)]">
                 <a
                   href={`https://wa.me/${contactInfo.phone.replace(
                     /\s+/g,
                     ""
+                  )}?text=${encodeURIComponent(
+                    `Hola, estoy interesado en la actividad "${title}". ¿Podrías darme más información?`
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -60,7 +64,7 @@ const ActivityContactModal: React.FC<ActivityContactModalProps> = ({
           {contactInfo.link && (
             <div>
               <label className="block text-sm font-medium text-[rgb(68,63,63)] mb-1">
-                Enlace
+                Página web o redes sociales
               </label>
               <div className="w-full p-1 text-[rgb(68,63,63)]">
                 <a

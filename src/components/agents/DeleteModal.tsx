@@ -22,24 +22,24 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
             <BsPersonX size={25} className="text-[rgba(220,38,38)]" />
           </div>
           <h3 className="text-xl font-semibold text-[#111827] mb-2">
-            ¿Eliminar Agente?
+            ¿Quieres eliminar este agente?
           </h3>
           <p className="text-sm text-[#6B7280] mb-6">
-            ¿Está seguro de que desea eliminar este agente? Todos los datos relacionados con este
-            agente se eliminarán permanentemente. Esta acción no se puede deshacer.
+            Esta acción no se puede deshacer. ¿Estás segura de que
+            deseas eliminarlo?
           </p>
           <div className="flex justify-center space-x-4 w-full">
             <button
               onClick={onClose}
               className="cursor-pointer flex-1 basis-[120px] px-4 py-2 text-sm font-medium text-[rgba(68,63,63)] hover:text-[#111827] border border-[rgba(199,195,193)] rounded-lg transition-colors"
             >
-              Cancel
+              Cancelar
             </button>
             <button
               onClick={onConfirm}
               className="cursor-pointer flex-1 basis-[120px] px-4 py-2 text-sm font-medium bg-[rgba(220,38,38)] hover:bg-red-600 text-[rgba(255,255,255)] border border-[rgba(199,195,193)] rounded-lg transition-colors"
             >
-              Yes, Remove
+              Eliminar agente
             </button>
           </div>
         </div>

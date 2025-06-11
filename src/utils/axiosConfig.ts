@@ -23,6 +23,32 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     if (error.response?.status === 403 || error.response?.status === 401) {
       try {
+        const currentPath = window.location.pathname;
+        const publicRoutes = [
+          "/",
+          "/home",
+          "/about",
+          "/mapa",
+          "/calendario-eventos",
+          "/organizadores",
+          "/activity-details",
+          "/event-detail",
+          "/login",
+          "/admin/login"
+        ];
+        
+        const isPublicRoute = publicRoutes.some(route => 
+          currentPath === route ||
+          currentPath.startsWith("/register/") ||
+          currentPath.startsWith("/organizadores/") ||
+          currentPath.startsWith("/activity-details/") ||
+          currentPath.startsWith("/event-detail/")
+        );
+
+        if (isPublicRoute) {
+          return Promise.reject(error);
+        }
+
         const userData = JSON.parse(localStorage.getItem('userData') || '{}');
         const isAdmin = userData?.role === 'admin';
 
