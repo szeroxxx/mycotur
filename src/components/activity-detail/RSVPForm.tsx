@@ -53,7 +53,7 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
   };
   const validatePhoneNumber = (phone: string): string | null => {
     if (!phone.trim()) {
-      return "El número de teléfono es obligatorio";
+      return "Revise el número de teléfono";
     }
     const validation = validateSpanishPhoneNumber(phone);
     return validation.isValid ? null : validation.errorMessage || null;

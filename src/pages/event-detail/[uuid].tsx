@@ -219,7 +219,7 @@ const EventDetailPage: React.FC = () => {
                       className="text-lg font-semibold mb-4 leading-tight"
                       style={{ color: "rgba(68, 63, 63, 1)" }}
                     >
-                      Este evento ya
+                      Este evento ya{" "}
                       <span style={{ color: "rgba(22, 163, 74, 1)" }}>
                         acabó
                       </span>{" "}
@@ -260,7 +260,7 @@ const EventDetailPage: React.FC = () => {
                     className="text-lg font-semibold mb-4 leading-tight"
                     style={{ color: "rgba(68, 63, 63, 1)" }}
                   >
-                    Este evento ya
+                    Este evento ya{" "}
                     <span style={{ color: "rgba(22, 163, 74, 1)" }}>
                       acabó
                     </span>{" "}
