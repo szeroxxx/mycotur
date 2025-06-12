@@ -8,6 +8,7 @@ import {
   LocationSuggestion,
 } from "../../utils/googlePlacesService";
 import { validateSpanishPhoneNumber } from "../../utils/phoneValidation";
+import { validateUrl } from "../../utils/urlValidation";
 import SpanishMonthPicker from "../ui/SpanishMonthPicker";
 
 interface Category {
@@ -55,6 +56,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
   const locationRef = useRef<HTMLDivElement>(null);
 
   const [phoneError, setPhoneError] = useState<string | null>(null);
+  const [urlError, setUrlError] = useState<string | null>(null);
 
   const [previewImages, setPreviewImages] = useState<string[]>([]);
   const [previewVideos, setPreviewVideos] = useState<string[]>([]);
@@ -158,7 +160,6 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
     setIsValidLocation(true);
     setLocationError(null);
   };
-
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const phoneValue = e.target.value;
     onChange(e);
@@ -171,6 +172,18 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
       }
     } else {
       setPhoneError(null);
+    }
+  };
+
+  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const urlValue = e.target.value;
+    onChange(e);
+
+    const validation = validateUrl(urlValue);
+    if (!validation.isValid) {
+      setUrlError(validation.errorMessage || null);
+    } else {
+      setUrlError(null);
     }
   };
 
@@ -474,7 +487,6 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
       );
       return;
     }
-
     if (activity.phone && activity.phone.trim()) {
       const phoneValidation = validateSpanishPhoneNumber(activity.phone);
       if (!phoneValidation.isValid) {
@@ -483,6 +495,15 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
       }
     }
     setPhoneError(null);
+
+    if (activity.url && activity.url.trim()) {
+      const urlValidation = validateUrl(activity.url);
+      if (!urlValidation.isValid) {
+        setUrlError(urlValidation.errorMessage || null);
+        return;
+      }
+    }
+    setUrlError(null);
 
     onSubmit(e);
   };
@@ -678,7 +699,8 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
           <p className="text-[rgba(68,63,63)] text-sm mb-4 font-sm">
             ¿En qué temporada se puede realizar la actividad?
             <RequiredIndicator />
-          </p>{" "}          <div className="flex gap-4">
+          </p>{" "}
+          <div className="flex gap-4">
             <div className="w-full">
               <label className="block text-sm font-sm text-[rgba(142,133,129)] mb-2">
                 Mes de Inicio
@@ -767,10 +789,15 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
             type="text"
             name="url"
             value={activity.url || ""}
-            onChange={onChange}
-            className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
+            onChange={handleUrlChange}
+            className={`w-full px-4 py-2 text-[rgba(142,133,129)] border rounded-lg text-sm focus:outline-none focus:ring-1 ${
+              urlError
+                ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                : "border-[#E5E7EB] focus:ring-[#D45B20] focus:border-[#D45B20]"
+            }`}
             required={!activity.phone && !activity.email}
           />
+          {urlError && <p className="mt-1 text-sm text-red-600">{urlError}</p>}
         </div>
       </div>
       <div>

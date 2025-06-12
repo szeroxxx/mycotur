@@ -9,6 +9,7 @@ import {
   LocationSuggestion,
 } from "../../utils/googlePlacesService";
 import { validateSpanishPhoneNumber } from "../../utils/phoneValidation";
+import { validateUrl } from "../../utils/urlValidation";
 
 const MAX_FILE_SIZE_MB = 10;
 const MAX_VIDEO_SIZE_MB = 15;
@@ -68,6 +69,7 @@ export const EventForm: React.FC<EventFormProps> = ({
 
   // Phone validation state
   const [phoneError, setPhoneError] = useState<string | null>(null);
+  const [urlError, setUrlError] = useState<string | null>(null);
 
   const [previewImages, setPreviewImages] = useState<string[]>([]);
   const [previewVideos, setPreviewVideos] = useState<string[]>([]);
@@ -240,7 +242,6 @@ export const EventForm: React.FC<EventFormProps> = ({
     setIsValidLocation(true);
     setLocationError(null);
   };
-
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const phoneValue = e.target.value;
     onChange(e);
@@ -254,6 +255,18 @@ export const EventForm: React.FC<EventFormProps> = ({
       }
     } else {
       setPhoneError(null);
+    }
+  };
+
+  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const urlValue = e.target.value;
+    onChange(e);
+
+    const validation = validateUrl(urlValue);
+    if (!validation.isValid) {
+      setUrlError(validation.errorMessage || null);
+    } else {
+      setUrlError(null);
     }
   };
 
@@ -624,9 +637,7 @@ export const EventForm: React.FC<EventFormProps> = ({
     if (selectedCategories.length === 0) {
       setCategoriesError("Seleccione al menos una categoría");
       return;
-    }
-
-    // Validate phone number if provided
+    } // Validate phone number if provided
     if (event.phone && event.phone.trim()) {
       const phoneValidation = validateSpanishPhoneNumber(event.phone);
       if (!phoneValidation.isValid) {
@@ -635,6 +646,15 @@ export const EventForm: React.FC<EventFormProps> = ({
       }
     }
     setPhoneError(null);
+
+    if (event.url && event.url.trim()) {
+      const urlValidation = validateUrl(event.url);
+      if (!urlValidation.isValid) {
+        setUrlError(urlValidation.errorMessage || null);
+        return;
+      }
+    }
+    setUrlError(null);
 
     onSubmit(e);
   };
@@ -904,7 +924,7 @@ export const EventForm: React.FC<EventFormProps> = ({
                 : "border-[#E5E7EB] focus:ring-[#D45B20] focus:border-[#D45B20]"
             }`}
             required={!event.phone && !event.url}
-          />
+          />{" "}
           {phoneError && (
             <p className="mt-1 text-sm text-red-600">{phoneError}</p>
           )}
@@ -913,10 +933,15 @@ export const EventForm: React.FC<EventFormProps> = ({
             type="text"
             name="url"
             value={event.url || ""}
-            onChange={onChange}
-            className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
+            onChange={handleUrlChange}
+            className={`w-full px-4 py-2 text-[rgba(142,133,129)] border rounded-lg text-sm focus:outline-none focus:ring-1 ${
+              urlError
+                ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                : "border-[#E5E7EB] focus:ring-[#D45B20] focus:border-[#D45B20]"
+            }`}
             required={!event.phone && !event.email}
           />
+          {urlError && <p className="mt-1 text-sm text-red-600">{urlError}</p>}
         </div>
       </div>
       <div>
