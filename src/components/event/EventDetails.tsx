@@ -59,29 +59,6 @@ const EventDetails: React.FC<EventDetailsProps> = ({
     }
   }, [location.coordinates]);
 
-  // const formatDate = (dateStr: string): string => {
-  //   const date = new Date(dateStr);
-  //   const day = date.getDate();
-  //   const month = date.toLocaleString("en-US", { month: "long" });
-  //   const year = date.getFullYear();
-
-  //   const ordinalSuffix = (d: number): string => {
-  //     if (d > 3 && d < 21) return "th";
-  //     switch (d % 10) {
-  //       case 1:
-  //         return "st";
-  //       case 2:
-  //         return "nd";
-  //       case 3:
-  //         return "rd";
-  //       default:
-  //         return "th";
-  //     }
-  //   };
-
-  //   return `${day}${ordinalSuffix(day)} ${month}, ${year}`;
-  // };
-
   return (
     <div className="space-y-6">
       <div>
@@ -93,7 +70,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-[rgba(68,63,63)]">
-                  Cuándo y Dónde
+                  Fecha y Hora
                 </span>
               </div>
               <span className="text-[rgba(100,92,90)]">

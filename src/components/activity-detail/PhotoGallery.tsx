@@ -140,7 +140,6 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
   
   return (
     <div className="w-full mb-8 sm:mb-12 relative">
-      {/* Mobile Layout */}
       <div className="block sm:hidden">
         <div className="grid grid-cols-2 gap-2 h-[280px] overflow-hidden">
           <div
@@ -231,7 +230,6 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
         </div>
       </div>
 
-      {/* Desktop Layout */}
       <div className="hidden sm:block">
         <div className="grid grid-cols-2 gap-3 h-[350px] overflow-hidden">
           <div
@@ -320,7 +318,6 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
         </div>
       </div>
 
-      {/* Category Info Modal */}
       {showCategoryInfo && (
         <div className="fixed inset-0 z-[10001] flex items-center justify-center p-4">
           <div
@@ -329,7 +326,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
           ></div>
           <div className="relative z-10 bg-white rounded-lg shadow-xl max-w-sm sm:max-w-md w-full mx-4 p-4 sm:p-6">
             <div className="flex items-center justify-between mb-3 sm:mb-4">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900">Categories</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900">Categorías</h3>
               <button
                 onClick={() => setShowCategoryInfo(false)}
                 className="text-gray-400 hover:text-gray-600 transition-colors p-1"

@@ -4,7 +4,6 @@ import { getToken } from "next-auth/jwt";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
   const publicRoutes = [
     "/",
     "/home",
@@ -25,6 +24,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
   if (pathname.startsWith("/calendario-eventos/")) {
+    return NextResponse.next();
+  }
+  if (pathname.startsWith("/mapa/")) {
     return NextResponse.next();
   }
   if (pathname.startsWith("/activity-details/")) {
@@ -86,7 +88,9 @@ export const config = {
     "/home",
     "/about",
     "/mapa",
+    "/mapa/:path*",
     "/calendario-eventos",
+    "/calendario-eventos/:path*",
     "/organizadores/:path*",
     "/activity-details/:path*",
     "/event-detail/:path*",

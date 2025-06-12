@@ -40,14 +40,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     "/activity-details",
     "/event-detail",
   ];
-
   const isPublicRoute = publicRoutes.some(
     (route) =>
       router.pathname === route ||
       router.pathname.startsWith("/register/") ||
       router.pathname.startsWith("/organizadores/") ||
       router.pathname.startsWith("/activity-details/") ||
-      router.pathname.startsWith("/event-detail/")
+      router.pathname.startsWith("/event-detail/") ||
+      router.pathname.startsWith("/mapa/") ||
+      router.pathname.startsWith("/calendario-eventos/")
   );
 
   if (isPublicRoute) {

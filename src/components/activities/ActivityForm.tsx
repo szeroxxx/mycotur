@@ -54,7 +54,6 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
   const [locationError, setLocationError] = useState<string | null>(null);
   const locationRef = useRef<HTMLDivElement>(null);
 
-  // Phone validation state
   const [phoneError, setPhoneError] = useState<string | null>(null);
 
   const [previewImages, setPreviewImages] = useState<string[]>([]);
@@ -476,7 +475,6 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
       return;
     }
 
-    // Validate phone number if provided
     if (activity.phone && activity.phone.trim()) {
       const phoneValidation = validateSpanishPhoneNumber(activity.phone);
       if (!phoneValidation.isValid) {

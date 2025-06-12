@@ -1,5 +1,7 @@
 import React from "react";
-
+import { GoMail } from "react-icons/go";
+import { LuExternalLink } from "react-icons/lu";
+import { FaWhatsapp } from "react-icons/fa";
 interface ActivityContactModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -34,7 +36,8 @@ const ActivityContactModal: React.FC<ActivityContactModalProps> = ({
               <label className="block text-sm font-medium text-[rgb(68,63,63)]">
                 Correo electrónico
               </label>
-              <div className="w-full p-1 text-[rgb(68,63,63)]">
+              <div className="flex items-center w-full p-1 text-[rgb(68,63,63)]">
+                <GoMail className="mr-1 h-5 w-5" />
                 {contactInfo.email}
               </div>
             </div>
@@ -44,7 +47,8 @@ const ActivityContactModal: React.FC<ActivityContactModalProps> = ({
               <label className="block text-sm font-medium text-[rgb(68,63,63)]">
                 Número de teléfono
               </label>
-              <div className="w-full p-1 text-[rgb(68,63,63)]">
+              <div className="flex items-center w-full p-1 text-[rgb(68,63,63)]">
+                <FaWhatsapp className="mr-1 h-5 w-5 text-[#D45B20]" />
                 <a
                   href={`https://wa.me/${contactInfo.phone.replace(
                     /\s+/g,
@@ -66,12 +70,13 @@ const ActivityContactModal: React.FC<ActivityContactModalProps> = ({
               <label className="block text-sm font-medium text-[rgb(68,63,63)] mb-1">
                 Página web o redes sociales
               </label>
-              <div className="w-full p-1 text-[rgb(68,63,63)]">
+              <div className="flex items-center w-full p-1 text-[rgb(68,63,63)]">
+                <LuExternalLink className="mr-1 text-[#D45B20] h-5 w-5" />{" "}
                 <a
                   href={contactInfo.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#D45B20] hover:underline"
+                  className="text-[#D45B20] hover:underline leading-5"
                 >
                   {contactInfo.link}
                 </a>

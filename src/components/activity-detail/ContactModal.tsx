@@ -1,4 +1,7 @@
 import React from "react";
+import { GoMail } from "react-icons/go";
+import { FaFacebookF, FaInstagram } from "react-icons/fa";
+import { SlSocialYoutube } from "react-icons/sl";
 
 interface ContactModalProps {
   isOpen: boolean;
@@ -33,7 +36,8 @@ const ContactModal: React.FC<ContactModalProps> = ({
               <label className="block text-sm font-medium text-[rgb(68,63,63)]">
                 Correo electrónico
               </label>
-              <div className="w-full p-1 text-[rgb(68,63,63)]">
+              <div className="flex items-center w-full p-1 text-[rgb(68,63,63)]">
+                <GoMail className="mr-1 h-5 w-5" />
                 {contactInfo.email}
               </div>
             </div>
@@ -43,7 +47,8 @@ const ContactModal: React.FC<ContactModalProps> = ({
               <label className="block text-sm font-medium text-[rgb(68,63,63)]">
                 Facebook
               </label>
-              <div className="w-full p-1 text-[rgb(68,63,63)] ">
+              <div className="flex items-center w-full p-1 text-[rgb(68,63,63)]">
+                <FaFacebookF className="mr-1 h-5 w-5 text-[#D45B20]" />
                 <a
                   href={contactInfo.facebook}
                   target="_blank"
@@ -60,7 +65,8 @@ const ContactModal: React.FC<ContactModalProps> = ({
               <label className="block text-sm font-medium text-[rgb(68,63,63)] mb-1">
                 Instagram
               </label>
-              <div className="w-full p-1 text-[rgb(68,63,63)]">
+              <div className="flex items-center w-full p-1 text-[rgb(68,63,63)]">
+                <FaInstagram className="mr-1 h-5 w-5 text-[#D45B20]" />
                 <a
                   href={contactInfo.instagram}
                   target="_blank"
@@ -77,7 +83,8 @@ const ContactModal: React.FC<ContactModalProps> = ({
               <label className="block text-sm font-medium text-[rgb(68,63,63)] mb-1">
                 YouTube
               </label>
-              <div className="w-full p-1 text-[rgb(68,63,63)]">
+              <div className="flex items-center w-full p-1 text-[rgb(68,63,63)]">
+                <SlSocialYoutube className="mr-1 h-5 w-5 text-[#D45B20]" />
                 <a
                   href={contactInfo.youtube}
                   target="_blank"

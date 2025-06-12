@@ -1,4 +1,7 @@
 import React from "react";
+import { GoMail } from "react-icons/go";
+import { FaWhatsapp } from "react-icons/fa";
+import { LuExternalLink } from "react-icons/lu";
 
 interface EventsContactModalProps {
   isOpen: boolean;
@@ -34,7 +37,8 @@ const EventsContactModal: React.FC<EventsContactModalProps> = ({
               <label className="block text-sm font-medium text-[rgb(68,63,63)]">
                 Correo electrónico
               </label>
-              <div className="w-full p-1 text-[rgb(68,63,63)]">
+              <div className="flex items-center w-full p-1 text-[rgb(68,63,63)]">
+                <GoMail className="mr-1 h-5 w-5 " />
                 {contactInfo.email}
               </div>
             </div>
@@ -44,7 +48,8 @@ const EventsContactModal: React.FC<EventsContactModalProps> = ({
               <label className="block text-sm font-medium text-[rgb(68,63,63)]">
                 Número de teléfono
               </label>
-              <div className="w-full p-1 text-[rgb(68,63,63)]">
+              <div className="flex items-center w-full p-1 text-[rgb(68,63,63)]">
+                <FaWhatsapp className="mr-1 h-5 w-5 text-[#D45B20]" />
                 <a
                   href={`https://wa.me/${contactInfo.phone.replace(
                     /\s+/g,
@@ -66,7 +71,8 @@ const EventsContactModal: React.FC<EventsContactModalProps> = ({
               <label className="block text-sm font-medium text-[rgb(68,63,63)] mb-1">
                 Página web o redes sociales
               </label>
-              <div className="w-full p-1 text-[rgb(68,63,63)]">
+              <div className="flex items-center w-full p-1 text-[rgb(68,63,63)]">
+                <LuExternalLink className="mr-1 h-5 w-5 text-[#D45B20]" />
                 <a
                   href={contactInfo.link}
                   target="_blank"

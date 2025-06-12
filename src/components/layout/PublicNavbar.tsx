@@ -24,9 +24,8 @@ const PublicNavbar = () => {
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
   };
-
   const handleExternalLink = (url: string) => {
-    window.open(url, '_blank', 'noopener,noreferrer');
+    window.location.href = url;
   };
 
   return (
@@ -61,7 +60,6 @@ const PublicNavbar = () => {
                 </button>
               </div>
 
-              {/* Desktop Navigation - Hidden on mobile/tablet */}
               <div className="hidden xl:flex items-center justify-center flex-1 mx-8">
                 <div className="flex items-center space-x-2 2xl:space-x-6">
                   {navItems.map((item) => {
@@ -98,10 +96,7 @@ const PublicNavbar = () => {
                 </div>
               </div>
 
-              {/* Spacer for desktop balance */}
               <div className="hidden xl:block flex-shrink-0 w-[156px]"></div>
-
-              {/* Mobile/Tablet Menu Button - Show when navigation is hidden */}
               <button
                 onClick={toggleMobileMenu}
                 className="xl:hidden flex flex-col justify-center items-center w-8 h-8 space-y-1"
@@ -128,7 +123,6 @@ const PublicNavbar = () => {
         </nav>
       </header>
 
-      {/* Mobile/Tablet Menu Overlay */}
       {isMobileMenuOpen && (
         <div
           className="fixed inset-0 bg-white z-[10000] xl:hidden"

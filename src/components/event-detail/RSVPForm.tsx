@@ -250,6 +250,12 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
               value={formData.firstName}
               onChange={handleInputChange}
               required
+              onInvalid={(e: React.InvalidEvent<HTMLInputElement>) => {
+                e.currentTarget.setCustomValidity('Este campo es obligatorio');
+              }}
+              onInput={(e: React.FormEvent<HTMLInputElement>) => {
+                e.currentTarget.setCustomValidity('');
+              }}
             />
             {fieldErrors.firstName && (
               <div className="text-red-500 text-xs mt-1">
@@ -274,6 +280,12 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
               value={formData.phoneNumber}
               onChange={handleInputChange}
               required
+              onInvalid={(e: React.InvalidEvent<HTMLInputElement>) => {
+                e.currentTarget.setCustomValidity('Este campo es obligatorio');
+              }}
+              onInput={(e: React.FormEvent<HTMLInputElement>) => {
+                e.currentTarget.setCustomValidity('');
+              }}
             />
             {fieldErrors.phoneNumber && (
               <div className="text-red-500 text-xs mt-1">
@@ -299,6 +311,12 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
               value={formData.email}
               onChange={handleInputChange}
               required
+              onInvalid={(e: React.InvalidEvent<HTMLInputElement>) => {
+                e.currentTarget.setCustomValidity('Este campo es obligatorio');
+              }}
+              onInput={(e: React.FormEvent<HTMLInputElement>) => {
+                e.currentTarget.setCustomValidity('');
+              }}
             />
             {fieldErrors.email && (
               <div className="text-red-500 text-xs mt-1">
@@ -325,6 +343,12 @@ const RSVPForm: React.FC<RSVPFormProps> = ({
               value={formData.numberOfPeople}
               onChange={handleInputChange}
               required
+              onInvalid={(e: React.InvalidEvent<HTMLInputElement>) => {
+                e.currentTarget.setCustomValidity('Este campo es obligatorio');
+              }}
+              onInput={(e: React.FormEvent<HTMLInputElement>) => {
+                e.currentTarget.setCustomValidity('');
+              }}
             />
             {fieldErrors.numberOfPeople && (
               <div className="text-red-500 text-xs mt-1">

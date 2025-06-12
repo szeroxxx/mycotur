@@ -49,7 +49,6 @@ export const ActivityRow: React.FC<ActivityRowProps> = ({
       <td className="py-4 px-6 text-sm text-[#82abcb] max-w-xs">
         <a
           href={createActivityUrl(activity.title, activity.uuid)}
-          target="_blank"
           rel="noopener noreferrer"
           className="cursor-pointer hover:text-[#111827] hover:underline transition-colors"
           title={activity.title}
@@ -57,6 +56,7 @@ export const ActivityRow: React.FC<ActivityRowProps> = ({
           {activity.title}
         </a>
       </td>
+
       <td className="py-4 px-6 text-sm text-[rgba(68,63,63)] max-w-xs relative">
         <div
           className="truncate"

@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Head from "next/head";
 import { Map, List, X } from "lucide-react";
+import { useRouter } from "next/router";
 import PublicLayout from "@/components/layout/PublicLayout";
 import ActivityCard from "@/components/activity-map/ActivityCard";
 import { useActivitiesData } from "@/hooks/useActivitiesData";
 import SearchBar from "@/components/ui/SearchBar";
-// import { useActivityLocations } from "@/hooks/useActivityLocations";
 import dynamic from "next/dynamic";
 
 const DynamicMapView = dynamic(
@@ -14,6 +14,7 @@ const DynamicMapView = dynamic(
 );
 
 const ActivityMapPage = () => {
+  const router = useRouter();
   const {
     filteredActivities,
     loading,
@@ -23,22 +24,26 @@ const ActivityMapPage = () => {
     setSearchLocation,
   } = useActivitiesData();
 
-  // const {
-  //   locations: activityLocations,
-  //   // isLoading: locationsLoading
-  // } = useActivityLocations();  // const [locationFilter, setLocationFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [showMobileMap, setShowMobileMap] = useState(false);
 
+  useEffect(() => {
+    const { category } = router.query;
+    if (category && typeof category === "string") {
+      setCategoryFilter(category);
+    }
+  }, [router.query]);
+
   const handleFilterChange = useCallback(
     (type: "location" | "category", value: string) => {
-      // if (type === "location") {
-      //   setLocationFilter(value === "Ubicación" ? "" : value);
-      // } else {
-      setCategoryFilter(value === "Categoría de la actividad" ? "" : value);
-      // }
+      if (type === "category") {
+        setCategoryFilter(value === "Categoría de la actividad" ? "" : value);
+        const newUrl =
+          value === "Categoría de la actividad" ? "/mapa" : `/mapa/${value}`;
+        router.push(newUrl, undefined, { shallow: true });
+      }
     },
-    []
+    [router]
   );
 
   useEffect(() => {
@@ -48,12 +53,6 @@ const ActivityMapPage = () => {
   useEffect(() => {
     setSearchLocation(null);
   }, [setSearchLocation]);
-
-  // useEffect(() => {
-  //   if (locationFilter || categoryFilter) {
-  //     filterActivities("", locationFilter, categoryFilter);
-  //   }
-  // }, [locationFilter, categoryFilter]);
 
   return (
     <PublicLayout>

@@ -23,8 +23,7 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     if (error.response?.status === 403 || error.response?.status === 401) {
       try {
-        const currentPath = window.location.pathname;
-        const publicRoutes = [
+        const currentPath = window.location.pathname;        const publicRoutes = [
           "/",
           "/home",
           "/about",
@@ -42,7 +41,9 @@ axiosInstance.interceptors.response.use(
           currentPath.startsWith("/register/") ||
           currentPath.startsWith("/organizadores/") ||
           currentPath.startsWith("/activity-details/") ||
-          currentPath.startsWith("/event-detail/")
+          currentPath.startsWith("/event-detail/") ||
+          currentPath.startsWith("/mapa/") ||
+          currentPath.startsWith("/calendario-eventos/")
         );
 
         if (isPublicRoute) {

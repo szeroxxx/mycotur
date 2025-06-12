@@ -98,7 +98,6 @@ export const EventRow: React.FC<EventRowProps> = ({
       <td className="py-4 px-6 text-sm text-[#82abcb] max-w-xs">
         <a
           href={createEventUrl(event.event, event.id)}
-          target="_blank"
           rel="noopener noreferrer"
           className="cursor-pointer hover:text-[#111827] hover:underline transition-colors"
           title={event.event}
