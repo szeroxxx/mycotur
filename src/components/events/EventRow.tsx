@@ -89,8 +89,9 @@ export const EventRow: React.FC<EventRowProps> = ({
 
   return (
     <tr className="border-b border-[#F3F4F6] hover:bg-[#F9FAFB]">
+      {" "}
       <td className="py-4 px-6 whitespace-nowrap text-sm text-[rgba(68,63,63)]">
-        {event.activityName}
+        {event.activityName || "-"}
       </td>
       {/* <td className="py-4 px-6 whitespace-nowrap text-sm text-[rgba(68,63,63)]">
         {event.event}

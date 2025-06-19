@@ -23,7 +23,7 @@ interface ApiEventItem {
   activityId: number;
   activityTitle: string;
   category: string;
-  categories?: string[]; 
+  categories?: string[];
   location: string;
   date: string;
   time: string;
@@ -124,13 +124,12 @@ export const useEvents = () => {
             },
           }
         );
-
         if (response.data && Array.isArray(response.data.data)) {
           const fetchedEvents: Event[] = response.data.data.map(
             (item: ApiEventItem) => ({
               id: item.uuid,
               activityName: item.activityTitle,
-              activityId: item.activityId.toString(),
+              activityId: item.activityId ? item.activityId.toString() : null,
               event: item.title,
               location: item.location,
               eventDate: item.date,
@@ -196,8 +195,7 @@ export const useEvents = () => {
           !event.event ||
           (!event.category &&
             (!event.categories || event.categories.length === 0)) ||
-          !event.email ||
-          !event.activityId
+          !event.email
         ) {
           showToast(
             "error",
@@ -239,7 +237,12 @@ export const useEvents = () => {
             formData.append("videos", video);
           }
         }
-        formData.append("activityId", event.activityId.toString());
+
+        // Only append activityId if it exists (not null for standalone events)
+        if (event.activityId) {
+          formData.append("activityId", event.activityId.toString());
+        }
+
         formData.append("title", event.event);
 
         if (event.categories && event.categories.length > 0) {
@@ -397,7 +400,11 @@ export const useEvents = () => {
             formData.append("videos", video);
           }
         }
-        formData.append("activityId", event.activityId.toString());
+
+        if (event.activityId) {
+          formData.append("activityId", event.activityId.toString());
+        }
+
         formData.append("title", event.event);
 
         if (event.categories && event.categories.length > 0) {

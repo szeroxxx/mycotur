@@ -15,7 +15,7 @@ import { CircleCheck } from "lucide-react";
 const emptyEvent: Event = {
   id: "",
   activityName: "",
-  activityId: "",
+  activityId: null,
   event: "",
   eventDate: "",
   eventTime: "",

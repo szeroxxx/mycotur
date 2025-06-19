@@ -18,6 +18,7 @@ import axiosInstance from "@/utils/axiosConfig";
 const submitRSVP = async (
   rsvpData: RSVPFormData,
   organizerData: { email: string; id: string },
+  activityTitle: string,
   showToast: (type: "success" | "error", message: string) => void
 ): Promise<boolean> => {
   try {
@@ -25,6 +26,7 @@ const submitRSVP = async (
       ...rsvpData,
       organizerMail: organizerData.email,
       organizerId: organizerData.id,
+      activityTitle: activityTitle,
     });
 
     if (response.status === 200 || response.status === 201) {
@@ -81,6 +83,7 @@ const ActivityDetailPage: React.FC = () => {
         email: activityData.organizer.socialLinks.email || "",
         id: activityData.organizer.id,
       },
+      activityData.title,
       showToast
     );
     if (!success) {

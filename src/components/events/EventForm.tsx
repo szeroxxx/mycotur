@@ -67,16 +67,17 @@ export const EventForm: React.FC<EventFormProps> = ({
   );
   const [categoriesError, setCategoriesError] = useState<string | null>(null);
 
-  // Phone validation state
   const [phoneError, setPhoneError] = useState<string | null>(null);
   const [urlError, setUrlError] = useState<string | null>(null);
-
   const [previewImages, setPreviewImages] = useState<string[]>([]);
   const [previewVideos, setPreviewVideos] = useState<string[]>([]);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const [hoverVideoIndex, setHoverVideoIndex] = useState<number | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isStandaloneEvent, setIsStandaloneEvent] = useState<boolean>(
+    Boolean(event.id && (!event.activityId || event.activityId === ""))
+  );
   useEffect(() => {
     if (event.location && event.location !== locationInput) {
       setLocationInput(event.location);
@@ -84,12 +85,16 @@ export const EventForm: React.FC<EventFormProps> = ({
       setLocationError(null);
     }
   }, [event.location]);
-
   useEffect(() => {
     const eventCategories =
       event.categories || (event.category ? [event.category] : []);
     setSelectedCategories(eventCategories);
   }, [event.categories, event.category]);
+  useEffect(() => {
+    setIsStandaloneEvent(
+      Boolean(event.id && (!event.activityId || event.activityId === ""))
+    );
+  }, [event.activityId, event.id]);
 
   const handleCategoryChange = (categoryTitle: string) => {
     const updatedCategories = selectedCategories.includes(categoryTitle)
@@ -150,11 +155,25 @@ export const EventForm: React.FC<EventFormProps> = ({
       }
     }
   };
-
   const handleRegularActivitySelect = (
     e: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    onChange(e);
+    const value = e.target.value;
+
+    if (value === "standalone") {
+      setIsStandaloneEvent(true);
+      onChange({
+        ...e,
+        target: {
+          ...e.target,
+          name: "activityId",
+          value: "",
+        },
+      } as React.ChangeEvent<HTMLSelectElement>);
+    } else {
+      setIsStandaloneEvent(false);
+      onChange(e);
+    }
   };
   const handleLocationChange = async (
     e: React.ChangeEvent<HTMLInputElement>
@@ -661,17 +680,27 @@ export const EventForm: React.FC<EventFormProps> = ({
 
   return (
     <form onSubmit={handleFormSubmit} className="space-y-6">
+      {" "}
       <div>
         <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
-          Rellenar automáticamente con una actividad existente (opcional)
-        </label>
+          ¿Está el evento relacionado con alguna actividad?{" "}
+          <RequiredIndicator />
+        </label>{" "}
         <select
-          name="activityName"
-          value={event.activityId?.toString() || ""}
-          onChange={handleAutoFillActivitySelect}
+          name="activityId"
+          value={
+            isStandaloneEvent
+              ? "standalone"
+              : event.activityId?.toString() || ""
+          }
+          onChange={handleRegularActivitySelect}
           className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
+          required
         >
           <option value="">Selecciona una actividad</option>
+          <option value="standalone">
+            No, es un evento puntual, distinto a mis actividades normales
+          </option>
           {activities.map((activity) => (
             <option key={activity.id} value={activity.id.toString()}>
               {activity.title}
@@ -681,14 +710,15 @@ export const EventForm: React.FC<EventFormProps> = ({
       </div>
       <div>
         <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
-          Actividad relacionada <RequiredIndicator />
-        </label>{" "}
+          Rellenar automaticamente con una actividad existente: ¿Quieres
+          rellenar automáticamente este evento con datos de una actividad ya
+          existente? (opcional)
+        </label>
         <select
-          name="activityId"
+          name="activityName"
           value={event.activityId?.toString() || ""}
-          onChange={handleRegularActivitySelect}
+          onChange={handleAutoFillActivitySelect}
           className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
-          required
         >
           <option value="">Selecciona una actividad</option>
           {activities.map((activity) => (

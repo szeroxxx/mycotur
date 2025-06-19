@@ -117,11 +117,14 @@ const DiscoverOrganiserPage = () => {
         </div>
       </PublicLayout>
     );
-  }
-  return (
+  }  return (
     <PublicLayout>
       <Head>
-        <title>Discover Organisers | Mycotur</title>
+        <title>Organizadores Micológicos de Ávila | Ávila Mycotour</title>
+        <meta 
+          name="description" 
+          content="Conoce a los organizadores del micoturismo en Ávila: asociaciones, guías, centros y expertos que ofrecen actividades únicas todo el año." 
+        />
       </Head>
 
       <div className="hidden lg:block min-h-screen bg-gradient-to-br from-[rgba(244,242,242)] to-[rgba(248,250,252)]">

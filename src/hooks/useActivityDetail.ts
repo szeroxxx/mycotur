@@ -45,7 +45,8 @@ interface RawActivityDetailData {
 
 export interface ActivityDetailData {
   id: string;
-  title: string;  photos: {
+  title: string;
+  photos: {
     id: string;
     url: string;
     alt: string;
@@ -105,7 +106,8 @@ export const useActivityDetail = (uuid: string | undefined) => {
   ): ActivityDetailData => {
     return {
       id: data.uuid,
-      title: data.title,      photos: data.photos.map((media, index) => ({
+      title: data.title,
+      photos: data.photos.map((media, index) => ({
         id: (index + 1).toString(),
         url: getMediaUrl(media.name),
         alt: `${data.title} - Media ${index + 1}`,
@@ -114,15 +116,14 @@ export const useActivityDetail = (uuid: string | undefined) => {
       totalPhotos: data.photos.length,
       category: data.category,
       categories: data.categories || (data.category ? [data.category] : []),
-      eventDates: data.eventDates || [],
-      seasons: {
+      eventDates: data.eventDates || [],      seasons: {
         availableMonths: `${
           data.title
-        } Esta actividad se puede organizar normalmente entre  ${new Date(
+        } se puede organizar normalmente entre  ${new Date(
           data.startMonth
-        ).toLocaleDateString("en-US", { month: "long" })} y ${new Date(
+        ).toLocaleDateString("es-ES", { month: "long" })} y ${new Date(
           data.endMonth
-        ).toLocaleDateString("en-US", {
+        ).toLocaleDateString("es-ES", {
           month: "long",
         })} `,
         unavailableMonths: undefined,
@@ -162,7 +163,8 @@ export const useActivityDetail = (uuid: string | undefined) => {
 
   useEffect(() => {
     const fetchActivityDetail = async () => {
-      if (!uuid) return;      try {
+      if (!uuid) return;
+      try {
         setLoading(true);
         setError(null);
         const URL = process.env.NEXTAUTH_BACKEND_URL;

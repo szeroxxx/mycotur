@@ -1,7 +1,7 @@
 export interface Event {
   id: string;
   activityName: string;
-  activityId: string;
+  activityId?: string | null;
   event: string;
   eventDate: string;
   eventTime: string;

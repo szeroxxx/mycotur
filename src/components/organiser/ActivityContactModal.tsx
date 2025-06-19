@@ -54,7 +54,7 @@ const ActivityContactModal: React.FC<ActivityContactModalProps> = ({
                     /\s+/g,
                     ""
                   )}?text=${encodeURIComponent(
-                    `Hola, estoy interesado en la actividad "${title}". ¿Podrías darme más información?`
+                    `Hola, he visto vuestra actividad en Ávila Mycotour y me interesa realizar "${title}". ¿Podrías darme más información? Gracias!`
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"

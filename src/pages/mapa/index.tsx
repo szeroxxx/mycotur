@@ -53,11 +53,14 @@ const ActivityMapPage = () => {
   useEffect(() => {
     setSearchLocation(null);
   }, [setSearchLocation]);
-
   return (
     <PublicLayout>
       <Head>
-        <title>Activity Map | Mycotur</title>
+        <title>Catálogo de Actividades de Micoturismo | Ávila Mycotour</title>
+        <meta 
+          name="description" 
+          content="Filtra por zona, tipo de actividad o fecha y descubre experiencias micológicas en toda Ávila. Desde rutas guiadas hasta talleres y recolección de setas." 
+        />
       </Head>
       <div className="hidden lg:flex h-[calc(100vh-5rem)] overflow-hidden scrollbar-hide">
         <div className="w-1/3 flex flex-col border-r border-[rgba(226,225,223,0.6)]">

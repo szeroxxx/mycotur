@@ -126,11 +126,11 @@ const EventDetails: React.FC<EventDetailsProps> = ({
         <h3 className="text-lg font-semibold text-[rgba(68,63,63)] mb-4">
           Descripción
         </h3>
-        <p className="text-sm text-[rgba(100,92,90)] leading-relaxed">
+        <p className="text-sm text-[rgba(100,92,90)] leading-relaxed whitespace-pre-wrap">
           {description.main}
         </p>
         {description.additional && (
-          <p className="text-sm text-[rgba(100,92,90)] leading-relaxed mt-3">
+          <p className="text-sm text-[rgba(100,92,90)] leading-relaxed mt-3 whitespace-pre-wrap">
             {description.additional}
           </p>
         )}

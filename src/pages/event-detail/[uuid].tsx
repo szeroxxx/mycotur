@@ -19,6 +19,7 @@ import { RSVPFormData } from "@/components/event-detail/RSVPForm";
 const submitRSVP = async (
   rsvpData: RSVPFormData,
   organizerData: { email: string; id: string },
+  eventTitle: string,
   showToast: (type: "success" | "error", message: string) => void
 ): Promise<boolean> => {
   try {
@@ -26,6 +27,7 @@ const submitRSVP = async (
       ...rsvpData,
       organizerMail: organizerData.email,
       organizerId: organizerData.id,
+      eventTitle: eventTitle,
     });
 
     if (response.status === 200 || response.status === 201) {
@@ -83,6 +85,7 @@ const EventDetailPage: React.FC = () => {
         email: eventData.organizer.socialLinks.email || "",
         id: eventData.organizer.id,
       },
+      eventData.title,
       showToast
     );
 
@@ -219,12 +222,8 @@ const EventDetailPage: React.FC = () => {
                       className="text-lg font-semibold mb-4 leading-tight"
                       style={{ color: "rgba(68, 63, 63, 1)" }}
                     >
-                      Este evento ya{" "}
-                      <span style={{ color: "rgba(22, 163, 74, 1)" }}>
-                        acabó
-                      </span>{" "}
-                      Contacta al organizador para realizar esta actividad
-                      cuando mejor te venga
+                      Este evento ya acabó Contacta al organizador para realizar
+                      esta actividad cuando mejor te venga
                     </h3>
                     <Button
                       variant="outline"
@@ -260,12 +259,8 @@ const EventDetailPage: React.FC = () => {
                     className="text-lg font-semibold mb-4 leading-tight"
                     style={{ color: "rgba(68, 63, 63, 1)" }}
                   >
-                    Este evento ya{" "}
-                    <span style={{ color: "rgba(22, 163, 74, 1)" }}>
-                      acabó
-                    </span>{" "}
-                    Contacta al organizador para realizar esta actividad cuando
-                    mejor te venga
+                    Este evento ya acabó Contacta al organizador para realizar
+                    esta actividad cuando mejor te venga
                   </h3>
                   <Button
                     variant="outline"
