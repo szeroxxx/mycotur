@@ -14,7 +14,7 @@ interface ApiActivityResponse {
   id: number;
   uuid: string;
   title: string;
-  category?: string; 
+  category?: string;
   categories?: string[];
   location: string;
   lat: string;
@@ -124,9 +124,8 @@ export const useActivities = () => {
     ) => {
       try {
         const formData = new FormData();
-
         if (activity.images && activity.images.length > 0) {
-          const maxSize = 10 * 1024 * 1024;
+          const maxSize = 15 * 1024 * 1024;
           const allowedImageTypes = ["image/jpeg", "image/png", "image/webp"];
 
           for (const image of activity.images) {
@@ -135,7 +134,7 @@ export const useActivities = () => {
               return;
             }
             if (image.size > maxSize) {
-              showToast("error", "Las imágenes deben ser inferiores a 10MB");
+              showToast("error", "Las imágenes deben ser inferiores a 15MB");
               return;
             }
           }
@@ -235,7 +234,7 @@ export const useActivities = () => {
         const formData = new FormData();
 
         if (activity.images && activity.images.length > 0) {
-          const maxSize = 15 * 1024 * 1024; 
+          const maxSize = 15 * 1024 * 1024;
           const allowedImageTypes = ["image/jpeg", "image/png", "image/webp"];
 
           for (const image of activity.images) {

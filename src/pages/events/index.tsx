@@ -118,13 +118,20 @@ const EventsPage: React.FC = () => {
 
     setSelectedEvent((prev) => ({
       ...prev!,
-      activityId: activity.id,
-      activityName: activity.title,
+      event: activity.title,
       description: activity.description,
       email: activity.email,
       phone: activity.phone,
       url: activity.url,
       fees: activity.notes,
+      // location: activity.location,
+      // lat: parseFloat(activity.lat) || 0,
+      // lon: parseFloat(activity.lon) || 0,
+      categories: activity.categories || [],
+      category:
+        activity.categories && activity.categories.length > 0
+          ? activity.categories[0]
+          : "",
     }));
   };
 
@@ -165,13 +172,16 @@ const EventsPage: React.FC = () => {
 
     setIsSubmitting(true);
     try {
+      let result;
       if (selectedEvent.id) {
-        await updateEvent(selectedEvent);
+        result = await updateEvent(selectedEvent);
       } else {
-        await createEvent(selectedEvent);
+        result = await createEvent(selectedEvent);
       }
-      setIsModalOpen(false);
-      setSelectedEvent(null);
+      if (result) {
+        setIsModalOpen(false);
+        setSelectedEvent(null);
+      }
     } catch (err) {
       showToast(
         "error",

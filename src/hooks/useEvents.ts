@@ -4,7 +4,7 @@ import axios from "axios";
 import axiosInstance from "../utils/axiosConfig";
 
 const ITEMS_PER_PAGE = 10;
-const MAX_FILE_SIZE_MB = 5;
+const MAX_FILE_SIZE_MB = 15;
 const ALLOWED_FILE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const ALLOWED_VIDEO_TYPES = ["video/mp4", "video/webm", "video/mov"];
 const MAX_VIDEO_SIZE_MB = 15;

@@ -11,7 +11,7 @@ import {
 import { validateSpanishPhoneNumber } from "../../utils/phoneValidation";
 import { validateUrl } from "../../utils/urlValidation";
 
-const MAX_FILE_SIZE_MB = 10;
+const MAX_FILE_SIZE_MB = 15;
 const MAX_VIDEO_SIZE_MB = 15;
 const MAX_IMAGES = 10;
 const MAX_VIDEOS = 3;
@@ -78,6 +78,28 @@ export const EventForm: React.FC<EventFormProps> = ({
   const [isStandaloneEvent, setIsStandaloneEvent] = useState<boolean>(
     Boolean(event.id && (!event.activityId || event.activityId === ""))
   );
+  const [autoFillActivityId, setAutoFillActivityId] = useState<string>("");
+  const handleInvalidInput = (
+    e: React.FormEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    const target = e.currentTarget;
+    if (target.validity.valueMissing) {
+      target.setCustomValidity("Este campo es obligatorio.");
+    } else {
+      target.setCustomValidity("");
+    }
+  };
+
+  const handleInputChange = (
+    e: React.FormEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    e.currentTarget.setCustomValidity("");
+  };
+
   useEffect(() => {
     if (event.location && event.location !== locationInput) {
       setLocationInput(event.location);
@@ -91,10 +113,12 @@ export const EventForm: React.FC<EventFormProps> = ({
     setSelectedCategories(eventCategories);
   }, [event.categories, event.category]);
   useEffect(() => {
-    setIsStandaloneEvent(
-      Boolean(event.id && (!event.activityId || event.activityId === ""))
-    );
-  }, [event.activityId, event.id]);
+    if (event.id) {
+      setIsStandaloneEvent(
+        Boolean(!event.activityId || event.activityId === "")
+      );
+    }
+  }, [event.id]);
 
   const handleCategoryChange = (categoryTitle: string) => {
     const updatedCategories = selectedCategories.includes(categoryTitle)
@@ -112,36 +136,27 @@ export const EventForm: React.FC<EventFormProps> = ({
       onCategoriesChange(updatedCategories);
     }
   };
-
   const handleAutoFillActivitySelect = (
     e: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    const selectedId = e.target.value ? Number(e.target.value) : null;
+    const selectedId = e.target.value;
+    setAutoFillActivityId(selectedId);
+
     const selectedActivity = selectedId
-      ? activities.find((activity) => Number(activity.id) === selectedId)
+      ? activities.find((activity) => activity.id.toString() === selectedId)
       : undefined;
 
-    if (onActivitySelect) {
-      onActivitySelect(selectedActivity);
-    }
-    onChange({
-      ...e,
-      target: {
-        ...e.target,
-        name: "activityId",
-        value: e.target.value,
-      },
-    } as React.ChangeEvent<HTMLSelectElement>);
-
     if (selectedActivity) {
-      onChange({
-        ...e,
-        target: {
-          ...e.target,
-          name: "activityName",
-          value: selectedActivity.title,
-        },
-      } as React.ChangeEvent<HTMLSelectElement>);
+      if (selectedActivity.title) {
+        onChange({
+          ...e,
+          target: {
+            ...e.target,
+            name: "event",
+            value: selectedActivity.title,
+          },
+        } as React.ChangeEvent<HTMLSelectElement>);
+      }
 
       if (selectedActivity.description) {
         onChange({
@@ -152,6 +167,67 @@ export const EventForm: React.FC<EventFormProps> = ({
             value: selectedActivity.description,
           },
         } as React.ChangeEvent<HTMLSelectElement>);
+      }
+
+      if (selectedActivity.email) {
+        onChange({
+          ...e,
+          target: {
+            ...e.target,
+            name: "email",
+            value: selectedActivity.email,
+          },
+        } as React.ChangeEvent<HTMLSelectElement>);
+      }
+
+      if (selectedActivity.phone) {
+        onChange({
+          ...e,
+          target: {
+            ...e.target,
+            name: "phone",
+            value: selectedActivity.phone,
+          },
+        } as React.ChangeEvent<HTMLSelectElement>);
+      }
+
+      if (selectedActivity.url) {
+        onChange({
+          ...e,
+          target: {
+            ...e.target,
+            name: "url",
+            value: selectedActivity.url,
+          },
+        } as React.ChangeEvent<HTMLSelectElement>);
+      }      if (selectedActivity.notes) {
+        onChange({
+          ...e,
+          target: {
+            ...e.target,
+            name: "fees",
+            value: selectedActivity.notes,
+          },
+        } as React.ChangeEvent<HTMLSelectElement>);
+      }
+
+      if (
+        selectedActivity.categories &&
+        selectedActivity.categories.length > 0
+      ) {
+        setSelectedCategories(selectedActivity.categories);
+        setCategoriesError(null);
+
+        if (onCategoriesChange) {
+          onCategoriesChange(selectedActivity.categories);
+        }
+      }
+      if (onActivitySelect) {
+        onActivitySelect(selectedActivity);
+      }
+    } else {
+      if (onActivitySelect) {
+        onActivitySelect(undefined);
       }
     }
   };
@@ -452,11 +528,12 @@ export const EventForm: React.FC<EventFormProps> = ({
 
     const imageFiles: File[] = [];
     const videoFiles: File[] = [];
-
     for (const file of newFiles) {
       if (ALLOWED_IMAGE_TYPES.includes(file.type)) {
-        if (file.size > 10 * 1024 * 1024) {
-          setUploadError(`La imagen ${file.name} excede el límite de 10MB`);
+        if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+          setUploadError(
+            `La imagen ${file.name} excede el límite de ${MAX_FILE_SIZE_MB}MB`
+          );
           return;
         }
         imageFiles.push(file);
@@ -694,6 +771,8 @@ export const EventForm: React.FC<EventFormProps> = ({
               : event.activityId?.toString() || ""
           }
           onChange={handleRegularActivitySelect}
+          onInvalid={handleInvalidInput}
+          onInput={handleInputChange}
           className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
           required
         >
@@ -713,10 +792,10 @@ export const EventForm: React.FC<EventFormProps> = ({
           Rellenar automaticamente con una actividad existente: ¿Quieres
           rellenar automáticamente este evento con datos de una actividad ya
           existente? (opcional)
-        </label>
+        </label>{" "}
         <select
-          name="activityName"
-          value={event.activityId?.toString() || ""}
+          name="autoFillActivity"
+          value={autoFillActivityId}
           onChange={handleAutoFillActivitySelect}
           className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
         >
@@ -731,12 +810,14 @@ export const EventForm: React.FC<EventFormProps> = ({
       <div>
         <label className="block text-sm font-medium text-[rgba(68,63,63)] mb-2">
           Nombre del evento <RequiredIndicator />
-        </label>
+        </label>{" "}
         <input
           type="text"
           name="event"
           value={event.event || ""}
           onChange={onChange}
+          onInvalid={handleInvalidInput}
+          onInput={handleInputChange}
           placeholder="Ej. Ruta micológica al atardecer"
           className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
           required
@@ -748,6 +829,7 @@ export const EventForm: React.FC<EventFormProps> = ({
             Fecha del Evento <RequiredIndicator />
           </label>
           <div className="relative">
+            {" "}
             <input
               type="date"
               name="eventDate"
@@ -757,6 +839,8 @@ export const EventForm: React.FC<EventFormProps> = ({
                   : ""
               }
               onChange={onChange}
+              onInvalid={handleInvalidInput}
+              onInput={handleInputChange}
               className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20] cursor-pointer"
               style={{
                 WebkitAppearance: "none",
@@ -791,6 +875,8 @@ export const EventForm: React.FC<EventFormProps> = ({
                   : ""
               }
               onChange={onChange}
+              onInvalid={handleInvalidInput}
+              onInput={handleInputChange}
               className="w-full px-4 py-2 border text-[rgba(142,133,129)] border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20] cursor-pointer"
               style={{
                 WebkitAppearance: "none",
@@ -856,11 +942,14 @@ export const EventForm: React.FC<EventFormProps> = ({
           Ubicación <RequiredIndicator />
         </label>
         <div className="relative" ref={locationRef}>
+          {" "}
           <input
             type="text"
             name="location"
             value={locationInput}
             onChange={handleLocationChange}
+            onInvalid={handleInvalidInput}
+            onInput={handleInputChange}
             placeholder="Buscar ubicaciones en Valle del Tiétar, Sierra de Gredos..."
             className={`w-full px-4 py-2 text-[rgba(142,133,129)] border rounded-lg text-sm focus:outline-none focus:ring-1 ${
               isValidLocation && event.location
@@ -871,7 +960,6 @@ export const EventForm: React.FC<EventFormProps> = ({
             }`}
             required
           />
-
           {isValidLocation && event.location && (
             <div className="mt-2 text-sm text-green-600 flex items-center gap-1">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -884,18 +972,15 @@ export const EventForm: React.FC<EventFormProps> = ({
               Ubicación válida seleccionada
             </div>
           )}
-
           {locationError && (
             <div className="mt-2 text-sm text-red-600">{locationError}</div>
           )}
-
           {!isValidLocation && !locationError && (
             <div className="mt-2 text-sm text-gray-500">
               Escriba para buscar y seleccione una ubicación de las sugerencias
               de Google Maps
             </div>
           )}
-
           {showSuggestions && suggestions.length > 0 && (
             <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
               {suggestions.map((suggestion) => (
@@ -933,11 +1018,14 @@ export const EventForm: React.FC<EventFormProps> = ({
           <RequiredIndicator />
         </label>
         <div className="space-y-4">
+          {" "}
           <input
             type="email"
             name="email"
             value={event.email || ""}
             onChange={onChange}
+            onInvalid={handleInvalidInput}
+            onInput={handleInputChange}
             placeholder="Dirección de correo electrónico"
             className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
             required
@@ -947,6 +1035,8 @@ export const EventForm: React.FC<EventFormProps> = ({
             name="phone"
             value={event.phone || ""}
             onChange={handlePhoneChange}
+            onInvalid={handleInvalidInput}
+            onInput={handleInputChange}
             placeholder="Número de teléfono"
             className={`w-full px-4 py-2 text-[rgba(142,133,129)] border rounded-lg text-sm focus:outline-none focus:ring-1 ${
               phoneError
@@ -957,13 +1047,15 @@ export const EventForm: React.FC<EventFormProps> = ({
           />{" "}
           {phoneError && (
             <p className="mt-1 text-sm text-red-600">{phoneError}</p>
-          )}
+          )}{" "}
           <input
             placeholder="Enlace (página web o redes)"
             type="text"
             name="url"
             value={event.url || ""}
             onChange={handleUrlChange}
+            onInvalid={handleInvalidInput}
+            onInput={handleInputChange}
             className={`w-full px-4 py-2 text-[rgba(142,133,129)] border rounded-lg text-sm focus:outline-none focus:ring-1 ${
               urlError
                 ? "border-red-500 focus:ring-red-500 focus:border-red-500"
@@ -995,8 +1087,10 @@ export const EventForm: React.FC<EventFormProps> = ({
           name="description"
           value={event.description || ""}
           onChange={onChange}
+          onInvalid={handleInvalidInput}
+          onInput={handleInputChange}
           maxLength={1000}
-          placeholder="Escribe más sobre el evento, horarios, punto de encuentro o detalles útiles"
+          placeholder="Escribe más sobre el evento, horarios, punto de encuentro o detalles útiles"
           rows={3}
           className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
           required
@@ -1141,7 +1235,7 @@ export const EventForm: React.FC<EventFormProps> = ({
               {uploadError ? (
                 <span className="text-red-500">{uploadError}</span>
               ) : (
-                `Images: ${currentImageCount}/${MAX_IMAGES} | Videos: ${currentVideoCount}/${MAX_VIDEOS} | Images: Max ${MAX_FILE_SIZE_MB}MB | Videos: Max ${MAX_VIDEO_SIZE_MB}MB`
+                `Imágenes: ${currentImageCount}/${MAX_IMAGES} | Vídeos: ${currentVideoCount}/${MAX_VIDEOS} | Máx. ${MAX_FILE_SIZE_MB}MB cada uno`
               )}
             </p>
             <p className="text-xs text-[#6B7280] mt-1">

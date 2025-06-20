@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axiosInstance from "../utils/axiosConfig";
 import { getMediaUrl } from "../utils/mediaHelpers";
+import { getSpanishMonthName } from "../utils/dateHelpers";
 
 interface RawActivityDetailData {
   id: number;
@@ -116,16 +117,13 @@ export const useActivityDetail = (uuid: string | undefined) => {
       totalPhotos: data.photos.length,
       category: data.category,
       categories: data.categories || (data.category ? [data.category] : []),
-      eventDates: data.eventDates || [],      seasons: {
+      eventDates: data.eventDates || [],
+      seasons: {
         availableMonths: `${
           data.title
-        } se puede organizar normalmente entre  ${new Date(
+        } se puede organizar normalmente entre ${getSpanishMonthName(
           data.startMonth
-        ).toLocaleDateString("es-ES", { month: "long" })} y ${new Date(
-          data.endMonth
-        ).toLocaleDateString("es-ES", {
-          month: "long",
-        })} `,
+        )} y ${getSpanishMonthName(data.endMonth)}`,
         unavailableMonths: undefined,
       },
       description: {

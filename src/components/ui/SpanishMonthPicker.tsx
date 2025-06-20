@@ -20,41 +20,29 @@ const SpanishMonthPicker: React.FC<SpanishMonthPickerProps> = ({
   placeholder = "Seleccionar mes",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedYear, setSelectedYear] = useState<number>(() => {
-    if (value) {
-      const [year] = value.split("-");
-      return parseInt(year, 10);
-    }
-    return new Date().getFullYear();
-  });
-
   const [selectedMonth, setSelectedMonth] = useState<number | null>(() => {
     if (value) {
-      const [, month] = value.split("-");
-      return parseInt(month, 10);
+      const monthValue = value.includes("-") ? value.split("-")[1] : value;
+      return parseInt(monthValue, 10);
     }
     return null;
   });
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 21 }, (_, i) => currentYear - 10 + i);
-
   const getDisplayText = () => {
     if (!value) return placeholder;
 
-    const [year, month] = value.split("-");
-    const monthNumber = parseInt(month, 10);
+    const monthValue = value.includes("-") ? value.split("-")[1] : value;
+    const monthNumber = parseInt(monthValue, 10);
     const spanishMonth = spanishMonths.find((m) => m.value === monthNumber);
 
-    return spanishMonth ? `${spanishMonth.name} ${year}` : value;
+    return spanishMonth ? spanishMonth.name : value;
   };
 
-  const handleSelection = (month: number, year: number) => {
-    const formattedValue = `${year}-${month.toString().padStart(2, "0")}`;
+  const handleSelection = (month: number) => {
+    const formattedValue = month.toString().padStart(2, "0");
     setSelectedMonth(month);
-    setSelectedYear(year);
     onChange(formattedValue);
     setIsOpen(false);
   };
@@ -87,51 +75,26 @@ const SpanishMonthPicker: React.FC<SpanishMonthPickerProps> = ({
             isOpen ? "rotate-180" : ""
           }`}
         />
-      </div>
-
+      </div>{" "}
       {isOpen && (
         <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border border-[#E5E7EB] rounded-lg shadow-lg max-h-80 overflow-hidden">
-          <div className="flex">
-            <div className="w-1/3 border-r border-[#E5E7EB]">
-              <div className="p-2 bg-gray-50 text-sm font-medium text-[rgba(68,63,63)] border-b border-[#E5E7EB]">
-                Año
-              </div>{" "}
-              <div className="max-h-60 overflow-y-auto scrollbar-hide">
-                {years.map((year) => (
-                  <div
-                    key={year}
-                    className={`p-2 text-sm cursor-pointer hover:bg-[#D45B20]/10 ${
-                      selectedYear === year
-                        ? "bg-[#D45B20]/20 text-[#D45B20] font-medium"
-                        : "text-[rgba(68,63,63)]"
-                    }`}
-                    onClick={() => setSelectedYear(year)}
-                  >
-                    {year}
-                  </div>
-                ))}
+          <div className="p-2 bg-gray-50 text-sm font-medium text-[rgba(68,63,63)] border-b border-[#E5E7EB]">
+            Seleccionar Mes
+          </div>
+          <div className="max-h-60 overflow-y-auto scrollbar-hide">
+            {spanishMonths.map((month) => (
+              <div
+                key={month.value}
+                className={`p-2 text-sm cursor-pointer hover:bg-[#D45B20]/10 ${
+                  selectedMonth === month.value
+                    ? "bg-[#D45B20]/20 text-[#D45B20] font-medium"
+                    : "text-[rgba(68,63,63)]"
+                }`}
+                onClick={() => handleSelection(month.value)}
+              >
+                {month.name}
               </div>
-            </div>
-            <div className="flex-1">
-              <div className="p-2 bg-gray-50 text-sm font-medium text-[rgba(68,63,63)] border-b border-[#E5E7EB]">
-                Mes
-              </div>{" "}
-              <div className="max-h-60 overflow-y-auto scrollbar-hide">
-                {spanishMonths.map((month) => (
-                  <div
-                    key={month.value}
-                    className={`p-2 text-sm cursor-pointer hover:bg-[#D45B20]/10 ${
-                      selectedMonth === month.value
-                        ? "bg-[#D45B20]/20 text-[#D45B20] font-medium"
-                        : "text-[rgba(68,63,63)]"
-                    }`}
-                    onClick={() => handleSelection(month.value, selectedYear)}
-                  >
-                    {month.name}
-                  </div>
-                ))}
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       )}

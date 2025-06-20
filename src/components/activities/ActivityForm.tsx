@@ -65,6 +65,27 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
+  const handleInvalidInput = (
+    e: React.FormEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    const target = e.currentTarget;
+    if (target.validity.valueMissing) {
+      target.setCustomValidity("Este campo es obligatorio.");
+    } else {
+      target.setCustomValidity("");
+    }
+  };
+
+  const handleInputChange = (
+    e: React.FormEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    e.currentTarget.setCustomValidity("");
+  };
+
   useEffect(() => {
     if (activity.location && activity.location !== locationInput) {
       setLocationInput(activity.location);
@@ -297,17 +318,20 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
 
     const imageFiles: File[] = [];
     const videoFiles: File[] = [];
-
     for (const file of newFiles) {
       if (ALLOWED_IMAGE_TYPES.includes(file.type)) {
-        if (file.size > 10 * 1024 * 1024) {
-          setUploadError(`La imagen ${file.name} excede el límite de 10MB`);
+        if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+          setUploadError(
+            `La imagen ${file.name} excede el límite de ${MAX_FILE_SIZE_MB}MB`
+          );
           return;
         }
         imageFiles.push(file);
       } else if (ALLOWED_VIDEO_TYPES.includes(file.type)) {
-        if (file.size > 15 * 1024 * 1024) {
-          setUploadError(`El video ${file.name} excede el límite de 15MB`);
+        if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+          setUploadError(
+            `El video ${file.name} excede el límite de ${MAX_FILE_SIZE_MB}MB`
+          );
           return;
         }
         videoFiles.push(file);
@@ -521,13 +545,15 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
       <div>
         <label className="block text-sm font-sm text-[rgba(68,63,63)] mb-2">
           Título de la Actividad <RequiredIndicator />
-        </label>
+        </label>{" "}
         <input
           placeholder="Nombre de la Actividad"
           type="text"
           name="title"
           value={activity.title || ""}
           onChange={onChange}
+          onInvalid={handleInvalidInput}
+          onInput={handleInputChange}
           className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
           required
         />
@@ -622,11 +648,14 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
           Ubicación <RequiredIndicator />
         </label>
         <div className="relative" ref={locationRef}>
+          {" "}
           <input
             type="text"
             name="location"
             value={locationInput}
             onChange={handleLocationChange}
+            onInvalid={handleInvalidInput}
+            onInput={handleInputChange}
             placeholder="Comienza a escribir para buscar ubicaciones (por ejemplo, Valle del Tiétar, Sierra de Gredos...)"
             className={`w-full px-4 py-2 text-[rgba(142,133,129)] border rounded-lg text-sm focus:outline-none focus:ring-1 ${
               locationError && !isValidLocation
@@ -764,6 +793,8 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
             name="phone"
             value={activity.phone || ""}
             onChange={handlePhoneChange}
+            onInvalid={handleInvalidInput}
+            onInput={handleInputChange}
             placeholder="Número de teléfono"
             className={`w-full px-4 py-2 text-[rgba(142,133,129)] border rounded-lg text-sm focus:outline-none focus:ring-1 ${
               phoneError
@@ -774,22 +805,26 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
           />
           {phoneError && (
             <p className="mt-1 text-sm text-red-600">{phoneError}</p>
-          )}
+          )}{" "}
           <input
             type="email"
             name="email"
             value={activity.email || ""}
             onChange={onChange}
+            onInvalid={handleInvalidInput}
+            onInput={handleInputChange}
             placeholder="Dirección de correo electrónico"
             className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
             required={!activity.phone && !activity.url}
-          />
+          />{" "}
           <input
             placeholder="Enlace a página web"
             type="text"
             name="url"
             value={activity.url || ""}
             onChange={handleUrlChange}
+            onInvalid={handleInvalidInput}
+            onInput={handleInputChange}
             className={`w-full px-4 py-2 text-[rgba(142,133,129)] border rounded-lg text-sm focus:outline-none focus:ring-1 ${
               urlError
                 ? "border-red-500 focus:ring-red-500 focus:border-red-500"
@@ -809,7 +844,9 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
           name="notes"
           value={activity.notes || ""}
           onChange={onChange}
-          placeholder="Ej. Actividad gratuita, 5€ por persona (incluye comida y materiales)"
+          onInvalid={handleInvalidInput}
+          onInput={handleInputChange}
+          placeholder="Ej. Actividad gratuita, 5€ por persona (incluye comida y materiales)"
           rows={3}
           required
           className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
@@ -823,7 +860,9 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
           name="description"
           value={activity.description || ""}
           onChange={onChange}
-          placeholder="Comparte más detalles sobre la actividad y cómo contactar contigo"
+          onInvalid={handleInvalidInput}
+          onInput={handleInputChange}
+          placeholder="Comparte más detalles sobre la actividad y cómo contactar contigo"
           rows={3}
           maxLength={1000}
           className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20]"
@@ -968,7 +1007,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
               {uploadError ? (
                 <span className="text-red-500">{uploadError}</span>
               ) : (
-                `Images: ${currentImageCount}/${MAX_IMAGES} | Videos: ${currentVideoCount}/${MAX_VIDEOS} | Max ${MAX_FILE_SIZE_MB}MB each`
+                `Imágenes: ${currentImageCount}/${MAX_IMAGES} | Vídeos: ${currentVideoCount}/${MAX_VIDEOS} | Máx. ${MAX_FILE_SIZE_MB}MB cada uno`
               )}
             </p>
             <p className="text-xs text-[#6B7280] mt-1">

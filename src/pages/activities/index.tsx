@@ -162,13 +162,13 @@ const ActivitiesPage: React.FC = () => {
 
     setSelectedActivity(duplicatedActivity);
     setIsModalOpen(true);
-  };
-  const handleSubmit = async (e: React.FormEvent) => {
+  };  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedActivity) return;
 
     setIsSubmitting(true);
     try {
+      let result;
       if (selectedActivity.id) {
         const updateData = {
           ...selectedActivity,
@@ -179,7 +179,7 @@ const ActivitiesPage: React.FC = () => {
           mediaUrls: selectedActivity.mediaUrls || [],
         };
 
-        await updateActivity(updateData);
+        result = await updateActivity(updateData);
       } else {
         const createData = {
           ...selectedActivity,
@@ -188,11 +188,13 @@ const ActivitiesPage: React.FC = () => {
           mediaUrls: selectedActivity.mediaUrls || [],
         };
 
-        await createActivity(createData);
+        result = await createActivity(createData);
       }
 
-      setIsModalOpen(false);
-      setSelectedActivity(null);
+      if (result) {
+        setIsModalOpen(false);
+        setSelectedActivity(null);
+      }
     } catch (err) {
       console.error("Error saving activity:", err);
       showToast(
