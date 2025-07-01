@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
 import { Event } from "../../types/event";
 import { createEventUrl } from "../../utils/urlHelpers";
+import { convertDateToSpanish } from "../../utils/dateHelpers";
 
 interface EventRowProps {
   event: Event;
@@ -41,33 +42,33 @@ export const EventRow: React.FC<EventRowProps> = ({
     e.stopPropagation();
     setShowCategoryPopup(!showCategoryPopup);
   };
-  function formatDate(dateString: string): string {
-    const options: Intl.DateTimeFormatOptions = {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    };
-    const date = new Date(dateString);
+  // function formatDate(dateString: string): string {
+  //   const options: Intl.DateTimeFormatOptions = {
+  //     year: "numeric",
+  //     month: "long",
+  //     day: "numeric",
+  //   };
+  //   const date = new Date(dateString);
 
-    const day: number = date.getDate();
-    const suffix: string = ((day: number): string => {
-      if (day > 3 && day < 21) return "th";
-      switch (day % 10) {
-        case 1:
-          return "st";
-        case 2:
-          return "nd";
-        case 3:
-          return "rd";
-        default:
-          return "th";
-      }
-    })(day);
+  //   const day: number = date.getDate();
+  //   const suffix: string = ((day: number): string => {
+  //     if (day > 3 && day < 21) return "th";
+  //     switch (day % 10) {
+  //       case 1:
+  //         return "st";
+  //       case 2:
+  //         return "nd";
+  //       case 3:
+  //         return "rd";
+  //       default:
+  //         return "th";
+  //     }
+  //   })(day);
 
-    return `${day}${suffix} ${
-      date.toLocaleString("en-US", options).split(" ")[0]
-    }, ${date.getFullYear()}`;
-  }
+  //   return `${day}${suffix} ${
+  //     date.toLocaleString("en-US", options).split(" ")[0]
+  //   }, ${date.getFullYear()}`;
+  // }
 
   function formatTime(timeString: string): string {
     const [hours, minutes] = timeString.split(":").map(Number);
@@ -86,6 +87,14 @@ export const EventRow: React.FC<EventRowProps> = ({
   //   categories.length > 1
   //     ? `${categories[0]} + ${categories.length - 1} more`
   //     : categories[0] || event.category || "";
+
+  console.log("event.eventDate::: ", event.eventDate);
+  const eventDate = new Date(event.eventDate);
+  const formattedDate = eventDate.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 
   return (
     <tr className="border-b border-[#F3F4F6] hover:bg-[#F9FAFB]">
@@ -107,7 +116,7 @@ export const EventRow: React.FC<EventRowProps> = ({
         </a>
       </td>
       <td className="py-4 px-6 whitespace-nowrap text-sm text-[rgba(68,63,63)]">
-        {formatDate(event.eventDate)}
+        {convertDateToSpanish(formattedDate)}
       </td>
       <td className="py-4 px-6 whitespace-nowrap text-sm text-[rgba(68,63,63)]">
         {formatTime(event.eventTime)}

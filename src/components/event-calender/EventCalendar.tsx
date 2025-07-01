@@ -12,6 +12,7 @@ import {
   isSameDay,
   isToday,
 } from "date-fns";
+import { es } from "date-fns/locale";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/utils/utils";
 
@@ -27,6 +28,7 @@ interface EventCalendarProps {
   onDateSelect: (date: Date) => void;
   selectedDate?: Date;
   checkDateHasEvent?: (date: Date) => boolean;
+  onCalendarMount?: () => void;
 }
 
 const EventCalendar: React.FC<EventCalendarProps> = ({
@@ -34,8 +36,15 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
   onDateSelect,
   selectedDate,
   checkDateHasEvent,
+  onCalendarMount,
 }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
+
+  React.useEffect(() => {
+    if (onCalendarMount) {
+      onCalendarMount();
+    }
+  }, [onCalendarMount]);
 
   const prevMonth = () => {
     setCurrentMonth(subMonths(currentMonth, 1));
@@ -54,7 +63,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
           <ChevronLeft className="h-5 w-5 lg:h-6 lg:w-6 text-[rgba(68,63,63)]" />
         </button>
         <h2 className="text-lg lg:text-xl font-semibold text-[rgba(68,63,63)]">
-          {format(currentMonth, "MMMM yyyy")}
+          {format(currentMonth, "MMMM yyyy", { locale: es })}
         </h2>
         <button
           onClick={nextMonth}
@@ -66,7 +75,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
     );
   };
   const renderDays = () => {
-    const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    const days = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
     return (
       <div className="flex w-full">
         {days.map((day, i) => (
@@ -101,28 +110,39 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
         const isCurrentDay = isToday(day);
         const isSelected = selectedDate && isSameDay(day, selectedDate);
         const isCurrentMonth = isSameMonth(day, monthStart);
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const dayDate = new Date(cloneDay);
+        dayDate.setHours(0, 0, 0, 0);
+        const isPastDate = dayDate < today;
 
         days.push(
           <div
             key={day.toString()}
             className={cn(
-              "m-[0.5px] relative flex-1 min-h-[60px] lg:min-h-[80px] flex items-center justify-center cursor-pointer  hover:bg-gray-50 transition-colors duration-200",
+              "m-[0.5px] relative flex-1 min-h-[60px] lg:min-h-[80px] flex items-center justify-center transition-colors duration-200 cursor-pointer",
               !isCurrentMonth ? "text-gray-300" : "",
+              isPastDate ? "text-gray-400 opacity-75 hover:bg-gray-50" : "hover:bg-gray-50",
               isSelected
                 ? "bg-[rgba(168,193,135)] text-white hover:bg-[rgba(148,173,115)]"
                 : "",
-              hasEvents && !isSelected
+              !isSelected && hasEvents && !isPastDate
                 ? "bg-[rgba(229,114,0)] text-white hover:bg-[rgba(209,94,0)]"
                 : "",
-              !isSelected && isCurrentMonth && !hasEvents
+              !isSelected && hasEvents && isPastDate
+                ? "bg-[rgba(229,114,0,0.6)] text-white hover:bg-[rgba(209,94,0,0.6)]"
+                : "",
+              !isSelected && isCurrentMonth && !hasEvents && !isPastDate
                 ? "text-[rgba(100,92,90)] hover:bg-gray-50"
                 : "",
-              hasEvents && isSelected
-                ? "bg-[rgba(168,193,135)] text-white"
+              !isSelected && isCurrentMonth && !hasEvents && isPastDate
+                ? "text-gray-400 hover:bg-gray-50"
                 : "",
               isCurrentDay && !isSelected ? "font-bold" : ""
             )}
             onClick={() => isCurrentMonth && onDateSelect(cloneDay)}
+            title={isPastDate ? "Evento pasado - Haz clic para filtrar" : hasEvents ? "Evento disponible" : "Sin eventos"}
           >
             <span className="text-sm lg:text-base font-medium">
               {dateFormatted}

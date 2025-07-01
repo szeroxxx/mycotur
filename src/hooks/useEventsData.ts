@@ -21,6 +21,7 @@ interface RawEventData {
 
 export const useEventsData = () => {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [allEvents, setAllEvents] = useState<CalendarEvent[]>([]); // Store all events including past ones
   const [filteredEvents, setFilteredEvents] = useState<CalendarEvent[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [isDateFilterActive, setIsDateFilterActive] = useState<boolean>(false);
@@ -30,6 +31,7 @@ export const useEventsData = () => {
     location: "Ubicación",
     category: "Categoría del evento",
   });
+
   const mapEventsData = (data: RawEventData[]): CalendarEvent[] => {
     return data.map((item) => ({
       uuid: item.uuid,
@@ -49,40 +51,87 @@ export const useEventsData = () => {
     }));
   };
 
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        setLoading(true);
-        const URL = process.env.NEXTAUTH_BACKEND_URL;
-        const response = await axiosInstance.get(`${URL}/api/visitor/event`);
-        if (response.data && Array.isArray(response.data.data)) {
-          const mappedEvents = mapEventsData(response.data.data);
+  const fetchEvents = async (
+    filterDate?: string,
+    includePastEvents: boolean = false
+  ) => {
+    try {
+      setLoading(true);
+      const URL = process.env.NEXTAUTH_BACKEND_URL;
+      let apiUrl = `${URL}/api/visitor/event`;
+
+      const params = new URLSearchParams();
+
+      if (filterDate) {
+        params.append("date", filterDate);
+      }
+
+      if (includePastEvents) {
+        params.append("includePastEvents", "true");
+      }
+
+      if (params.toString()) {
+        apiUrl += `?${params.toString()}`;
+      }
+
+      const response = await axiosInstance.get(apiUrl);
+      if (response.data && Array.isArray(response.data.data)) {
+        const mappedEvents = mapEventsData(response.data.data);
+
+        if (filterDate) {
+          setFilteredEvents(mappedEvents);
+          setIsDateFilterActive(true);
+        } else {
           setEvents(mappedEvents);
           setFilteredEvents(mappedEvents);
-        }
-        setLoading(false);
-      } catch (err) {
-        console.log("err::: ", err);
-        setError("Failed to load events");
-        setLoading(false);
-      }
-    };
 
+          if (includePastEvents) {
+            setAllEvents(mappedEvents);
+          }
+        }
+      }
+      setLoading(false);
+    } catch (err) {
+      console.log("err::: ", err);
+      setError("Failed to load events");
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchEvents();
-  }, []);  const filterEvents = (date?: Date, location?: string, category?: string) => {
+  }, []);
+  const filterEvents = async (
+    date?: Date,
+    location?: string,
+    category?: string
+  ) => {
     const newLocation = location || filters.location;
     const newCategory = category || filters.category;
-
 
     setFilters({
       location: newLocation,
       category: newCategory,
     });
 
-    let filtered = [...events];    if (date) {
+    if (date) {
       setSelectedDate(date);
       setIsDateFilterActive(true);
-      filtered = filtered.filter((event) => {
+
+      const formattedDate = date.toISOString().split("T")[0];
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const selectedDate = new Date(date);
+      selectedDate.setHours(0, 0, 0, 0);
+      const isPastDate = selectedDate < today;
+
+      if (isPastDate && allEvents.length === 0) {
+        await fetchEvents(undefined, true);
+      }
+
+      const eventsToSearch = isPastDate ? allEvents : events;
+      const localEvents = eventsToSearch.filter((event) => {
         const eventDate = new Date(event.date);
         return (
           eventDate.getFullYear() === date.getFullYear() &&
@@ -90,72 +139,71 @@ export const useEventsData = () => {
           eventDate.getDate() === date.getDate()
         );
       });
+
+      if (localEvents.length > 0) {
+        let filtered = localEvents;
+
+        if (newCategory !== "Categoría del evento") {
+          filtered = filtered.filter((event) => {
+            const categoryMatch =
+              event.category?.toLowerCase() === newCategory.toLowerCase();
+            const categoriesMatch = event.categories?.some(
+              (cat) => cat?.toLowerCase() === newCategory.toLowerCase()
+            );
+            return categoryMatch || categoriesMatch;
+          });
+        }
+
+        setFilteredEvents(filtered);
+        return filtered;
+      } else {
+        await fetchEvents(formattedDate);
+        return;
+      }
     } else {
       setIsDateFilterActive(false);
-    }
 
-    // if (newLocation !== "Ubicación") {
-    //   let locationFiltered = [...events];
-    //   if (date) {
-    //     locationFiltered = locationFiltered.filter((event) => {
-    //       const eventDate = new Date(event.date);
-    //       return (
-    //         eventDate.getFullYear() === date.getFullYear() &&
-    //         eventDate.getMonth() === date.getMonth() &&
-    //         eventDate.getDate() === date.getDate()
-    //       );
-    //     });
-    //   }
-      
-    //   filtered = locationFiltered.filter((event) =>
-    //     event.location.toLowerCase().includes(newLocation.toLowerCase())
-    //   );
-    // }
+      let filtered = [...events];
 
-    if (newCategory !== "Categoría del evento") {
-      let categoryFiltered = [...events];
-        if (date) {
-        categoryFiltered = categoryFiltered.filter((event) => {
-          const eventDate = new Date(event.date);
-          return (
-            eventDate.getFullYear() === date.getFullYear() &&
-            eventDate.getMonth() === date.getMonth() &&
-            eventDate.getDate() === date.getDate()
+      if (newCategory !== "Categoría del evento") {
+        filtered = filtered.filter((event) => {
+          const categoryMatch =
+            event.category?.toLowerCase() === newCategory.toLowerCase();
+          const categoriesMatch = event.categories?.some(
+            (cat) => cat?.toLowerCase() === newCategory.toLowerCase()
           );
+          return categoryMatch || categoriesMatch;
         });
       }
-      
-      // if (newLocation !== "Ubicación") {
-      //   categoryFiltered = categoryFiltered.filter((event) =>
-      //     event.location.toLowerCase().includes(newLocation.toLowerCase())
-      //   );
-      // }
-      
-      
-      filtered = categoryFiltered.filter((event) => {
-        const categoryMatch = event.category?.toLowerCase() === newCategory.toLowerCase();
-        const categoriesMatch = event.categories?.some(
-          (cat) => cat?.toLowerCase() === newCategory.toLowerCase()
-        );
-        return categoryMatch || categoriesMatch;
-      });
-    }
 
-    setFilteredEvents(filtered);
-    return filtered;
+      setFilteredEvents(filtered);
+      return filtered;
+    }
   };
-  const clearAllFilters = () => {
+  const clearAllFilters = async () => {
     setIsDateFilterActive(false);
     setFilters({
       location: "Ubicación",
       category: "Categoría del evento",
     });
-    setFilteredEvents(events);
-    return events;
+    await fetchEvents();
+  };
+
+  const loadAllEventsForCalendar = async () => {
+    if (allEvents.length === 0) {
+      await fetchEvents(undefined, true);
+    }
   };
 
   const dateHasEvent = (date: Date) => {
-    return events.some((event) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const checkDate = new Date(date);
+    checkDate.setHours(0, 0, 0, 0);
+
+    const eventsToCheck = checkDate < today ? allEvents : events;
+
+    return eventsToCheck.some((event) => {
       const eventDate = new Date(event.date);
       return (
         eventDate.getFullYear() === date.getFullYear() &&
@@ -163,7 +211,8 @@ export const useEventsData = () => {
         eventDate.getDate() === date.getDate()
       );
     });
-  };  return {
+  };
+  return {
     events,
     filteredEvents,
     selectedDate,
@@ -173,5 +222,6 @@ export const useEventsData = () => {
     filterEvents,
     clearAllFilters,
     dateHasEvent,
+    loadAllEventsForCalendar,
   };
 };

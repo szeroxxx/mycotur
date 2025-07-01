@@ -238,9 +238,10 @@ export const useEvents = () => {
           }
         }
 
-        // Only append activityId if it exists (not null for standalone events)
         if (event.activityId) {
           formData.append("activityId", event.activityId.toString());
+        } else {
+          formData.append("activityId", "");
         }
 
         formData.append("title", event.event);
@@ -403,6 +404,8 @@ export const useEvents = () => {
 
         if (event.activityId) {
           formData.append("activityId", event.activityId.toString());
+        } else {
+          formData.append("activityId", "");
         }
 
         formData.append("title", event.event);

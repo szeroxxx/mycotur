@@ -30,6 +30,8 @@ interface EventSearchBarProps {
   categoryFilter: string;
   onFilterChange: (type: "location" | "category", value: string) => void;
   onSearch?: () => void;
+  onClearAllFilters?: () => void;
+  isDateFilterActive?: boolean;
   className?: string;
   variant?: "compact" | "full";
 }
@@ -39,6 +41,8 @@ const EventSearchBar: React.FC<EventSearchBarProps> = ({
   categoryFilter,
   onFilterChange,
   // onSearch,
+  onClearAllFilters,
+  isDateFilterActive = false,
   className = "",
   variant = "full",
 }) => {
@@ -66,10 +70,8 @@ const EventSearchBar: React.FC<EventSearchBarProps> = ({
   // );
 
   const hasActiveFilters = useMemo(() => {
-    return (
-      categoryFilter !== "Categoría del evento" // locationFilter !== "Ubicación" || 
-    );
-  }, [categoryFilter]); // locationFilter, categoryFilter
+    return categoryFilter !== "Categoría del evento" || isDateFilterActive;
+  }, [categoryFilter, isDateFilterActive]);
 
   const handleFilterChange = (
     type: "location" | "category",
@@ -77,13 +79,16 @@ const EventSearchBar: React.FC<EventSearchBarProps> = ({
   ): void => {
     onFilterChange(type, value);
   };
-    const handleClearFilters = (): void => {
-    // onFilterChange("location", "Ubicación");
-    onFilterChange("category", "Categoría del evento");
+  const handleClearFilters = (): void => {
+    if (onClearAllFilters) {
+      onClearAllFilters();
+    } else {
+      onFilterChange("category", "Categoría del evento");
+    }
   };
 
-  const isLoading = categoriesLoading; // || locationsLoading;
-  const error = categoriesError; // || locationsError;
+  const isLoading = categoriesLoading;
+  const error = categoriesError;
 
   if (isLoading) {
     return (
@@ -118,7 +123,7 @@ const EventSearchBar: React.FC<EventSearchBarProps> = ({
             ))}
           </select>
         </div> */}
-        
+
         <div className={variant === "compact" ? "flex-1 min-w-0" : "w-36"}>
           <select
             value={categoryFilter}

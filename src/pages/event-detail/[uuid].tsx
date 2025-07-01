@@ -222,7 +222,7 @@ const EventDetailPage: React.FC = () => {
                       className="text-lg font-semibold mb-4 leading-tight"
                       style={{ color: "rgba(68, 63, 63, 1)" }}
                     >
-                      Este evento ya acabó Contacta al organizador para realizar
+                      Este evento ya acabó, Contacta al organizador para realizar
                       esta actividad cuando mejor te venga
                     </h3>
                     <Button
@@ -259,7 +259,7 @@ const EventDetailPage: React.FC = () => {
                     className="text-lg font-semibold mb-4 leading-tight"
                     style={{ color: "rgba(68, 63, 63, 1)" }}
                   >
-                    Este evento ya acabó Contacta al organizador para realizar
+                    Este evento ya acabó, Contacta al organizador para realizar
                     esta actividad cuando mejor te venga
                   </h3>
                   <Button

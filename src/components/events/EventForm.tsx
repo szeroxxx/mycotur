@@ -10,6 +10,7 @@ import {
 } from "../../utils/googlePlacesService";
 import { validateSpanishPhoneNumber } from "../../utils/phoneValidation";
 import { validateUrl } from "../../utils/urlValidation";
+import SpanishDatePicker from "../ui/SpanishDatePicker";
 
 const MAX_FILE_SIZE_MB = 15;
 const MAX_VIDEO_SIZE_MB = 15;
@@ -76,7 +77,9 @@ export const EventForm: React.FC<EventFormProps> = ({
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isStandaloneEvent, setIsStandaloneEvent] = useState<boolean>(
-    Boolean(event.id && (!event.activityId || event.activityId === ""))
+    Boolean(
+      !event.activityId || event.activityId === "" || event.activityId === null
+    )
   );
   const [autoFillActivityId, setAutoFillActivityId] = useState<string>("");
   const handleInvalidInput = (
@@ -113,12 +116,14 @@ export const EventForm: React.FC<EventFormProps> = ({
     setSelectedCategories(eventCategories);
   }, [event.categories, event.category]);
   useEffect(() => {
-    if (event.id) {
-      setIsStandaloneEvent(
-        Boolean(!event.activityId || event.activityId === "")
-      );
-    }
-  }, [event.id]);
+    setIsStandaloneEvent(
+      Boolean(
+        !event.activityId ||
+          event.activityId === "" ||
+          event.activityId === null
+      )
+    );
+  }, [event.activityId, event.id]);
 
   const handleCategoryChange = (categoryTitle: string) => {
     const updatedCategories = selectedCategories.includes(categoryTitle)
@@ -200,7 +205,8 @@ export const EventForm: React.FC<EventFormProps> = ({
             value: selectedActivity.url,
           },
         } as React.ChangeEvent<HTMLSelectElement>);
-      }      if (selectedActivity.notes) {
+      }
+      if (selectedActivity.notes) {
         onChange({
           ...e,
           target: {
@@ -829,29 +835,24 @@ export const EventForm: React.FC<EventFormProps> = ({
             Fecha del Evento <RequiredIndicator />
           </label>
           <div className="relative">
-            {" "}
-            <input
-              type="date"
+            <SpanishDatePicker
               name="eventDate"
               value={
                 event.eventDate
                   ? new Date(event.eventDate).toISOString().split("T")[0]
                   : ""
               }
-              onChange={onChange}
-              onInvalid={handleInvalidInput}
-              onInput={handleInputChange}
-              className="w-full px-4 py-2 text-[rgba(142,133,129)] border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#D45B20] focus:border-[#D45B20] cursor-pointer"
-              style={{
-                WebkitAppearance: "none",
-                MozAppearance: "textfield",
-                position: "relative",
-                background: "transparent",
-              }}
-              onClick={(e) => {
-                e.currentTarget.showPicker?.();
+              onChange={(value) => {
+                const dateEvent = {
+                  target: {
+                    name: "eventDate",
+                    value: value,
+                  },
+                } as React.ChangeEvent<HTMLInputElement>;
+                onChange(dateEvent);
               }}
               required
+              placeholder="Seleccionar fecha del evento"
             />
           </div>
         </div>

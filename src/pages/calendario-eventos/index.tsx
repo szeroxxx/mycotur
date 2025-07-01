@@ -19,6 +19,7 @@ const Index = () => {
     clearAllFilters,
     dateHasEvent,
     events,
+    loadAllEventsForCalendar,
   } = useEventsData();
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
   // const [locationFilter, setLocationFilter] = useState("Ubicación");
@@ -29,24 +30,29 @@ const Index = () => {
     title: event.title,
     hasEvent: true,
   }));
-  const handleDateSelect = (date: Date) => {
+  const handleDateSelect = async (date: Date) => {
     const isSameDate =
       selectedDate &&
       selectedDate.getFullYear() === date.getFullYear() &&
       selectedDate.getMonth() === date.getMonth() &&
       selectedDate.getDate() === date.getDate();
 
-    if (isSameDate) {
-      filterEvents(undefined, "Ubicación", categoryFilter);
+    if (isSameDate && isDateFilterActive) {
+      await filterEvents(undefined, "Ubicación", categoryFilter);
     } else {
-      filterEvents(date, "Ubicación", categoryFilter);
+      await filterEvents(date, "Ubicación", categoryFilter);
     }
   };
 
-  const handleSearch = () => {
-    filterEvents(selectedDate, "Ubicación", categoryFilter);
+  const handleSearch = async () => {
+    await filterEvents(selectedDate, "Ubicación", categoryFilter);
   };
-  const handleFilterChange = (type: "location" | "category", value: string) => {
+
+  const handleClearAllFilters = async () => {
+    setCategoryFilter("Categoría del evento");
+    await clearAllFilters();
+  };
+  const handleFilterChange = async (type: "location" | "category", value: string) => {
     // if (type === "location") {
     //   setLocationFilter(value);
 
@@ -62,10 +68,10 @@ const Index = () => {
     // } else {
     setCategoryFilter(value);
 
-    if (value === "Categoría del evento") {
-      clearAllFilters();
+    if (value === "Categoría del evento" && !isDateFilterActive) {
+      await clearAllFilters();
     } else {
-      filterEvents(
+      await filterEvents(
         isDateFilterActive ? selectedDate : undefined,
         "Ubicación",
         value
@@ -92,6 +98,8 @@ const Index = () => {
                 categoryFilter={categoryFilter}
                 onFilterChange={handleFilterChange}
                 onSearch={handleSearch}
+                onClearAllFilters={handleClearAllFilters}
+                isDateFilterActive={isDateFilterActive}
                 variant="compact"
               />
               <div className="space-y-4">
@@ -138,6 +146,7 @@ const Index = () => {
               onDateSelect={handleDateSelect}
               selectedDate={isDateFilterActive ? selectedDate : undefined}
               checkDateHasEvent={dateHasEvent}
+              onCalendarMount={loadAllEventsForCalendar}
             />
           </div>
         </div>
@@ -156,6 +165,7 @@ const Index = () => {
               onDateSelect={handleDateSelect}
               selectedDate={isDateFilterActive ? selectedDate : undefined}
               checkDateHasEvent={dateHasEvent}
+              onCalendarMount={loadAllEventsForCalendar}
             />
           </div>{" "}
           <div className="p-4 pb-2">
@@ -164,6 +174,8 @@ const Index = () => {
               categoryFilter={categoryFilter}
               onFilterChange={handleFilterChange}
               onSearch={handleSearch}
+              onClearAllFilters={handleClearAllFilters}
+              isDateFilterActive={isDateFilterActive}
               variant="compact"
             />
           </div>

@@ -1,6 +1,7 @@
 import React from "react";
 import { User, MapPin, Clock, CalendarDays } from "lucide-react";
 import { format } from "date-fns";
+import { es } from "date-fns/locale";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { createEventUrl } from "../../utils/urlHelpers";
@@ -114,7 +115,7 @@ const EventCard: React.FC<EventCardProps> = ({
           <div className="flex items-center text-[rgba(100,92,90)] text-xs sm:text-sm">
             <CalendarDays size={14} className="mr-2 flex-shrink-0" />
             <span className="font-medium">
-              {format(new Date(date), "MMM dd, yyyy")}
+              {format(new Date(date), "MMM dd", { locale: es })}
             </span>
             <Clock size={14} className="ml-3 mr-1 flex-shrink-0" />
             <span>{formattedTime}</span>
