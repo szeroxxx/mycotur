@@ -600,7 +600,7 @@ const ProfilePage: React.FC = () => {
                     />
                   ) : (
                     <p className="text-[rgb(68,63,63)] font-medium break-all sm:break-normal">
-                      {profileData.primaryMail || "Not provided"}
+                      {profileData.primaryMail || "-"}
                     </p>
                   )}
                 </div>
@@ -695,7 +695,7 @@ const ProfilePage: React.FC = () => {
                     </div>
                   ) : (
                     <p className="text-[rgb(68,63,63)] font-medium">
-                      {profileData.address || "Not provided"}
+                      {profileData.address || "-"}
                     </p>
                   )}
                 </div>
