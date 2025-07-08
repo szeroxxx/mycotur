@@ -595,7 +595,7 @@ const ProfilePage: React.FC = () => {
                           primaryMail: e.target.value,
                         }))
                       }
-                      placeholder="Ingrese su correo electrónico principal"
+                      placeholder="Correo electrónico público (visible por los usuarios)"
                       className="w-full p-2 text-[rgb(68,63,63)] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#D45B20] text-sm"
                     />
                   ) : (
