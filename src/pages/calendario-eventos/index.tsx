@@ -13,6 +13,7 @@ const Index = () => {
   const {
     filteredEvents,
     loading,
+    calendarLoading,
     selectedDate,
     isDateFilterActive,
     filterEvents,
@@ -20,6 +21,7 @@ const Index = () => {
     dateHasEvent,
     events,
     loadAllEventsForCalendar,
+    error,
   } = useEventsData();
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
   // const [locationFilter, setLocationFilter] = useState("Ubicación");
@@ -52,7 +54,10 @@ const Index = () => {
     setCategoryFilter("Categoría del evento");
     await clearAllFilters();
   };
-  const handleFilterChange = async (type: "location" | "category", value: string) => {
+  const handleFilterChange = async (
+    type: "location" | "category",
+    value: string
+  ) => {
     // if (type === "location") {
     //   setLocationFilter(value);
 
@@ -110,6 +115,18 @@ const Index = () => {
                       Cargando eventos...
                     </p>
                   </div>
+                ) : error ? (
+                  <div className="text-center py-12 bg-gradient-to-br from-red-50 to-red-100 rounded-2xl shadow-lg border border-red-200">
+                    <p className="text-red-600 text-lg mb-4">
+                      Error al cargar los eventos
+                    </p>
+                    <button
+                      onClick={() => window.location.reload()}
+                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                      Reintentar
+                    </button>
+                  </div>
                 ) : filteredEvents.length === 0 ? (
                   <div className="text-center py-12 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-[rgba(226,225,223,0.3)]">
                     <p className="text-[rgba(100,92,90)] text-lg">
@@ -140,7 +157,17 @@ const Index = () => {
         </div>
 
         <div className="w-2/3 sticky top-0 h-full">
-          <div className="h-full bg-white rounded-none shadow-sm flex flex-col">
+          <div className="h-full bg-white rounded-none shadow-sm flex flex-col relative">
+            {calendarLoading && (
+              <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
+                <div className="text-center">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[rgba(194,91,52)]"></div>
+                  <p className="mt-4 text-[rgba(100,92,90)]">
+                    Cargando calendario...
+                  </p>
+                </div>
+              </div>
+            )}
             <EventCalendar
               events={calendarEvents}
               onDateSelect={handleDateSelect}
@@ -159,7 +186,17 @@ const Index = () => {
         </div>
 
         <div className="flex-1 overflow-y-auto scrollbar-hide touch-scroll bg-gradient-to-b from-white to-gray-50">
-          <div className="h-[45vh] bg-white shadow-lg mx-4 mt-4 rounded-2xl overflow-hidden">
+          <div className="h-[45vh] bg-white shadow-lg mx-4 mt-4 rounded-2xl overflow-hidden relative">
+            {calendarLoading && (
+              <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
+                <div className="text-center">
+                  <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-[rgba(194,91,52)]"></div>
+                  <p className="mt-2 text-[rgba(100,92,90)] text-sm">
+                    Cargando calendario...
+                  </p>
+                </div>
+              </div>
+            )}
             <EventCalendar
               events={calendarEvents}
               onDateSelect={handleDateSelect}
@@ -186,6 +223,18 @@ const Index = () => {
                 <p className="mt-4 text-[rgba(100,92,90)]">
                   Cargando eventos...
                 </p>
+              </div>
+            ) : error ? (
+              <div className="text-center py-12 bg-gradient-to-br from-red-50 to-red-100 rounded-2xl shadow-lg border border-red-200">
+                <p className="text-red-600 text-base mb-4">
+                  Error al cargar los eventos
+                </p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                >
+                  Reintentar
+                </button>
               </div>
             ) : filteredEvents.length === 0 ? (
               <div className="text-center py-12 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-[rgba(226,225,223,0.3)]">

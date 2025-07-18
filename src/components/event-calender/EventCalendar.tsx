@@ -44,7 +44,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
     if (onCalendarMount) {
       onCalendarMount();
     }
-  }, [onCalendarMount]);
+  }, []);
 
   const prevMonth = () => {
     setCurrentMonth(subMonths(currentMonth, 1));

@@ -27,6 +27,8 @@ export const useEventsData = () => {
   const [isDateFilterActive, setIsDateFilterActive] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [calendarLoading, setCalendarLoading] = useState(false);
+  const [allEventsLoaded, setAllEventsLoaded] = useState(false);
   const [filters, setFilters] = useState({
     location: "Ubicación",
     category: "Categoría del evento",
@@ -56,7 +58,12 @@ export const useEventsData = () => {
     includePastEvents: boolean = false
   ) => {
     try {
-      setLoading(true);
+      if (includePastEvents) {
+        setCalendarLoading(true);
+      } else {
+        setLoading(true);
+      }
+
       const URL = process.env.NEXTAUTH_BACKEND_URL;
       let apiUrl = `${URL}/api/visitor/event`;
 
@@ -87,14 +94,48 @@ export const useEventsData = () => {
 
           if (includePastEvents) {
             setAllEvents(mappedEvents);
+            setAllEventsLoaded(true);
+          }
+        }
+      } else {
+        if (filterDate) {
+          setFilteredEvents([]);
+          setIsDateFilterActive(true);
+        } else {
+          setEvents([]);
+          setFilteredEvents([]);
+          if (includePastEvents) {
+            setAllEvents([]);
+            setAllEventsLoaded(true);
           }
         }
       }
-      setLoading(false);
+
+      if (includePastEvents) {
+        setCalendarLoading(false);
+      } else {
+        setLoading(false);
+      }
     } catch (err) {
       console.log("err::: ", err);
       setError("Failed to load events");
-      setLoading(false);
+      if (includePastEvents) {
+        setCalendarLoading(false);
+        setAllEventsLoaded(true);
+      } else {
+        setLoading(false);
+      }
+
+      if (filterDate) {
+        setFilteredEvents([]);
+        setIsDateFilterActive(true);
+      } else {
+        setEvents([]);
+        setFilteredEvents([]);
+        if (includePastEvents) {
+          setAllEvents([]);
+        }
+      }
     }
   };
 
@@ -126,10 +167,9 @@ export const useEventsData = () => {
       selectedDate.setHours(0, 0, 0, 0);
       const isPastDate = selectedDate < today;
 
-      if (isPastDate && allEvents.length === 0) {
+      if (isPastDate && !allEventsLoaded) {
         await fetchEvents(undefined, true);
       }
-
       const eventsToSearch = isPastDate ? allEvents : events;
       const localEvents = eventsToSearch.filter((event) => {
         const eventDate = new Date(event.date);
@@ -186,11 +226,12 @@ export const useEventsData = () => {
       location: "Ubicación",
       category: "Categoría del evento",
     });
+    setError(null); // Clear any previous errors
     await fetchEvents();
   };
 
   const loadAllEventsForCalendar = async () => {
-    if (allEvents.length === 0) {
+    if (!allEventsLoaded && !calendarLoading) {
       await fetchEvents(undefined, true);
     }
   };
@@ -218,6 +259,7 @@ export const useEventsData = () => {
     selectedDate,
     isDateFilterActive,
     loading,
+    calendarLoading,
     error,
     filterEvents,
     clearAllFilters,
