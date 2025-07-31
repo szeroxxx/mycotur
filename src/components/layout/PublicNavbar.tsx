@@ -47,7 +47,7 @@ const PublicNavbar = () => {
               {/* Logo */}
               <div className="flex-shrink-0">
                 <button 
-                  onClick={() => handleExternalLink("https://mycotour.webflow.io/")}
+                  onClick={() => handleExternalLink("https://avilamycotour.es/")}
                   className="flex items-center cursor-pointer"
                 >
                   <Image
