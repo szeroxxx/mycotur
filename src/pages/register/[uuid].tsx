@@ -26,22 +26,41 @@ const RegisterPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const URL = process.env.NEXTAUTH_BACKEND_URL;
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (!uuid) return;      try {
-        const response = await axiosInstance.get(`${URL}/api/user-info/${uuid}`);
+      if (!uuid) return;
+
+      try {
+        const response = await axiosInstance.get(
+          `${URL}/api/user-info/${uuid}`
+        );
         setUserData(response.data);
       } catch (err) {
-        if (axios.isAxiosError(err) && err.response?.status === 400) {
-          setError("User not found");
+        if (axios.isAxiosError(err)) {
+          if (err.response?.status === 400) {
+            setError("Usuario no encontrado");
+          } else if (err.response?.status === 410) {
+            // Handle expired link
+            const errorMessage =
+              err.response?.data?.error ||
+              "Este enlace de invitación ha expirado";
+            setError(errorMessage);
+          } else {
+            console.error("Error fetching user data:", err);
+            setError(
+              "Error al cargar la información del usuario. Por favor, inténtalo de nuevo."
+            );
+          }
         } else {
           console.error("Error fetching user data:", err);
-          setError("Failed to load user information. Please try again.");
+          setError(
+            "Error al cargar la información del usuario. Por favor, inténtalo de nuevo."
+          );
         }
-   
       } finally {
         setIsLoading(false);
       }
@@ -55,14 +74,22 @@ const RegisterPage: React.FC = () => {
     setError("");
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setError("Las contraseñas no coinciden");
       return;
     }
 
     if (password.length < 8) {
-      setError("Password must be at least 8 characters long");
+      setError("La contraseña debe tener al menos 8 caracteres");
       return;
-    }    try {
+    }
+
+    if (!userData) {
+      setError(
+        "Datos de usuario no disponibles. Por favor, recarga la página."
+      );
+      return;
+    }
+    try {
       const response = await axiosInstance.put(
         `${URL}/api/reset-password/${uuid}`,
         {
@@ -77,18 +104,110 @@ const RegisterPage: React.FC = () => {
       );
 
       if (response.data.message === "Password reset successfully") {
-        router.push("/login");
+        router.push("/login?registered=true");
       }
     } catch (err) {
       console.error("Error resetting password:", err);
-      setError("Failed to reset password. Please try again.");
+      if (axios.isAxiosError(err)) {
+        if (err.response?.status === 410) {
+          setError("Este enlace ya ha sido utilizado anteriormente.");
+        } else if (err.response?.status === 400) {
+          setError("Enlace de restablecimiento inválido o expirado.");
+        } else {
+          setError(
+            "Error al restablecer la contraseña. Por favor, inténtalo de nuevo."
+          );
+        }
+      } else {
+        setError(
+          "Error al restablecer la contraseña. Por favor, inténtalo de nuevo."
+        );
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[rgba(255,255,255)] flex items-center justify-center">
-        Cargando...
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[rgb(194,91,52)] mx-auto mb-4"></div>
+          <p className="text-[rgb(68,63,63)]">Cargando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const isExpiredLink =
+    error.includes("expirado") ||
+    error.includes("expired") ||
+    error.includes("utilizado");
+
+  if (error && isExpiredLink) {
+    return (
+      <div className="min-h-screen bg-[rgba(255,255,255)] flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-[rgba(255,255,255)] rounded-lg border border-gray-200 shadow-md p-8 text-center">
+          <div className="text-yellow-500 text-6xl mb-6">⚠️</div>
+          <h2 className="text-xl font-semibold text-[rgb(68,63,63)] mb-4">
+            Enlace Expirado
+          </h2>
+          <p className="text-[rgb(142,133,129)] mb-6 text-sm leading-relaxed">
+            {error.includes("utilizado")
+              ? "Este enlace de invitación ya ha sido utilizado. Si ya tienes una cuenta, puedes iniciar sesión."
+              : "Este enlace de invitación ha expirado. Si ya tienes una cuenta, puedes iniciar sesión."}
+          </p>
+          <div className="space-y-3">
+            <button
+              onClick={() => router.push("/login")}
+              className="w-full bg-[rgb(194,91,52)] hover:bg-[rgb(174,81,42)] text-white font-medium py-2.5 px-4 rounded transition-colors"
+            >
+              Ir a Iniciar Sesión
+            </button>
+            <button
+              onClick={() => router.push("/")}
+              className="w-full border border-[rgb(194,91,52)] text-[rgb(194,91,52)] hover:bg-[rgb(194,91,52)] hover:text-white font-medium py-2.5 px-4 rounded transition-colors"
+            >
+              Volver al Inicio
+            </button>
+          </div>
+          <div className="mt-6 text-xs text-[rgb(142,133,129)]">
+            Si necesitas ayuda, contacta al administrador.
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error && !isExpiredLink) {
+    return (
+      <div className="min-h-screen bg-[rgba(255,255,255)] flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-[rgba(255,255,255)] rounded-lg border border-gray-200 shadow-md p-8 text-center">
+          <div className="text-red-500 text-6xl mb-6">❌</div>
+          <h2 className="text-xl font-semibold text-[rgb(68,63,63)] mb-4">
+            Error
+          </h2>
+          <p className="text-[rgb(142,133,129)] mb-6 text-sm leading-relaxed">
+            {error}
+          </p>
+          <div className="space-y-3">
+            <button
+              onClick={() => window.location.reload()}
+              className="w-full bg-[rgb(194,91,52)] hover:bg-[rgb(174,81,42)] text-white font-medium py-2.5 px-4 rounded transition-colors"
+            >
+              Reintentar
+            </button>
+            <button
+              onClick={() => router.push("/")}
+              className="w-full border border-[rgb(194,91,52)] text-[rgb(194,91,52)] hover:bg-[rgb(194,91,52)] hover:text-white font-medium py-2.5 px-4 rounded transition-colors"
+            >
+              Volver al Inicio
+            </button>
+          </div>
+          <div className="mt-6 text-xs text-[rgb(142,133,129)]">
+            Si el problema persiste, contacta al administrador.
+          </div>
+        </div>
       </div>
     );
   }
@@ -189,9 +308,17 @@ const RegisterPage: React.FC = () => {
 
               <button
                 type="submit"
-                className="w-full bg-[rgb(194,91,52)] hover:bg-[rgb(174,81,42)] text-white font-medium py-2.5 px-4 rounded transition-colors"
+                disabled={isSubmitting}
+                className="w-full bg-[rgb(194,91,52)] hover:bg-[rgb(174,81,42)] disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium py-2.5 px-4 rounded transition-colors"
               >
-                Crear cuenta
+                {isSubmitting ? (
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Creando cuenta...
+                  </div>
+                ) : (
+                  "Crear cuenta"
+                )}
               </button>
             </form>
           </div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { signIn } from "next-auth/react";
 import { FiEye, FiEyeOff, FiX } from "react-icons/fi";
@@ -12,6 +12,7 @@ const AgentLogin: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
   const {
@@ -19,6 +20,15 @@ const AgentLogin: React.FC = () => {
     toast,
     isLoading: isResetLoading,
   } = usePublicPasswordReset();
+
+  useEffect(() => {
+    // Check if user was redirected here after successful registration
+    if (router.query.registered === "true") {
+      setSuccessMessage("¡Cuenta creada exitosamente! Ahora puedes iniciar sesión.");
+      // Clear the query parameter
+      router.replace("/login", undefined, { shallow: true });
+    }
+  }, [router]);
 
   const handleInvalidInput = (e: React.FormEvent<HTMLInputElement>) => {
     const target = e.currentTarget;
@@ -87,6 +97,12 @@ const AgentLogin: React.FC = () => {
               <h2 className="text-xl font-semibold text-center text-[rgb(68,63,63)] mb-6">
                 ¡Bienvenido de nuevo!
               </h2>
+
+              {successMessage && (
+                <div className="mb-4 p-3 bg-green-100 text-green-800 rounded-md text-center text-sm border border-green-200">
+                  {successMessage}
+                </div>
+              )}
 
               {error && (
                 <div className="mb-4 p-2 bg-red-100 text-red-800 rounded-md text-center text-sm">
